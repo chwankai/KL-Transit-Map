@@ -26,11 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navSettings = document.getElementById('nav-settings');
     const settingsModal = document.getElementById('settings-modal');
     const closeSettings = document.getElementById('close-settings');
-    const dataSourceSelect = document.getElementById('data-source-select');
-    const fbConfigSection = document.getElementById('firebase-config-section');
-    const saveFbConfig = document.getElementById('save-firebase-config');
-    const btnPopulate = document.getElementById('btn-populate');
-    const fbStatus = document.getElementById('firebase-status');
     
     navSettings.addEventListener('click', () => {
         settingsModal.classList.add('active');
@@ -43,15 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (e) => {
         if (e.target === settingsModal) {
             settingsModal.classList.remove('active');
-        }
-    });
-
-    dataSourceSelect.addEventListener('change', () => {
-        if (dataSourceSelect.value === 'firebase') {
-            fbConfigSection.classList.remove('hidden');
-        } else {
-            fbConfigSection.classList.add('hidden');
-            disconnectFirebase();
         }
     });
 
@@ -173,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="exclude-line-badge" style="--line-color: ${line.color}">${line.id}</div>
                     <span>${line.name}</span>
                 </div>
-                <input type="checkbox" value="${line.id}" class="exclude-checkbox">
+                <input type="checkbox" value="${line.id}" class="exclude-checkbox" checked>
             `;
             
             item.addEventListener('click', (e) => {
@@ -254,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const excluded = [];
-        const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:checked');
+        const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:not(:checked)');
         checkboxes.forEach(cb => excluded.push(cb.value));
         
         const route = transitData.findRoute(origin, dest, excluded);
@@ -399,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="station-badge-list">${getStationBadgesHtml(lastStationNode)}</div>
                     </div>
                     <div class="timeline-desc">
-                        ${isLast ? 'Arrive at destination' : `Transfer point to ${getLineName(steps[index + 1].line)}`}
+                        ${isLast ? 'Arrive at destination' : `Transfer to ${getLineName(steps[index + 1].line)}`}
                     </div>
                 </div>
             `;
@@ -437,141 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
         list.classList.toggle('hidden');
     };
 
-    // 8. Firebase Connection and Syncer Logic
-    let db = null;
-
-    function disconnectFirebase() {
-        db = null;
-        fbStatus.className = 'db-status-badge offline';
-        fbStatus.innerText = 'Status: Offline (Local Mode)';
-        btnPopulate.disabled = true;
-        
-        // Revert to local memory graph
-        // (Just recreate local graph by default cache)
-        loadLocalStations();
-    }
-
-    function loadLocalStations() {
-        console.log("Using offline database graph cache.");
-    }
-
-    async function tryConnectFirebase(config) {
-        fbStatus.className = 'db-status-badge offline';
-        fbStatus.innerText = 'Connecting to Firestore... 🔄';
-        btnPopulate.disabled = true;
-        
-        try {
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(config);
-            }
-            db = firebase.firestore();
-            
-            // Ping database by fetching a document or collection
-            await db.collection("stations").limit(1).get();
-            
-            fbStatus.className = 'db-status-badge online';
-            fbStatus.innerText = 'Status: Connected to Firestore! ✅';
-            btnPopulate.disabled = false;
-            
-            // Load live station data
-            const success = await loadStationsFromFirebase();
-            if (success) {
-                console.log("Firestore sync completed successfully.");
-            } else {
-                console.log("Firestore empty or unreachable. Using local cache fallback.");
-            }
-            
-        } catch (e) {
-            console.error("Firebase connection error: ", e);
-            fbStatus.className = 'db-status-badge offline';
-            fbStatus.innerText = `Error: Connection Failed (${e.code || 'Check console'})`;
-            btnPopulate.disabled = true;
-        }
-    }
-
-    async function loadStationsFromFirebase() {
-        if (!db) return false;
-        try {
-            const snapshot = await db.collection("stations").get();
-            if (snapshot.empty) return false;
-            
-            const stations = {};
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                stations[data.name] = data;
-            });
-            
-            // Load into transitData runtime structure
-            transitData.stations = stations;
-            
-            // Re-populate autocomplete datasets
-            setupAutocomplete(originInput, originDropdown);
-            setupAutocomplete(destInput, destDropdown);
-            return true;
-        } catch (e) {
-            console.error("Error loading stations: ", e);
-            return false;
-        }
-    }
-
-    // 9. Firestore Database Populator
-    btnPopulate.addEventListener('click', async () => {
-        if (!db) return alert("Firebase not connected!");
-        
-        btnPopulate.disabled = true;
-        btnPopulate.innerHTML = 'Populating Firestore... ⏳';
-        
-        try {
-            // Delete all existing station documents to prevent duplicate or renamed duplicates (like Dang W)
-            const snapshot = await db.collection("stations").get();
-            if (!snapshot.empty) {
-                const deleteBatch = db.batch();
-                snapshot.forEach(doc => {
-                    deleteBatch.delete(doc.ref);
-                });
-                await deleteBatch.commit();
-            }
-
-            // Write new batch to Firestore
-            const batch = db.batch();
-            const stations = transitData.stations;
-            
-            for (const name in stations) {
-                const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                const docRef = db.collection("stations").doc(key);
-                batch.set(docRef, stations[name]);
-            }
-            
-            await batch.commit();
-            btnPopulate.innerHTML = 'Populated Successfully! ✅';
-            alert(`Firestore Populated! Uploaded ${Object.keys(stations).length} stations and connections.`);
-        } catch (e) {
-            console.error("Database populate error: ", e);
-            alert(`Failed to populate database: ${e.message}`);
-            btnPopulate.disabled = false;
-            btnPopulate.innerHTML = 'Populate Firestore Database ⚙️';
-        }
-    });
-
-    // Save and Persist Settings Config
-    saveFbConfig.addEventListener('click', () => {
-        const apiKey = document.getElementById('fb-apikey').value.trim();
-        const projectId = document.getElementById('fb-projectid').value.trim();
-        const authDomain = `${projectId}.firebaseapp.com`;
-        
-        if (!apiKey || !projectId) {
-            alert('Please specify both your Firebase API Key and Project ID.');
-            return;
-        }
-        
-        localStorage.setItem('transit_db_mode', 'firebase');
-        localStorage.setItem('transit_fb_apikey', apiKey);
-        localStorage.setItem('transit_fb_projectid', projectId);
-        localStorage.setItem('transit_fb_authdomain', authDomain);
-        
-        tryConnectFirebase({ apiKey, projectId, authDomain });
-    });
-
     // Theme Control Logic
     const themeSelect = document.getElementById('theme-select');
     
@@ -606,24 +457,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedTheme = localStorage.getItem('theme_preference') || 'system';
         themeSelect.value = savedTheme;
         applyTheme(savedTheme);
-
-        // Load database configuration
-        const mode = localStorage.getItem('transit_db_mode') || 'local';
-        dataSourceSelect.value = mode;
-        
-        const apiKey = localStorage.getItem('transit_fb_apikey') || '';
-        const projectId = localStorage.getItem('transit_fb_projectid') || '';
-        const authDomain = localStorage.getItem('transit_fb_authdomain') || '';
-        
-        document.getElementById('fb-apikey').value = apiKey;
-        document.getElementById('fb-projectid').value = projectId;
-        
-        if (mode === 'firebase') {
-            fbConfigSection.classList.remove('hidden');
-            if (apiKey && projectId) {
-                tryConnectFirebase({ apiKey, projectId, authDomain });
-            }
-        }
     }
     
     // Initialize Autocomplete fields

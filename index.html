@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.7">
+    <link rel="stylesheet" href="style.css?v=1.8">
 </head>
 <body>
     <div class="app-container">
@@ -112,6 +112,9 @@
                 </div>
             </div>
         </main>
+        <footer class="app-footer">
+            Developed by CK 2026. <a href="https://github.com/chwankai/KV_Transit_Map" target="_blank" rel="noopener noreferrer">Github</a>
+        </footer>
     </div>
     
     <!-- Settings Modal -->
@@ -130,53 +133,17 @@
                         <option value="system" selected>Follow System 🖥️</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="data-source-select">Database Mode</label>
-                    <select id="data-source-select" class="form-control">
-                        <option value="local">Local Mode (Offline Cache)</option>
-                        <option value="firebase">Firebase Firestore (Cloud Sync)</option>
-                    </select>
-                </div>
-                
-                <div id="firebase-config-section" class="hidden">
-                    <p class="config-help">Enter your Firebase web configuration details below:</p>
-                    <div class="form-group">
-                        <label for="fb-apikey">API Key</label>
-                        <input type="text" id="fb-apikey" class="form-control" placeholder="AIzaSy...">
-                    </div>
-                    <div class="form-group">
-                        <label for="fb-projectid">Project ID</label>
-                        <input type="text" id="fb-projectid" class="form-control" placeholder="my-transit-project">
-                    </div>
-                    <div class="form-group text-center">
-                        <button id="save-firebase-config" class="btn btn-primary">Connect & Save</button>
-                    </div>
-                </div>
-                
-                <div id="firebase-status" class="db-status-badge offline">
-                    Status: Offline (Local Mode)
-                </div>
-                
-                <div class="db-populator-section">
-                    <h3>Database Populator</h3>
-                    <p class="populator-help">Populating will write the complete Klang Valley station and connection graph (130+ stations) to your Firestore collection <code>stations</code>.</p>
-                    <button id="btn-populate" class="btn btn-secondary btn-block" disabled>Populate Firestore Database ⚙️</button>
-                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Firebase compatibility scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <!-- PDF.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     
     <!-- Route Database and Finder Logic -->
-    <script src="transit-data.js?v=1.7"></script>
+    <script src="transit-data.js?v=1.8"></script>
     
     <!-- Application Orchestrator -->
-    <script src="app.js?v=1.7"></script>
+    <script src="app.js?v=1.8"></script>
 </body>
 </html>

@@ -8,7 +8,8 @@
         "KG": { id: "KG", name: "MRT Kajang Line", color: "#1f8f4c" },
         "PY": { id: "PY", name: "MRT Putrajaya Line", color: "#FFD200" },
         "MR": { id: "MR", name: "KL Monorail Line", color: "#8dc63f" },
-        "BRT": { id: "BRT", name: "BRT Sunway Line", color: "#00422b" }
+        "BRT": { id: "BRT", name: "BRT Sunway Line", color: "#00422b" },
+        "SA": { id: "SA", name: "LRT Shah Alam Line", color: "#01abe4" }
     };
 
     // 2. Raw Line Stations Sequence
@@ -194,12 +195,36 @@
         { code: "SB7", name: "USJ 7" }
     ];
 
+    const SA_Line = [
+        { code: "SA01", name: "Bandar Utama" },
+        { code: "SA02", name: "Kayu Ara" },
+        { code: "SA03", name: "BU 11" },
+        { code: "SA05", name: "Damansara Idaman" },
+        { code: "SA06", name: "Subang" },
+        { code: "SA07", name: "Glenmarie 2" },
+        { code: "SA09", name: "Kerjaya" },
+        { code: "SA10", name: "Stadium Shah Alam" },
+        { code: "SA12", name: "Dato' Menteri" },
+        { code: "SA14", name: "UiTM Shah Alam" },
+        { code: "SA15", name: "Seksyen 7 Shah Alam" },
+        { code: "SA17", name: "Bandar Baru Klang" },
+        { code: "SA18", name: "Pasar Klang" },
+        { code: "SA19", name: "Jalan Meru" },
+        { code: "SA20", name: "Jambatan Kota" },
+        { code: "SA21", name: "Hospital Tengku Ampuan Rahimah" },
+        { code: "SA22", name: "Seri Andalas" },
+        { code: "SA23", name: "Klang Jaya" },
+        { code: "SA24", name: "Bandar Bukit Tinggi" },
+        { code: "SA26", name: "Johan Setia" }
+    ];
+
     // Explicit pedestrian interchange bridges between differently named stations
     const explicitTransfers = [
         { from: "Muzium Negara", to: "KL Sentral", line: "WALKWAY", distance: 1.0 },
         { from: "Bukit Nanas", to: "Dang Wangi", line: "WALKWAY", distance: 1.2 },
         { from: "Plaza Rakyat", to: "Merdeka", line: "WALKWAY", distance: 0.8 },
-        { from: "Medan Tuanku", to: "Sultan Ismail", line: "WALKWAY", distance: 0.6 }
+        { from: "Medan Tuanku", to: "Sultan Ismail", line: "WALKWAY", distance: 0.6 },
+        { from: "Glenmarie 2", to: "Glenmarie", line: "WALKWAY", distance: 0.5 }
     ];
 
     // 3. Compile Graph Programmatically
@@ -273,6 +298,7 @@
         PY_Line.forEach(s => registerStation(s, "PY"));
         MR_Line.forEach(s => registerStation(s, "MR"));
         BRT_Line.forEach(s => registerStation(s, "BRT"));
+        SA_Line.forEach(s => registerStation(s, "SA"));
 
         // Create adjacencies on lines
         connectStations(KJ_Line, "KJ");
@@ -284,6 +310,7 @@
         connectStations(PY_Line, "PY");
         connectStations(MR_Line, "MR");
         connectStations(BRT_Line, "BRT");
+        connectStations(SA_Line, "SA");
 
         // Apply explicit pedestrian walkways
         explicitTransfers.forEach(t => {
