@@ -2,12 +2,12 @@
 (function(global) {
     // 1. Definition of Rail Lines
     const lines = {
-        "KJ": { id: "KJ", name: "LRT Kelana Jaya Line", color: "#E21B22" },
-        "AG": { id: "AG", name: "LRT Ampang Line", color: "#FF8F00" },
-        "SP": { id: "SP", name: "LRT Sri Petaling Line", color: "#FF5A00" },
+        "KJ": { id: "KJ", name: "LRT Kelana Jaya Line", color: "#ff2e48" },
+        "AG": { id: "AG", name: "LRT Ampang Line", color: "#ff8d26" },
+        "SP": { id: "SP", name: "LRT Sri Petaling Line", color: "#8d170a" },
         "KG": { id: "KG", name: "MRT Kajang Line", color: "#1f8f4c" },
-        "PY": { id: "PY", name: "MRT Putrajaya Line", color: "#FFD200" },
-        "MR": { id: "MR", name: "KL Monorail Line", color: "#8dc63f" },
+        "PY": { id: "PY", name: "MRT Putrajaya Line", color: "#ffce36" },
+        "MR": { id: "MR", name: "KL Monorail Line", color: "#88c946" },
         "BRT": { id: "BRT", name: "BRT Sunway Line", color: "#00422b" },
         "SA": { id: "SA", name: "LRT Shah Alam Line", color: "#01abe4" }
     };
