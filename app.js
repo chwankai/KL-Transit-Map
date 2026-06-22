@@ -63,6 +63,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function setupAutocomplete(input, dropdown) {
         const stationNames = Object.keys(transitData.stations).sort();
+        const clearBtn = input.parentElement.querySelector('.input-clear-btn');
+        
+        function updateClearBtn() {
+            if (clearBtn) {
+                clearBtn.style.display = input.value ? 'flex' : 'none';
+            }
+        }
+        
+        if (clearBtn && !clearBtn.dataset.hasListener) {
+            clearBtn.dataset.hasListener = "true";
+            clearBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                input.value = '';
+                updateClearBtn();
+                input.focus();
+                renderOptions('');
+                dropdown.classList.add('active');
+            });
+        }
         
         function renderOptions(filterText = '') {
             dropdown.innerHTML = '';
@@ -96,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.addEventListener('mousedown', (e) => {
                     input.value = name;
                     dropdown.classList.remove('active');
+                    updateClearBtn();
                 });
                 dropdown.appendChild(option);
             });
@@ -104,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('focus', () => {
             renderOptions(input.value);
             dropdown.classList.add('active');
+            updateClearBtn();
         });
         
         input.addEventListener('blur', () => {
@@ -115,6 +137,26 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', () => {
             renderOptions(input.value);
             dropdown.classList.add('active');
+            updateClearBtn();
+        });
+
+        // Initialize state
+        updateClearBtn();
+    }
+
+    // 3.1 Swap Origin and Destination Stations
+    const btnSwapStations = document.getElementById('btn-swap-stations');
+    if (btnSwapStations) {
+        btnSwapStations.addEventListener('click', () => {
+            const originVal = originInput.value;
+            originInput.value = destInput.value;
+            destInput.value = originVal;
+            
+            // Trigger clear buttons visibility updates
+            const originClear = originInput.parentElement.querySelector('.input-clear-btn');
+            const destClear = destInput.parentElement.querySelector('.input-clear-btn');
+            if (originClear) originClear.style.display = originInput.value ? 'flex' : 'none';
+            if (destClear) destClear.style.display = destInput.value ? 'flex' : 'none';
         });
     }
 
@@ -465,7 +507,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPopulate.innerHTML = 'Populating Firestore... ⏳';
         
         try {
-            // Write batch to Firestore
+            // Delete all existing station documents to prevent duplicate or renamed duplicates (like Dang W)
+            const snapshot = await db.collection("stations").get();
+            if (!snapshot.empty) {
+                const deleteBatch = db.batch();
+                snapshot.forEach(doc => {
+                    deleteBatch.delete(doc.ref);
+                });
+                await deleteBatch.commit();
+            }
+
+            // Write new batch to Firestore
             const batch = db.batch();
             const stations = transitData.stations;
             
