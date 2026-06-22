@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klang Valley Transit Map</title>
+    <title>Klang Valley Transit Map & Router</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.8">
 </head>
 <body>
     <div class="app-container">
@@ -17,19 +17,133 @@
             <div class="logo-area">
                 <div class="logo-icon">🚇</div>
                 <div class="logo-text">
-                    <h1>Klang Valley Rail Map</h1>
-                    <span class="subtext">Integrated Transit System</span>
+                    <h1 id="app-title">KV Transit Map</h1>
+                    <span class="subtext">Integrated Route Planner</span>
                 </div>
+            </div>
+            <nav class="nav-links">
+                <button id="nav-map" class="nav-btn active">🗺️ Map</button>
+                <button id="nav-plan" class="nav-btn">🧭 Plan</button>
+                <button id="nav-settings" class="nav-btn-icon" title="Database Settings">⚙️</button>
+            </nav>
         </header>
         
         <main class="main-content">
-            <!-- Map Display Area -->
-            <div id="pdf-container" class="pdf-viewer-container"></div>
+            <!-- Tab 1: Map View -->
+            <div id="view-map" class="tab-view active">
+                <div class="pdf-tab-layout">
+                    <div id="pdf-container" class="pdf-viewer-container"></div>
+                    <div class="map-controls">
+                        <button id="btn-toggle-map" class="btn btn-primary">Upcoming Map 🗺️</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 2: Plan View -->
+            <div id="view-plan" class="tab-view">
+                <div class="planner-layout">
+                    <!-- Left Column: Setup Route -->
+                    <div class="planner-sidebar">
+                        <div class="glass-card planner-card">
+                            <h2>Find Route</h2>
+                            <form id="route-form" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label>Origin Station</label>
+                                    <div class="custom-select-wrapper">
+                                        <input type="text" id="origin-input" placeholder="Type station name..." autocomplete="off">
+                                        <button type="button" id="clear-origin" class="input-clear-btn" title="Clear origin">&times;</button>
+                                        <div id="origin-dropdown" class="select-dropdown"></div>
+                                    </div>
+                                </div>
+                                <div class="swap-container">
+                                    <button type="button" id="btn-swap-stations" class="btn-swap" title="Swap origin and destination">⇅</button>
+                                </div>
+                                <div class="form-group">
+                                    <label>Destination Station</label>
+                                    <div class="custom-select-wrapper">
+                                        <input type="text" id="dest-input" placeholder="Type station name..." autocomplete="off">
+                                        <button type="button" id="clear-dest" class="input-clear-btn" title="Clear destination">&times;</button>
+                                        <div id="dest-dropdown" class="select-dropdown"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Exclude Lines</label>
+                                    <div class="exclude-checklist" id="exclude-lines-checklist">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                </div>
+                                <button type="submit" id="btn-submit-plan" class="btn btn-primary btn-block">Search Journey 🚀</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Results -->
+                    <div class="planner-results">
+                        <div id="results-placeholder" class="results-placeholder glass-card">
+                            <div class="placeholder-icon">🧭</div>
+                            <p>Select your origin, destination, and line preferences, then click "Search Journey" to plan your route.</p>
+                        </div>
+                        <div id="results-container" class="results-container hidden">
+                            <div class="results-header glass-card">
+                                <div class="fare-display">
+                                    <span class="fare-label">Cashless Fare</span>
+                                    <span class="fare-value" id="res-fare">RM 0.00</span>
+                                </div>
+                                <div class="journey-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-label">Distance</span>
+                                        <span class="meta-value" id="res-dist">0.0 km</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-label">Transfers</span>
+                                        <span class="meta-value" id="res-transfers">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="route-details glass-card">
+                                <h3>Journey Directions</h3>
+                                <div class="route-timeline" id="route-timeline-container">
+                                    <!-- Populated dynamically -->
+                                </div>
+                                <button id="btn-search-again" class="btn btn-secondary btn-block search-again-btn">Search Again 🔍</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
+        <footer class="app-footer">
+            Developed by CK 2026. <a href="https://github.com/chwankai/KV_Transit_Map" target="_blank" rel="noopener noreferrer">Github</a>
+        </footer>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span id="close-settings" class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="theme-select">App Theme</label>
+                    <select id="theme-select" class="form-control">
+                        <option value="dark">Dark Mode 🌙</option>
+                        <option value="light">Light Mode ☀️</option>
+                        <option value="system" selected>Follow System 🖥️</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- PDF.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    <script src="app.js"></script>
+    
+    <!-- Route Database and Finder Logic -->
+    <script src="transit-data.js?v=1.8"></script>
+    
+    <!-- Application Orchestrator -->
+    <script src="app.js?v=1.8"></script>
 </body>
 </html>
