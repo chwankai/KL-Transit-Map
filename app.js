@@ -188,16 +188,17 @@ document.addEventListener('DOMContentLoaded', () => {
     setupExcludeChecklist();
 
     // 5. PDF Map Viewer Rendering
-    const pdfUrl = 'Klang Valley Rail Map.pdf';
+    let currentMapUrl = 'Klang Valley Rail Map.pdf';
     const { pdfjsLib } = window;
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     
     const pdfContainer = document.getElementById('pdf-container');
+    const btnToggleMap = document.getElementById('btn-toggle-map');
     let pdfDoc = null;
     
     function renderPdf() {
         pdfContainer.innerHTML = '';
-        pdfjsLib.getDocument(pdfUrl).promise.then((pdfDoc_) => {
+        pdfjsLib.getDocument(currentMapUrl).promise.then((pdfDoc_) => {
             pdfDoc = pdfDoc_;
             for (let i = 1; i <= pdfDoc.numPages; i++) {
                 pdfDoc.getPage(i).then((page) => {
@@ -217,6 +218,20 @@ document.addEventListener('DOMContentLoaded', () => {
             pdfContainer.innerHTML = `<div class="error-msg">Error loading map PDF. Please try again.</div>`;
         });
     }
+
+    if (btnToggleMap) {
+        btnToggleMap.addEventListener('click', () => {
+            if (currentMapUrl === 'Klang Valley Rail Map.pdf') {
+                currentMapUrl = 'Circle Line.pdf';
+                btnToggleMap.innerHTML = 'Standard Map 🗺️';
+            } else {
+                currentMapUrl = 'Klang Valley Rail Map.pdf';
+                btnToggleMap.innerHTML = 'Upcoming Map 🗺️';
+            }
+            renderPdf();
+        });
+    }
+
     renderPdf();
 
     // 6. Pathfinder UI Event Linkage

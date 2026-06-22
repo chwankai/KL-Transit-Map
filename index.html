@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.6">
+    <link rel="stylesheet" href="style.css?v=1.7">
 </head>
 <body>
     <div class="app-container">
@@ -31,7 +31,12 @@
         <main class="main-content">
             <!-- Tab 1: Map View -->
             <div id="view-map" class="tab-view active">
-                <div id="pdf-container" class="pdf-viewer-container"></div>
+                <div class="pdf-tab-layout">
+                    <div id="pdf-container" class="pdf-viewer-container"></div>
+                    <div class="map-controls">
+                        <button id="btn-toggle-map" class="btn btn-primary">Upcoming Map 🗺️</button>
+                    </div>
+                </div>
             </div>
             
             <!-- Tab 2: Plan View -->
@@ -169,9 +174,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     
     <!-- Route Database and Finder Logic -->
-    <script src="transit-data.js?v=1.6"></script>
+    <script src="transit-data.js?v=1.7"></script>
     
     <!-- Application Orchestrator -->
-    <script src="app.js?v=1.6"></script>
+    <script src="app.js?v=1.7"></script>
 </body>
 </html>
