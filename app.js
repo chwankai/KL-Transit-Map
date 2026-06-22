@@ -215,6 +215,26 @@ document.addEventListener('DOMContentLoaded', () => {
         resTransfers.innerText = route.transfers;
         
         renderTimeline(route);
+
+        // Switch layout to show directions results on mobile
+        document.querySelector('.planner-layout').classList.add('showing-results');
+    });
+
+    // Handle mobile "Search Again" reset and layout switch back to input form
+    const btnSearchAgain = document.getElementById('btn-search-again');
+    btnSearchAgain.addEventListener('click', () => {
+        document.querySelector('.planner-layout').classList.remove('showing-results');
+        
+        // Reset station inputs for clean new search
+        originInput.value = '';
+        destInput.value = '';
+        
+        // Reset results containers back to placeholder state
+        resultsContainer.classList.add('hidden');
+        resultsPlaceholder.classList.remove('hidden');
+        
+        // Scroll sidebar back to top
+        document.querySelector('.planner-sidebar').scrollTop = 0;
     });
 
     // 7. Timeline Formatter
@@ -485,7 +505,42 @@ document.addEventListener('DOMContentLoaded', () => {
         tryConnectFirebase({ apiKey, projectId, authDomain });
     });
 
+    // Theme Control Logic
+    const themeSelect = document.getElementById('theme-select');
+    
+    function applyTheme(theme) {
+        document.body.classList.remove('light-theme');
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+        } else if (theme === 'system') {
+            const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (!systemIsDark) {
+                document.body.classList.add('light-theme');
+            }
+        }
+    }
+    
+    themeSelect.addEventListener('change', () => {
+        const selectedTheme = themeSelect.value;
+        localStorage.setItem('theme_preference', selectedTheme);
+        applyTheme(selectedTheme);
+    });
+    
+    // Listen for system theme preferences changes dynamically
+    const systemMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    systemMediaQuery.addEventListener('change', () => {
+        if (localStorage.getItem('theme_preference') === 'system') {
+            applyTheme('system');
+        }
+    });
+
     function loadSavedConfig() {
+        // Load theme configuration
+        const savedTheme = localStorage.getItem('theme_preference') || 'system';
+        themeSelect.value = savedTheme;
+        applyTheme(savedTheme);
+
+        // Load database configuration
         const mode = localStorage.getItem('transit_db_mode') || 'local';
         dataSourceSelect.value = mode;
         
