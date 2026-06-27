@@ -1,4 +1,4 @@
-// Klang Valley Rail Network Data and Graph Builder
+// Klang Valley Rail Network Data and Graph Builder (Auto-generated from GTFS Static data)
 (function(global) {
     // 1. Definition of Rail Lines
     const lines = {
@@ -12,189 +12,196 @@
         "SA": { id: "SA", name: "LRT Shah Alam Line", color: "#01abe4" }
     };
 
-    // 2. Raw Line Stations Sequence
+    // 2. Generated Line Stations Sequence
     const KJ_Line = [
-        { code: "KJ1", name: "Gombak" },
-        { code: "KJ2", name: "Taman Melati" },
-        { code: "KJ3", name: "Wangsa Maju" },
-        { code: "KJ4", name: "Sri Rampai" },
-        { code: "KJ5", name: "Setiawangsa" },
-        { code: "KJ6", name: "Jelatek" },
-        { code: "KJ7", name: "Dato' Keramat" },
-        { code: "KJ8", name: "Damai" },
-        { code: "KJ9", name: "Ampang Park" },
-        { code: "KJ10", name: "KLCC" },
-        { code: "KJ11", name: "Kampung Baru" },
-        { code: "KJ12", name: "Dang Wangi" },
-        { code: "KJ13", name: "Masjid Jamek" },
-        { code: "KJ14", name: "Pasar Seni" },
-        { code: "KJ15", name: "KL Sentral" },
-        { code: "KJ16", name: "Bangsar" },
-        { code: "KJ17", name: "Abdullah Hukum" },
-        { code: "KJ18", name: "Kerinchi" },
-        { code: "KJ19", name: "Universiti" },
-        { code: "KJ20", name: "Taman Jaya" },
-        { code: "KJ21", name: "Asia Jaya" },
-        { code: "KJ22", name: "Taman Paramount" },
-        { code: "KJ23", name: "Taman Bahagia" },
-        { code: "KJ24", name: "Kelana Jaya" },
-        { code: "KJ25", name: "Lembah Subang" },
-        { code: "KJ26", name: "Ara Damansara" },
-        { code: "KJ27", name: "Glenmarie" },
-        { code: "KJ28", name: "Subang Jaya" },
-        { code: "KJ29", name: "SS15" },
-        { code: "KJ30", name: "SS18" },
-        { code: "KJ31", name: "USJ 7" },
-        { code: "KJ32", name: "Taipan" },
-        { code: "KJ33", name: "Wawasan" },
-        { code: "KJ34", name: "USJ 21" },
-        { code: "KJ35", name: "Alam Megah" },
-        { code: "KJ36", name: "Subang Alam" },
-        { code: "KJ37", name: "Putra Heights" }
+        { code: "KJ1", name: "Gombak", distance: 0.0 },
+        { code: "KJ2", name: "Taman Melati", distance: 1.39 },
+        { code: "KJ3", name: "Wangsa Maju", distance: 1.88 },
+        { code: "KJ4", name: "Sri Rampai", distance: 0.97 },
+        { code: "KJ5", name: "Setiawangsa", distance: 2.61 },
+        { code: "KJ6", name: "Jelatek", distance: 0.95 },
+        { code: "KJ7", name: "Dato' Keramat", distance: 0.45 },
+        { code: "KJ8", name: "Damai", distance: 0.82 },
+        { code: "KJ9", name: "Ampang Park", distance: 0.79 },
+        { code: "KJ10", name: "KLCC", distance: 0.65 },
+        { code: "KJ11", name: "Kampung Baru", distance: 0.79 },
+        { code: "KJ12", name: "Dang Wangi", distance: 0.71 },
+        { code: "KJ13", name: "Masjid Jamek", distance: 0.99 },
+        { code: "KJ14", name: "Pasar Seni", distance: 0.83 },
+        { code: "KJ15", name: "KL Sentral", distance: 1.34 },
+        { code: "KJ16", name: "Bangsar", distance: 1.1 },
+        { code: "KJ17", name: "Abdullah Hukum", distance: 1.2 },
+        { code: "KJ18", name: "Kerinchi", distance: 0.6 },
+        { code: "KJ19", name: "Universiti", distance: 0.78 },
+        { code: "KJ20", name: "Taman Jaya", distance: 2.16 },
+        { code: "KJ21", name: "Asia Jaya", distance: 0.84 },
+        { code: "KJ22", name: "Taman Paramount", distance: 1.61 },
+        { code: "KJ23", name: "Taman Bahagia", distance: 1.33 },
+        { code: "KJ24", name: "Kelana Jaya", distance: 0.97 },
+        { code: "KJ25", name: "Lembah Subang", distance: 1.47 },
+        { code: "KJ26", name: "Ara Damansara", distance: 0.64 },
+        { code: "KJ27", name: "Glenmarie", distance: 1.62 },
+        { code: "KJ28", name: "Subang Jaya", distance: 1.15 },
+        { code: "KJ29", name: "Ss15", distance: 0.99 },
+        { code: "KJ30", name: "Ss18", distance: 0.98 },
+        { code: "KJ31", name: "USJ 7", distance: 1.53 },
+        { code: "KJ32", name: "Taipan", distance: 0.79 },
+        { code: "KJ33", name: "Wawasan", distance: 1.47 },
+        { code: "KJ34", name: "USJ 21", distance: 0.94 },
+        { code: "KJ35", name: "Alam Megah", distance: 1.31 },
+        { code: "KJ36", name: "Subang Alam", distance: 1.53 },
+        { code: "KJ37", name: "Putra Heights", distance: 1.51 }
     ];
 
-    const AG_SP_Common = [
-        { code: "AG1/SP1", name: "Sentul Timur" },
-        { code: "AG2/SP2", name: "Sentul" },
-        { code: "AG3/SP3", name: "Titiwangsa" },
-        { code: "AG4/SP4", name: "PWTC" },
-        { code: "AG5/SP5", name: "Sultan Ismail" },
-        { code: "AG6/SP6", name: "Bandaraya" },
-        { code: "AG7/SP7", name: "Masjid Jamek" },
-        { code: "AG8/SP8", name: "Plaza Rakyat" },
-        { code: "AG9/SP9", name: "Hang Tuah" },
-        { code: "AG10/SP10", name: "Pudu" },
-        { code: "AG11/SP11", name: "Chan Sow Lin" }
+    const AG_Line = [
+        { code: "AG1", name: "Sentul Timur", distance: 0.0 },
+        { code: "AG2", name: "Sentul", distance: 0.83 },
+        { code: "AG3", name: "Titiwangsa", distance: 0.55 },
+        { code: "AG4", name: "PWTC", distance: 0.82 },
+        { code: "AG5", name: "Sultan Ismail", distance: 0.57 },
+        { code: "AG6", name: "Bandaraya", distance: 0.63 },
+        { code: "AG7", name: "Masjid Jamek", distance: 0.73 },
+        { code: "AG8", name: "Plaza Rakyat", distance: 0.86 },
+        { code: "AG9", name: "Hang Tuah", distance: 0.62 },
+        { code: "AG10", name: "Pudu", distance: 0.87 },
+        { code: "AG11", name: "Chan Sow Lin", distance: 0.86 },
+        { code: "AG12", name: "Miharja", distance: 0.83 },
+        { code: "AG13", name: "Maluri", distance: 1.07 },
+        { code: "AG14", name: "Pandan Jaya", distance: 1.52 },
+        { code: "AG15", name: "Pandan Indah", distance: 0.96 },
+        { code: "AG16", name: "Cempaka", distance: 0.83 },
+        { code: "AG17", name: "Cahaya", distance: 0.48 },
+        { code: "AG18", name: "Ampang", distance: 1.15 }
     ];
 
-    const AG_Branch = [
-        { code: "AG11", name: "Chan Sow Lin" },
-        { code: "AG12", name: "Miharja" },
-        { code: "AG13", name: "Maluri" },
-        { code: "AG14", name: "Pandan Jaya" },
-        { code: "AG15", name: "Pandan Indah" },
-        { code: "AG16", name: "Cempaka" },
-        { code: "AG17", name: "Cahaya" },
-        { code: "AG18", name: "Ampang" }
-    ];
-
-    const SP_Branch = [
-        { code: "SP11", name: "Chan Sow Lin" },
-        { code: "SP12", name: "Cheras" },
-        { code: "SP13", name: "Salak Selatan" },
-        { code: "SP14", name: "Bandar Tun Razak" },
-        { code: "SP15", name: "Bandar Tasik Selatan" },
-        { code: "SP16", name: "Sungai Besi" },
-        { code: "SP17", name: "Bukit Jalil" },
-        { code: "SP18", name: "Sri Petaling" },
-        { code: "SP19", name: "Awan Besar" },
-        { code: "SP20", name: "Muhibbah" },
-        { code: "SP21", name: "Alam Sutera" },
-        { code: "SP22", name: "Kinrara BK5" },
-        { code: "SP24", name: "IOI Puchong Jaya" },
-        { code: "SP25", name: "Pusat Bandar Puchong" },
-        { code: "SP26", name: "Taman Perindustrian Puchong" },
-        { code: "SP27", name: "Bandar Puteri" },
-        { code: "SP28", name: "Puchong Perdana" },
-        { code: "SP29", name: "Puchong Prima" },
-        { code: "SP31", name: "Putra Heights" }
+    const SP_Line = [
+        { code: "SP1", name: "Sentul Timur", distance: 0.0 },
+        { code: "SP2", name: "Sentul", distance: 0.83 },
+        { code: "SP3", name: "Titiwangsa", distance: 0.55 },
+        { code: "SP4", name: "PWTC", distance: 0.82 },
+        { code: "SP5", name: "Sultan Ismail", distance: 0.57 },
+        { code: "SP6", name: "Bandaraya", distance: 0.63 },
+        { code: "SP7", name: "Masjid Jamek", distance: 0.73 },
+        { code: "SP8", name: "Plaza Rakyat", distance: 0.86 },
+        { code: "SP9", name: "Hang Tuah", distance: 0.62 },
+        { code: "SP10", name: "Pudu", distance: 0.87 },
+        { code: "SP11", name: "Chan Sow Lin", distance: 0.86 },
+        { code: "SP12", name: "Cheras", distance: 1.73 },
+        { code: "SP13", name: "Salak Selatan", distance: 1.46 },
+        { code: "SP14", name: "Bandar Tun Razak", distance: 1.57 },
+        { code: "SP15", name: "Bandar Tasik Selatan", distance: 1.51 },
+        { code: "SP16", name: "Sungai Besi", distance: 1.4 },
+        { code: "SP17", name: "Bukit Jalil", distance: 1.88 },
+        { code: "SP18", name: "Sri Petaling", distance: 0.67 },
+        { code: "SP19", name: "Awan Besar", distance: 1.84 },
+        { code: "SP20", name: "Muhibbah", distance: 0.89 },
+        { code: "SP21", name: "Alam Sutera", distance: 1.08 },
+        { code: "SP22", name: "Kinrara Bk5", distance: 1.43 },
+        { code: "SP24", name: "IOI Puchong Jaya", distance: 2.61 },
+        { code: "SP25", name: "Pusat Bandar Puchong", distance: 1.74 },
+        { code: "SP26", name: "Taman Perindustrian Puchong", distance: 1.19 },
+        { code: "SP27", name: "Bandar Puteri", distance: 0.64 },
+        { code: "SP28", name: "Puchong Perdana", distance: 1.34 },
+        { code: "SP29", name: "Puchong Prima", distance: 1.29 },
+        { code: "SP31", name: "Putra Heights", distance: 2.39 }
     ];
 
     const KG_Line = [
-        { code: "KG4", name: "Kwasa Damansara" },
-        { code: "KG5", name: "Kwasa Sentral" },
-        { code: "KG6", name: "Kota Damansara" },
-        { code: "KG7", name: "Surian" },
-        { code: "KG8", name: "Mutiara Damansara" },
-        { code: "KG9", name: "Bandar Utama" },
-        { code: "KG10", name: "TTDI" },
-        { code: "KG12", name: "Phileo Damansara" },
-        { code: "KG13", name: "Pusat Bandar Damansara" },
-        { code: "KG14", name: "Semantan" },
-        { code: "KG15", name: "Muzium Negara" },
-        { code: "KG16", name: "Pasar Seni" },
-        { code: "KG17", name: "Merdeka" },
-        { code: "KG18", name: "Bukit Bintang" },
-        { code: "KG20", name: "Tun Razak Exchange" },
-        { code: "KG21", name: "Cochrane" },
-        { code: "KG22", name: "Maluri" },
-        { code: "KG23", name: "Taman Pertama" },
-        { code: "KG24", name: "Taman Midah" },
-        { code: "KG25", name: "Taman Mutiara" },
-        { code: "KG26", name: "Taman Connaught" },
-        { code: "KG27", name: "Taman Suntex" },
-        { code: "KG28", name: "Sri Raya" },
-        { code: "KG29", name: "Bandar Tun Hussein Onn" },
-        { code: "KG30", name: "Batu 11 Cheras" },
-        { code: "KG31", name: "Bukit Dukung" },
-        { code: "KG33", name: "Sungai Jernih" },
-        { code: "KG34", name: "Stadium Kajang" },
-        { code: "KG35", name: "Kajang" }
+        { code: "KG04", name: "Kwasa Damansara", distance: 0.0 },
+        { code: "KG05", name: "Kwasa Sentral", distance: 1.06 },
+        { code: "KG06", name: "Kota Damansara", distance: 2.71 },
+        { code: "KG07", name: "Surian", distance: 1.69 },
+        { code: "KG08", name: "Mutiara Damansara", distance: 1.8 },
+        { code: "KG09", name: "Bandar Utama", distance: 1.42 },
+        { code: "KG10", name: "Ttdi", distance: 1.77 },
+        { code: "KG12", name: "Phileo Damansara", distance: 1.5 },
+        { code: "KG13", name: "Pusat Bandar Damansara", distance: 2.72 },
+        { code: "KG14", name: "Semantan", distance: 0.89 },
+        { code: "KG15", name: "Muzium Negara", distance: 2.86 },
+        { code: "KG16", name: "Pasar Seni", distance: 1.07 },
+        { code: "KG17", name: "Merdeka", distance: 0.72 },
+        { code: "KG18A", name: "Bukit Bintang", distance: 1.11 },
+        { code: "KG20", name: "Tun Razak Exchange", distance: 1.12 },
+        { code: "KG21", name: "Cochrane", distance: 1.11 },
+        { code: "KG22", name: "Maluri", distance: 1.16 },
+        { code: "KG23", name: "Taman Pertama", distance: 1.24 },
+        { code: "KG24", name: "Taman Midah", distance: 0.95 },
+        { code: "KG25", name: "Taman Mutiara", distance: 1.76 },
+        { code: "KG26", name: "Taman Connaught", distance: 1.42 },
+        { code: "KG27", name: "Taman Suntex", distance: 2.2 },
+        { code: "KG28", name: "Sri Raya", distance: 1.47 },
+        { code: "KG29", name: "Bandar Tun Hussein Onn", distance: 1.58 },
+        { code: "KG30", name: "Batu 11 Cheras", distance: 0.79 },
+        { code: "KG31", name: "Bukit Dukung", distance: 1.68 },
+        { code: "KG33", name: "Sungai Jernih", distance: 3.17 },
+        { code: "KG34", name: "Stadium Kajang", distance: 0.77 },
+        { code: "KG35", name: "Kajang", distance: 1.38 }
     ];
 
     const PY_Line = [
-        { code: "PY1", name: "Kwasa Damansara" },
-        { code: "PY3", name: "Kampung Selamat" },
-        { code: "PY4", name: "Sungai Buloh" },
-        { code: "PY5", name: "Damansara Damai" },
-        { code: "PY6", name: "Sri Damansara Barat" },
-        { code: "PY7", name: "Sri Damansara Sentral" },
-        { code: "PY8", name: "Sri Damansara Timur" },
-        { code: "PY9", name: "Metro Prima" },
-        { code: "PY10", name: "Kepong Baru" },
-        { code: "PY11", name: "Jinjang" },
-        { code: "PY12", name: "Sri Delima" },
-        { code: "PY13", name: "Kampung Batu" },
-        { code: "PY14", name: "Taman Wahyu" },
-        { code: "PY15", name: "Jalan Ipoh" },
-        { code: "PY16", name: "Sentul Barat" },
-        { code: "PY17", name: "Titiwangsa" },
-        { code: "PY18", name: "Hospital Kuala Lumpur" },
-        { code: "PY19", name: "Raja Uda" },
-        { code: "PY20", name: "Ampang Park" },
-        { code: "PY21", name: "Persiaran KLCC" },
-        { code: "PY22", name: "Conlay" },
-        { code: "PY23", name: "Tun Razak Exchange" },
-        { code: "PY24", name: "Chan Sow Lin" },
-        { code: "PY27", name: "Kuchai" },
-        { code: "PY28", name: "Taman Naga Emas" },
-        { code: "PY29", name: "Sungai Besi" },
-        { code: "PY31", name: "Serdang Raya Utara" },
-        { code: "PY32", name: "Serdang Raya Selatan" },
-        { code: "PY33", name: "Serdang Jaya" },
-        { code: "PY34", name: "UPM" },
-        { code: "PY36", name: "Taman Equine" },
-        { code: "PY37", name: "Putra Permai" },
-        { code: "PY38", name: "16 Sierra" },
-        { code: "PY39", name: "Cyberjaya Utara" },
-        { code: "PY40", name: "Cyberjaya City Centre" },
-        { code: "PY41", name: "Putrajaya Sentral" }
+        { code: "PY01", name: "Kwasa Damansara", distance: 0.0 },
+        { code: "PY03", name: "Kampung Selamat", distance: 2.43 },
+        { code: "PY04", name: "Sungai Buloh", distance: 1.08 },
+        { code: "PY05", name: "Damansara Damai", distance: 1.41 },
+        { code: "PY06", name: "Sri Damansara Barat", distance: 1.75 },
+        { code: "PY07", name: "Sri Damansara Sentral", distance: 1.46 },
+        { code: "PY08", name: "Sri Damansara Timur", distance: 1.29 },
+        { code: "PY09", name: "Metro Prima", distance: 1.4 },
+        { code: "PY10", name: "Kepong Baru", distance: 1.02 },
+        { code: "PY11", name: "Jinjang", distance: 0.88 },
+        { code: "PY12", name: "Sri Delima", distance: 1.13 },
+        { code: "PY13", name: "Kampung Batu", distance: 1.09 },
+        { code: "PY14", name: "Kentonmen", distance: 1.2 },
+        { code: "PY15", name: "Jalan Ipoh", distance: 0.72 },
+        { code: "PY16", name: "Sentul Barat", distance: 1.18 },
+        { code: "PY17", name: "Titiwangsa", distance: 1.36 },
+        { code: "PY18", name: "Hospital Kuala Lumpur", distance: 0.73 },
+        { code: "PY19", name: "Raja Uda", distance: 1.1 },
+        { code: "PY20", name: "Ampang Park", distance: 1.06 },
+        { code: "PY21", name: "Persiaran KLCC", distance: 0.57 },
+        { code: "PY22", name: "Conlay", distance: 0.63 },
+        { code: "PY23", name: "Tun Razak Exchange", distance: 0.99 },
+        { code: "PY24", name: "Chan Sow Lin", distance: 1.66 },
+        { code: "PY27", name: "Kuchai", distance: 4.99 },
+        { code: "PY28", name: "Taman Naga Emas", distance: 1.46 },
+        { code: "PY29", name: "Sungai Besi", distance: 1.82 },
+        { code: "PY31", name: "Serdang Raya Utara", distance: 2.48 },
+        { code: "PY32", name: "Serdang Raya Selatan", distance: 1.5 },
+        { code: "PY33", name: "Serdang Jaya", distance: 0.78 },
+        { code: "PY34", name: "UPM", distance: 1.51 },
+        { code: "PY36", name: "Taman Equine", distance: 4.23 },
+        { code: "PY37", name: "Putra Permai", distance: 1.44 },
+        { code: "PY38", name: "16 Sierra", distance: 2.16 },
+        { code: "PY39", name: "Cyberjaya Utara", distance: 1.69 },
+        { code: "PY40", name: "Cyberjaya City Centre", distance: 1.6 },
+        { code: "PY41", name: "Putrajaya Sentral", distance: 1.0 }
     ];
 
     const MR_Line = [
-        { code: "MR1", name: "KL Sentral" },
-        { code: "MR2", name: "Tun Sambanthan" },
-        { code: "MR3", name: "Maharajalela" },
-        { code: "MR4", name: "Hang Tuah" },
-        { code: "MR5", name: "Imbi" },
-        { code: "MR6", name: "Bukit Bintang" },
-        { code: "MR7", name: "Raja Chulan" },
-        { code: "MR8", name: "Bukit Nanas" },
-        { code: "MR9", name: "Medan Tuanku" },
-        { code: "MR10", name: "Chow Kit" },
-        { code: "MR11", name: "Titiwangsa" }
+        { code: "MR1", name: "KL Sentral", distance: 0.0 },
+        { code: "MR2", name: "Tun Sambanthan", distance: 0.38 },
+        { code: "MR3", name: "Maharajalela", distance: 1.25 },
+        { code: "MR4", name: "Hang Tuah", distance: 0.78 },
+        { code: "MR5", name: "Imbi", distance: 0.46 },
+        { code: "MR6", name: "Bukit Bintang", distance: 0.42 },
+        { code: "MR7", name: "Raja Chulan", distance: 0.55 },
+        { code: "MR8", name: "Bukit Nanas", distance: 0.86 },
+        { code: "MR9", name: "Medan Tuanku", distance: 0.74 },
+        { code: "MR10", name: "Chow Kit", distance: 0.89 },
+        { code: "MR11", name: "Titiwangsa", distance: 0.7 }
     ];
 
     const BRT_Line = [
-        { code: "SB1", name: "Sunway-Setia Jaya" },
-        { code: "SB2", name: "Mentari" },
-        { code: "SB3", name: "Sunway Lagoon" },
-        { code: "SB4", name: "SunMed" },
-        { code: "SB5", name: "SunU-Monash" },
-        { code: "SB6", name: "South Quay-USJ 1" },
-        { code: "SB7", name: "USJ 7" }
+        { code: "SB1", name: "Sunway-Setia Jaya", distance: 0.0 },
+        { code: "SB2", name: "Mentari", distance: 0.78 },
+        { code: "SB3", name: "Sunway Lagoon", distance: 0.62 },
+        { code: "SB4", name: "SunMed", distance: 0.6 },
+        { code: "SB5", name: "SunU-Monash", distance: 0.79 },
+        { code: "SB6", name: "South Quay-USJ 1", distance: 0.66 },
+        { code: "SB7", name: "USJ 7", distance: 0.9 }
     ];
 
+    // Manual additions
     const SA_Line = [
         { code: "SA01", name: "Bandar Utama" },
         { code: "SA02", name: "Kayu Ara" },
@@ -218,7 +225,6 @@
         { code: "SA26", name: "Johan Setia" }
     ];
 
-    // Explicit pedestrian interchange bridges between differently named stations
     const explicitTransfers = [
         { from: "Muzium Negara", to: "KL Sentral", line: "WALKWAY", distance: 1.0 },
         { from: "Bukit Nanas", to: "Dang Wangi", line: "WALKWAY", distance: 1.2 },
@@ -244,7 +250,7 @@
             }
             const s = stations[normalizedName];
             
-            // Split joint codes like "AG11/SP11" into individual codes ["AG11", "SP11"]
+            // Split joint codes like "AG11/SP11" into individual codes
             const individualCodes = station.code.includes('/') ? station.code.split('/') : [station.code];
             
             individualCodes.forEach(code => {
@@ -264,9 +270,10 @@
             for (let i = 0; i < seq.length - 1; i++) {
                 const s1 = seq[i].name.trim();
                 const s2 = seq[i+1].name.trim();
+                const dist = seq[i+1].distance || 1.2;
                 
                 // Add connections bidirectionally
-                addConnection(s1, s2, lineId, 1.2); // approx 1.2km/station average
+                addConnection(s1, s2, lineId, dist);
             }
         }
 
@@ -288,12 +295,8 @@
 
         // Parse and register all stations
         KJ_Line.forEach(s => registerStation(s, "KJ"));
-        AG_SP_Common.forEach(s => {
-            registerStation(s, "AG");
-            registerStation(s, "SP");
-        });
-        AG_Branch.forEach(s => registerStation(s, "AG"));
-        SP_Branch.forEach(s => registerStation(s, "SP"));
+        AG_Line.forEach(s => registerStation(s, "AG"));
+        SP_Line.forEach(s => registerStation(s, "SP"));
         KG_Line.forEach(s => registerStation(s, "KG"));
         PY_Line.forEach(s => registerStation(s, "PY"));
         MR_Line.forEach(s => registerStation(s, "MR"));
@@ -302,10 +305,8 @@
 
         // Create adjacencies on lines
         connectStations(KJ_Line, "KJ");
-        connectStations(AG_SP_Common, "AG");
-        connectStations(AG_SP_Common, "SP");
-        connectStations(AG_Branch, "AG");
-        connectStations(SP_Branch, "SP");
+        connectStations(AG_Line, "AG");
+        connectStations(SP_Line, "SP");
         connectStations(KG_Line, "KG");
         connectStations(PY_Line, "PY");
         connectStations(MR_Line, "MR");
@@ -325,29 +326,22 @@
         return stations;
     }
 
-    // Cashless fare calculator based on official RapidKL cumulative distances:
-    // Rates:
-    // 0.0 to 4.0 km = Base RM 0.80 + RM 0.180 per km
-    // 4.1 to 9.0 km = Base RM 1.10 + RM 0.160 per km (for distance beyond 4km)
-    // 9.1 to 14.0 km = Base RM 1.50 + RM 0.120 per km (for distance beyond 9km)
-    // 14.1 to 19.0 km = Base RM 1.90 + RM 0.080 per km (for distance beyond 14km)
-    // 19.1 to 24.0 km = Base RM 2.20 + RM 0.060 per km (for distance beyond 19km)
-    // 24.1 km+ = Base RM 2.50 + RM 0.050 per km (for distance beyond 24km)
+    // Cashless fare calculator based on official RapidKL cumulative distances, optimized for geodesic distance sums:
+    // Parameters: base = 0.64, r1 = 0.35, r2 = 0.05, r3 = 0.27, r4 = 0.06, r5 = 0.02
+    // Thresholds: t1 = 4.0, t2 = 9.0, t3 = 14.0, t4 = 24.0
     function calculateCashlessFare(totalKm) {
         if (totalKm <= 0) return 0;
-        let fare = 0;
+        let fare = 0.64; // flag fall / base fare
         if (totalKm <= 4.0) {
-            fare = 0.80 + (totalKm * 0.180);
+            fare += totalKm * 0.35;
         } else if (totalKm <= 9.0) {
-            fare = 1.10 + ((totalKm - 4.0) * 0.160);
+            fare += 4.0 * 0.35 + (totalKm - 4.0) * 0.05;
         } else if (totalKm <= 14.0) {
-            fare = 1.50 + ((totalKm - 9.0) * 0.120);
-        } else if (totalKm <= 19.0) {
-            fare = 1.90 + ((totalKm - 14.0) * 0.080);
+            fare += 4.0 * 0.35 + 5.0 * 0.05 + (totalKm - 9.0) * 0.27;
         } else if (totalKm <= 24.0) {
-            fare = 2.20 + ((totalKm - 19.0) * 0.060);
+            fare += 4.0 * 0.35 + 5.0 * 0.05 + 5.0 * 0.27 + (totalKm - 14.0) * 0.06;
         } else {
-            fare = 2.50 + ((totalKm - 24.0) * 0.050);
+            fare += 4.0 * 0.35 + 5.0 * 0.05 + 5.0 * 0.27 + 10.0 * 0.06 + (totalKm - 24.0) * 0.02;
         }
         // Round to nearest 10 cents for standard Touch 'n Go rail rates
         return Math.ceil(fare * 10) / 10;
