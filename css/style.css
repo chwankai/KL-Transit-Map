@@ -1119,6 +1119,9 @@ body {
     flex-direction: column;
     z-index: 10;
     overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .sidebar-header {
@@ -1294,6 +1297,7 @@ body {
     overflow: hidden;
     position: relative;
     border: 1px solid var(--border-color);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bus-map {
@@ -1326,30 +1330,28 @@ body {
     color: #0f172a;
 }
 
-/* Responsive Bus Tab View */
-@media (max-width: 768px) {
-    .bus-layout {
-        flex-direction: column;
-    }
-    
-    .bus-sidebar {
-        width: calc(100% - 2.5rem);
-        height: auto;
-        max-height: 45vh;
-        margin: 1.25rem 1.25rem 0 1.25rem;
-    }
-    
-    .bus-map-container {
-        height: 45vh;
-        margin: 1.25rem;
-    }
+/* PC and Mobile text switches */
+.pc-text {
+    display: inline;
+}
+.mobile-text {
+    display: none;
 }
 
-/* Floating Show Tracker Button */
+/* PC Web Default: Hide toggle buttons completely */
+.sidebar-footer {
+    display: none !important;
+}
+.floating-bus-btn {
+    display: none !important;
+}
+
+/* Floating Show Tracker Button - Placed at Top-Center */
 .floating-bus-btn {
     position: absolute;
-    bottom: 2.25rem;
-    left: 2.25rem;
+    top: 2.25rem;
+    left: 50%;
+    transform: translate(-50%, 0);
     z-index: 20;
     border-radius: 30px;
     padding: 0.75rem 1.5rem;
@@ -1358,20 +1360,116 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-.floating-bus-btn.hidden {
-    display: none !important;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
 }
 
-/* Sidebar Hidden State Layout Toggles */
+.floating-bus-btn.hidden {
+    opacity: 0 !important;
+    transform: translate(-50%, -20px) !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Show tracker button should not move on hover */
+.floating-bus-btn:hover {
+    transform: translate(-50%, 0) !important;
+}
+
+/* Sidebar Hidden State Layout Toggles (Desktop) */
 .bus-layout.sidebar-hidden .bus-sidebar {
-    display: none !important;
+    width: 0 !important;
+    margin: 1.25rem 0 1.25rem 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    transform: translateX(-110%) !important;
+    pointer-events: none !important;
 }
 
 .bus-layout.sidebar-hidden .bus-map-container {
     height: calc(100% - 2.5rem) !important;
     width: calc(100% - 2.5rem) !important;
     margin: 1.25rem !important;
+}
+
+/* Responsive Bus Tab View (Mobile only layout toggle) */
+@media (max-width: 768px) {
+    .bus-layout {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .pc-text {
+        display: none;
+    }
+    .mobile-text {
+        display: inline;
+    }
+    
+    /* Show buttons on mobile */
+    .sidebar-footer {
+        display: block !important;
+    }
+    
+    .floating-bus-btn {
+        display: flex !important;
+    }
+    .floating-bus-btn.hidden {
+        opacity: 0 !important;
+        transform: translate(-50%, -20px) !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    /* DEFAULT MOBILE STATE: Show sidebar card full-page, hide map container */
+    .bus-layout:not(.sidebar-hidden) .bus-sidebar {
+        width: calc(100% - 2.5rem) !important;
+        height: calc(100% - 2.5rem) !important;
+        max-height: none !important;
+        margin: 1.25rem !important;
+        padding: 1.25rem !important;
+        opacity: 1 !important;
+        transform: scale(1) translateY(0) !important;
+        pointer-events: auto !important;
+        position: relative !important;
+    }
+
+    .bus-layout:not(.sidebar-hidden) .bus-map-container {
+        width: calc(100% - 2.5rem) !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 0 !important;
+        transform: scale(0.95) translateY(30px) !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        bottom: 0 !important;
+    }
+
+    /* SIDEBAR HIDDEN STATE: Hide sidebar card, show map container full-page */
+    .bus-layout.sidebar-hidden .bus-sidebar {
+        width: calc(100% - 2.5rem) !important;
+        height: 0 !important;
+        max-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 0 !important;
+        transform: scale(0.95) translateY(-30px) !important;
+        pointer-events: none !important;
+        position: absolute !important;
+    }
+
+    .bus-layout.sidebar-hidden .bus-map-container {
+        width: calc(100% - 2.5rem) !important;
+        height: calc(100% - 2.5rem) !important;
+        margin: 1.25rem !important;
+        opacity: 1 !important;
+        transform: scale(1) translateY(0) !important;
+        pointer-events: auto !important;
+        position: relative !important;
+    }
 }
 
 
