@@ -150,8 +150,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const excludeChecklist = document.getElementById('exclude-lines-checklist');
     function setupExcludeChecklist() {
         excludeChecklist.innerHTML = '';
-        for (const key in transitData.lines) {
-            const line = transitData.lines[key];
+        
+        const getLineType = (name) => {
+            if (name.includes("MRT")) return "MRT";
+            if (name.includes("LRT")) return "LRT";
+            if (name.includes("Monorail")) return "Monorail";
+            if (name.includes("BRT")) return "BRT";
+            return "Other";
+        };
+
+        const typeOrder = { "MRT": 1, "LRT": 2, "Monorail": 3, "BRT": 4, "Other": 5 };
+
+        const sortedLines = Object.values(transitData.lines).sort((a, b) => {
+            const typeA = getLineType(a.name);
+            const typeB = getLineType(b.name);
+            
+            if (typeOrder[typeA] !== typeOrder[typeB]) {
+                return typeOrder[typeA] - typeOrder[typeB];
+            }
+            return a.name.localeCompare(b.name);
+        });
+
+        sortedLines.forEach(line => {
             const item = document.createElement('div');
             item.className = 'exclude-item';
             item.innerHTML = `
@@ -169,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             excludeChecklist.appendChild(item);
-        }
+        });
     }
     setupExcludeChecklist();
 
