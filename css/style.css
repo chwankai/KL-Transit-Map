@@ -1101,3 +1101,247 @@ body {
     text-decoration: underline;
 }
 
+/* --- Bus View Layout & Styling --- */
+.bus-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.bus-sidebar {
+    width: 320px;
+    height: calc(100% - 2.5rem);
+    margin: 1.25rem 0 1.25rem 1.25rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-header h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.region-selector {
+    display: flex;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.25rem;
+    margin-bottom: 1rem;
+    gap: 0.25rem;
+}
+
+.region-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.region-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--button-secondary-bg);
+}
+
+.region-btn.active {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+.live-indicator {
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    animation: live-blink 1.5s infinite;
+}
+
+@keyframes live-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.bus-status-text {
+    font-size: 0.775rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bus-controls {
+    margin-bottom: 1rem;
+}
+
+.bus-bulk-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    transition: color var(--transition-speed) ease;
+}
+
+.btn-text:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+.bus-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 0.25rem;
+}
+
+.bus-route-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.75rem;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.bus-route-item:hover {
+    border-color: var(--accent-color);
+    background-color: var(--button-secondary-bg);
+}
+
+.bus-route-item.selected {
+    background-color: rgba(59, 130, 246, 0.08);
+    border-color: var(--accent-color);
+}
+
+.bus-route-left {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.bus-route-left input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-color);
+}
+
+.route-badge {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.route-desc {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.bus-count-badge {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.35rem;
+    border-radius: 20px;
+}
+
+.bus-map-container {
+    flex: 1;
+    height: calc(100% - 2.5rem);
+    margin: 1.25rem;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.bus-map {
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+}
+
+/* Custom Marker Info Window Styling */
+.bus-info-window {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #1e293b;
+    padding: 0.25rem;
+}
+
+.bus-info-window h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.bus-info-window p {
+    margin: 0.15rem 0;
+    font-size: 0.775rem;
+    color: #475569;
+}
+
+.bus-info-window strong {
+    color: #0f172a;
+}
+
+/* Responsive Bus Tab View */
+@media (max-width: 768px) {
+    .bus-layout {
+        flex-direction: column;
+    }
+    
+    .bus-sidebar {
+        width: calc(100% - 2.5rem);
+        height: auto;
+        max-height: 45vh;
+        margin: 1.25rem 1.25rem 0 1.25rem;
+    }
+    
+    .bus-map-container {
+        height: 45vh;
+        margin: 1.25rem;
+    }
+}
+

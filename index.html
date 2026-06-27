@@ -30,6 +30,7 @@
             <nav class="nav-links">
                 <button id="nav-map" class="nav-btn active">🗺️ Map</button>
                 <button id="nav-plan" class="nav-btn">🧭 Plan</button>
+                <button id="nav-bus" class="nav-btn">🚌 Bus</button>
                 <button id="nav-settings" class="nav-btn-icon" title="Database Settings">⚙️</button>
             </nav>
         </header>
@@ -119,9 +120,42 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Tab 3: Bus View -->
+            <div id="view-bus" class="tab-view">
+                <div class="bus-layout">
+                    <!-- Left Column: Bus sidebar -->
+                    <div class="bus-sidebar glass-card">
+                        <div class="sidebar-header">
+                            <h2 id="bus-sidebar-title">myBAS Live Tracker</h2>
+                            <span class="live-indicator">LIVE</span>
+                        </div>
+                        <div class="region-selector">
+                            <button id="btn-region-johor" class="region-btn active">Johor</button>
+                            <button id="btn-region-melaka" class="region-btn">Melaka</button>
+                        </div>
+                        <div class="bus-status-text" id="bus-status-text">Fetching live bus locations...</div>
+                        <div class="bus-controls">
+                            <button id="btn-refresh-bus" class="btn btn-secondary btn-block">Refresh Data 🔄</button>
+                            <div class="bus-bulk-actions">
+                                <button id="btn-select-all-bus" class="btn btn-text">Select All</button>
+                                <button id="btn-deselect-all-bus" class="btn btn-text">Deselect All</button>
+                            </div>
+                        </div>
+                        <div class="bus-list" id="bus-list-container">
+                            <!-- Dynamically populated route list -->
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Map -->
+                    <div class="bus-map-container glass-card">
+                        <div id="bus-map" class="bus-map"></div>
+                    </div>
+                </div>
+            </div>
         </main>
         <footer class="app-footer">
-            Developed by CK 2026. <a href="https://github.com/chwankai/KV_Transit_Map" target="_blank" rel="noopener noreferrer">Github</a>
+            © 2026 Chwan Kai. All Rights Reserved. <a href="https://github.com/chwankai/KV_Transit_Map" target="_blank" rel="noopener noreferrer">Github</a>
         </footer>
     </div>
     
@@ -141,10 +175,20 @@
                         <option value="system" selected>Follow System 🖥️</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="gmaps-key-input">Google Maps API Key</label>
+                    <input type="password" id="gmaps-key-input" class="form-control" placeholder="Enter key (saved to localStorage)...">
+                    <small class="form-help-text">Leave blank to use default keyless mode (shows watermark).</small>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Local config containing API Keys (ignored by Git) -->
+    <script src="js/config.js"></script>
+
+    <!-- Protobuf Library for GTFS-Realtime parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.2.4/dist/protobuf.min.js"></script>
     
     <!-- Route Database and Finder Logic -->
     <script src="js/transit-data.js?v=1.8"></script>
