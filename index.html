@@ -38,7 +38,9 @@
             <!-- Tab 1: Map View -->
             <div id="view-map" class="tab-view active">
                 <div class="pdf-tab-layout">
-                    <div id="pdf-container" class="pdf-viewer-container"></div>
+                    <div id="pdf-container" class="pdf-viewer-container">
+                        <img id="map-image" class="pdf-page-canvas" src="maps/Klang Valley Rail Map.jpg" alt="Klang Valley Rail Map">
+                    </div>
                     <div class="map-controls">
                         <button id="btn-toggle-map" class="btn btn-primary">Upcoming Map 🗺️</button>
                     </div>
@@ -142,9 +144,7 @@
             </div>
         </div>
     </div>
-    
-    <!-- PDF.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
     
     <!-- Route Database and Finder Logic -->
     <script src="js/transit-data.js?v=1.8"></script>
