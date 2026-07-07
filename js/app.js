@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     toStation = findStationByCodeOrName(firstStep.stop_id, firstStep.stop_name);
                 }
                 
-                if (fromStation && toStation) {
+                if (fromStation && toStation && fromStation !== toStation) {
                     if (path.length === 0 || path[path.length - 1] !== fromStation) {
                         path.push(fromStation);
                     }
@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsPlaceholder.classList.add('hidden');
         resultsContainer.classList.remove('hidden');
         
-        const cashlessVal = route.totalFare !== null && route.totalFare !== undefined ? `RM ${route.totalFare.toFixed(2)}` : '--';
+        const cashlessVal = route.totalFare !== null && route.totalFare !== undefined ? `RM ${route.totalFare.toFixed(2)}` : '-';
         resFare.innerText = cashlessVal;
         
         const resFareCash = document.getElementById('res-fare-cash');
