@@ -2,24 +2,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. View Switching Tabs
     const navMap = document.getElementById('nav-map');
     const navPlan = document.getElementById('nav-plan');
+    const navBus = document.getElementById('nav-bus');
     const viewMap = document.getElementById('view-map');
     const viewPlan = document.getElementById('view-plan');
+    const viewBus = document.getElementById('view-bus');
+    
+    function deactivateAllTabs() {
+        navMap.classList.remove('active');
+        navPlan.classList.remove('active');
+        navBus.classList.remove('active');
+        viewMap.classList.remove('active');
+        viewPlan.classList.remove('active');
+        viewBus.classList.remove('active');
+    }
     
     navMap.addEventListener('click', () => {
+        deactivateAllTabs();
         navMap.classList.add('active');
-        navPlan.classList.remove('active');
         viewMap.classList.add('active');
-        viewPlan.classList.remove('active');
+        stopBusTracking();
     });
     
     navPlan.addEventListener('click', () => {
+        deactivateAllTabs();
         navPlan.classList.add('active');
-        navMap.classList.remove('active');
         viewPlan.classList.add('active');
-        viewMap.classList.remove('active');
+        stopBusTracking();
         // Redraw autocomplete dropdown content on focus
         setupAutocomplete(originInput, originDropdown);
         setupAutocomplete(destInput, destDropdown);
+    });
+    
+    navBus.addEventListener('click', () => {
+        deactivateAllTabs();
+        navBus.classList.add('active');
+        viewBus.classList.add('active');
+        startBusTracking();
     });
 
     // 2. Settings Modal Control
@@ -1071,4 +1089,717 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Load config on boot
     loadSavedConfig();
+
+    // --- Live myBAS Tracking Module ---
+    let busMap = null;
+    let busMarkers = {}; // key: vehicleId, value: { marker, startPos, targetPos, startTime, targetTime, routeId, ... }
+    let busPollInterval = null;
+    let busAnimFrame = null;
+    let busRoutesMap = {}; // key: routeId, value: { name, activeCount }
+    let activeBuses = []; // list of decoded vehicles
+    let selectedRouteIds = new Set();
+    let hasInitializedSelection = false;
+    let mapsLoading = false;
+    let mapsLoaded = false;
+    let selectedRouteColors = {}; // Cache colors for routes to make them look harmonized
+    let activeInfoWindow = null;
+    let activeInfoWindowVehicleId = null;
+    
+    // Region configuration for Johor and Melaka
+    let activeRegion = 'johor';
+    const regionConfigs = {
+        johor: {
+            url: "https://api.data.gov.my/gtfs-realtime/vehicle-position/mybas-johor/",
+            center: { lat: 1.4927, lng: 103.7414 },
+            zoom: 11
+        },
+        melaka: {
+            url: "https://api.data.gov.my/gtfs-realtime/vehicle-position/mybas-melaka/",
+            center: { lat: 2.2418614, lng: 102.2387632 },
+            zoom: 12
+        }
+    };
+
+    // Static database of all myBAS routes for J- and M- lines
+    const staticRoutes = {
+        johor: [
+            { id: "J10", name: "J10", desc: "JB Sentral - Kota Tinggi" },
+            { id: "J11", name: "J11", desc: "JB Sentral - AEON Dato' Onn" },
+            { id: "J13", name: "J13", desc: "JB Sentral - Larkin Sentral" },
+            { id: "J15", name: "J15", desc: "JB Sentral - Mid Valley Southkey" },
+            { id: "J16", name: "J16", desc: "Angsana - Toppen Tebrau" },
+            { id: "J20", name: "J20", desc: "JB Sentral - Masai" },
+            { id: "J21", name: "J21", desc: "JB Sentral - Permas Jaya" },
+            { id: "J22", name: "J22", desc: "JB Sentral - Scientex" },
+            { id: "J30", name: "J30", desc: "JB Sentral - Kulai" },
+            { id: "J31", name: "J31", desc: "JB Sentral - Pulai Mutiara" },
+            { id: "J32", name: "J32", desc: "JB Sentral - Selesa Jaya" },
+            { id: "J33", name: "J33", desc: "JB Sentral - Sri Yaacob" },
+            { id: "J34", name: "J34", desc: "JB Sentral - Sutera Mall" },
+            { id: "J40", name: "J40", desc: "Larkin Sentral - Gelang Patah" },
+            { id: "J42", name: "J42", desc: "Gelang Patah - Pendas" },
+            { id: "J44", name: "J44", desc: "Larkin Sentral - Puteri Harbour" },
+            { id: "J50", name: "J50", desc: "Larkin Sentral - Pontian" },
+            { id: "J100", name: "J100", desc: "JB Sentral - KSL City Mall" },
+            { id: "J200", name: "J200", desc: "Terminal Masai - PPR Seri Alam" },
+            { id: "J205", name: "J205", desc: "Terminal Masai - Lotus Kota Masai" },
+            { id: "J300", name: "J300", desc: "Terminal Kulai - Putri Kulai" }
+        ],
+        melaka: [
+            { id: "M10A", name: "M10A", desc: "Melaka Sentral - MITC & UTeM" },
+            { id: "M10B", name: "M10B", desc: "Melaka Sentral - MITC" },
+            { id: "M11", name: "M11", desc: "Melaka Sentral - Bukit Katil" },
+            { id: "M12", name: "M12", desc: "Melaka Sentral - Airport Batu Berendam" },
+            { id: "M13", name: "M13", desc: "Melaka Sentral - Taman Inang Sari" },
+            { id: "M14", name: "M14", desc: "Melaka Sentral - Bertam Ulu" },
+            { id: "M15", name: "M15", desc: "Melaka Sentral - Pulau Gadong" },
+            { id: "M16", name: "M16", desc: "Melaka Sentral - Paya Luboh" },
+            { id: "M17", name: "M17", desc: "Melaka Sentral - Tangga Batu" },
+            { id: "M20", name: "M20", desc: "Melaka Sentral - Tampin" },
+            { id: "M20X", name: "M20X", desc: "Melaka Sentral - Alor Gajah" },
+            { id: "M21", name: "M21", desc: "Melaka Sentral - Tampin via Durian Tunggal" },
+            { id: "M21X", name: "M21X", desc: "Melaka Sentral - Alor Gajah via Durian Tunggal" },
+            { id: "M22", name: "M22", desc: "Melaka Sentral - Bandar Vendor" },
+            { id: "M23", name: "M23", desc: "Melaka Sentral - Masjid Tanah" },
+            { id: "M23X", name: "M23X", desc: "Melaka Sentral - Masjid Tanah" },
+            { id: "M30", name: "M30", desc: "Melaka Sentral - Batang Melaka via Selandar" },
+            { id: "M31", name: "M31", desc: "Melaka Sentral - Batang Melaka via Tebong" },
+            { id: "M32", name: "M32", desc: "Melaka Sentral - Jasin" },
+            { id: "M33", name: "M33", desc: "Jasin - Taman Seri Asahan" },
+            { id: "M100", name: "M100", desc: "Bandaraya Melaka Feeder" },
+            { id: "M101", name: "M101", desc: "Pasar Melaka Feeder" }
+        ]
+    };
+
+    // Minimal GTFS-RT Protobuf JSON definition
+    const gtfsRtProtoJson = {
+      nested: {
+        transit_realtime: {
+          nested: {
+            FeedMessage: {
+              fields: {
+                header: { rule: "required", type: "FeedHeader", id: 1 },
+                entity: { rule: "repeated", type: "FeedEntity", id: 2 }
+              }
+            },
+            FeedHeader: {
+              fields: {
+                gtfs_realtime_version: { rule: "required", type: "string", id: 1 },
+                incrementality: { type: "int32", id: 2 },
+                timestamp: { type: "uint64", id: 3 }
+              }
+            },
+            FeedEntity: {
+              fields: {
+                id: { rule: "required", type: "string", id: 1 },
+                is_deleted: { type: "bool", id: 2 },
+                trip_update: { type: "TripUpdate", id: 3 },
+                vehicle: { type: "VehiclePosition", id: 4 },
+                alert: { type: "Alert", id: 5 }
+              }
+            },
+            TripUpdate: {
+              fields: {
+                trip: { rule: "required", type: "TripDescriptor", id: 1 }
+              }
+            },
+            VehiclePosition: {
+              fields: {
+                trip: { type: "TripDescriptor", id: 1 },
+                position: { type: "Position", id: 2 },
+                current_stop_sequence: { type: "uint32", id: 3 },
+                current_status: { type: "int32", id: 4 },
+                timestamp: { type: "uint64", id: 5 },
+                congestion_level: { type: "int32", id: 6 },
+                stop_id: { type: "string", id: 7 },
+                vehicle: { type: "VehicleDescriptor", id: 8 }
+              }
+            },
+            Alert: {
+              fields: {
+                active_period: { rule: "repeated", type: "TimeRange", id: 1 }
+              }
+            },
+            TimeRange: {
+              fields: {
+                start: { type: "uint64", id: 1 },
+                end: { type: "uint64", id: 2 }
+              }
+            },
+            TripDescriptor: {
+              fields: {
+                trip_id: { type: "string", id: 1 },
+                route_id: { type: "string", id: 5 },
+                direction_id: { type: "uint32", id: 6 }
+              }
+            },
+            Position: {
+              fields: {
+                latitude: { rule: "required", type: "float", id: 1 },
+                longitude: { rule: "required", type: "float", id: 2 },
+                bearing: { type: "float", id: 3 },
+                odometer: { type: "double", id: 4 },
+                speed: { type: "float", id: 5 }
+              }
+            },
+            VehicleDescriptor: {
+              fields: {
+                id: { type: "string", id: 1 },
+                label: { type: "string", id: 2 },
+                license_plate: { type: "string", id: 3 }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    let FeedMessageType = null;
+    try {
+        const root = protobuf.Root.fromJSON(gtfsRtProtoJson);
+        FeedMessageType = root.lookupType("transit_realtime.FeedMessage");
+    } catch (e) {
+        console.error("Failed to build protobuf FeedMessage type:", e);
+    }
+
+    function getRouteColor(routeId) {
+        if (selectedRouteColors[routeId]) return selectedRouteColors[routeId];
+        let hash = 0;
+        for (let i = 0; i < routeId.length; i++) {
+            hash = routeId.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h = Math.abs(hash % 360);
+        const color = `hsl(${h}, 85%, 45%)`;
+        selectedRouteColors[routeId] = color;
+        return color;
+    }
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the earth in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c; // Distance in km
+    }
+
+    function formatRouteId(routeId) {
+        return routeId.replace(/CWLMYJB|MYJB|JB|CWLMYMK|MYMK|MK/g, '').trim();
+    }
+
+    function startBusTracking() {
+        const apiKey = (typeof CONFIG !== 'undefined' && CONFIG.GMAPS_API_KEY) || localStorage.getItem('gmaps_api_key') || '';
+        loadGoogleMaps(apiKey, () => {
+            initMap();
+            fetchBusData();
+            
+            clearInterval(busPollInterval);
+            busPollInterval = setInterval(fetchBusData, 15000);
+            
+            cancelAnimationFrame(busAnimFrame);
+            busAnimFrame = requestAnimationFrame(animateMarkers);
+        });
+    }
+
+    function stopBusTracking() {
+        clearInterval(busPollInterval);
+        cancelAnimationFrame(busAnimFrame);
+        for (const vehicleId in busMarkers) {
+            if (busMarkers[vehicleId].marker) {
+                busMarkers[vehicleId].marker.setMap(null);
+            }
+        }
+        busMarkers = {};
+    }
+
+    function loadGoogleMaps(apiKey, callback) {
+        if (mapsLoaded || (window.google && window.google.maps)) {
+            callback();
+            return;
+        }
+        if (mapsLoading) {
+            setTimeout(() => loadGoogleMaps(apiKey, callback), 100);
+            return;
+        }
+        mapsLoading = true;
+        
+        window.googleMapsCallback = () => {
+            mapsLoaded = true;
+            mapsLoading = false;
+            callback();
+        };
+        
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=googleMapsCallback`;
+        script.async = true;
+        script.defer = true;
+        script.onerror = () => {
+            mapsLoading = false;
+            document.getElementById('bus-status-text').innerText = "Failed to load Google Maps. Please verify your API Key.";
+        };
+        document.head.appendChild(script);
+    }
+
+    function initMap() {
+        if (busMap) return;
+        const container = document.getElementById('bus-map');
+        if (!container) return;
+        
+        const center = regionConfigs[activeRegion].center;
+        const zoom = regionConfigs[activeRegion].zoom;
+        
+        const darkMapStyle = [
+            { elementType: "geometry", stylers: [{ color: "#212121" }] },
+            { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+            { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#757575" }] },
+            { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+            { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+            { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
+            { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+            { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#181818" }] },
+            { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+            { featureType: "poi.park", elementType: "labels.text.stroke", stylers: [{ color: "#1b1b1b" }] },
+            { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#2c2c2c" }] },
+            { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a8a8a" }] },
+            { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#373737" }] },
+            { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3c3c3c" }] },
+            { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#4e4e4e" }] },
+            { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+            { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
+            { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3d3d3d" }] }
+        ];
+
+        const lightMapStyle = [];
+        const isDark = !document.body.classList.contains('light-theme');
+
+        busMap = new google.maps.Map(container, {
+            center: center,
+            zoom: zoom,
+            styles: isDark ? darkMapStyle : lightMapStyle,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true
+        });
+
+        const observer = new MutationObserver(() => {
+            const activeDark = !document.body.classList.contains('light-theme');
+            busMap.setOptions({ styles: activeDark ? darkMapStyle : lightMapStyle });
+        });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    let isFetchingBus = false;
+    function fetchBusData() {
+        if (isFetchingBus) return;
+        isFetchingBus = true;
+        
+        const statusText = document.getElementById('bus-status-text');
+        statusText.innerHTML = `Refreshing live locations... <span class="loading-spinner">⏳</span>`;
+        
+        fetch(regionConfigs[activeRegion].url)
+            .then(res => {
+                if (!res.ok) throw new Error("Status code " + res.status);
+                return res.arrayBuffer();
+            })
+            .then(buffer => {
+                if (!FeedMessageType) throw new Error("Protobuf decoder not configured.");
+                const message = FeedMessageType.decode(new Uint8Array(buffer));
+                
+                activeBuses = [];
+                const foundRoutes = {};
+                
+                if (message.entity && message.entity.length > 0) {
+                    message.entity.forEach(ent => {
+                        if (ent.vehicle && ent.vehicle.position && ent.vehicle.trip) {
+                            const routeId = ent.vehicle.trip.route_id || "Unknown";
+                            const vehicleId = ent.vehicle.vehicle ? (ent.vehicle.vehicle.id || ent.vehicle.vehicle.license_plate) : ent.id;
+                            const licensePlate = ent.vehicle.vehicle ? ent.vehicle.vehicle.license_plate : "N/A";
+                            const lat = ent.vehicle.position.latitude;
+                            const lng = ent.vehicle.position.longitude;
+                            const speed = ent.vehicle.position.speed ? (ent.vehicle.position.speed * 3.6).toFixed(1) : "0.0";
+                            const timestamp = ent.vehicle.timestamp ? Number(ent.vehicle.timestamp) * 1000 : Date.now();
+                            
+                            activeBuses.push({
+                                vehicleId,
+                                routeId,
+                                licensePlate,
+                                lat,
+                                lng,
+                                speed,
+                                timestamp
+                            });
+                            
+                            if (!foundRoutes[routeId]) {
+                                foundRoutes[routeId] = 0;
+                            }
+                            foundRoutes[routeId]++;
+                        }
+                    });
+                }
+                
+                // Initialize with all static routes for the active region
+                busRoutesMap = {};
+                const regionStatic = staticRoutes[activeRegion] || [];
+                regionStatic.forEach(route => {
+                    busRoutesMap[route.id] = {
+                        name: route.name,
+                        desc: route.desc,
+                        activeCount: 0
+                    };
+                });
+                
+                // Merge counts from live feed and dynamically discover new routes
+                for (const rawRouteId in foundRoutes) {
+                    const cleanRouteId = formatRouteId(rawRouteId);
+                    if (busRoutesMap[cleanRouteId]) {
+                        busRoutesMap[cleanRouteId].activeCount = foundRoutes[rawRouteId];
+                    } else {
+                        busRoutesMap[cleanRouteId] = {
+                            name: cleanRouteId,
+                            desc: `Route ${cleanRouteId}`,
+                            activeCount: foundRoutes[rawRouteId]
+                        };
+                    }
+                }
+                
+                if (!hasInitializedSelection) {
+                    for (const routeId in busRoutesMap) {
+                        selectedRouteIds.add(routeId);
+                    }
+                    hasInitializedSelection = true;
+                }
+                
+                updateRouteChecklist();
+                updateMarkersOnMap();
+                
+                statusText.innerText = `Found ${activeBuses.length} active buses across ${Object.keys(busRoutesMap).length} routes.`;
+                isFetchingBus = false;
+            })
+            .catch(err => {
+                console.error("Error loading bus data:", err);
+                statusText.innerText = "Error refreshing bus feed. Retrying shortly...";
+                isFetchingBus = false;
+            });
+    }
+
+    function updateRouteChecklist() {
+        const container = document.getElementById('bus-list-container');
+        if (!container) return;
+        
+        const hideInactive = document.getElementById('chk-hide-inactive')?.checked || false;
+        
+        let sortedRouteIds = Object.keys(busRoutesMap);
+        if (hideInactive) {
+            sortedRouteIds = sortedRouteIds.filter(routeId => busRoutesMap[routeId].activeCount > 0);
+        }
+        
+        sortedRouteIds.sort((a, b) => {
+            return busRoutesMap[a].name.localeCompare(busRoutesMap[b].name, undefined, { numeric: true });
+        });
+        
+        container.innerHTML = '';
+        
+        if (sortedRouteIds.length === 0) {
+            container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-secondary);font-size:0.85rem;">No active routes found matching filter.</div>`;
+            return;
+        }
+        
+        sortedRouteIds.forEach(routeId => {
+            const rData = busRoutesMap[routeId];
+            const isChecked = selectedRouteIds.has(routeId);
+            
+            const item = document.createElement('div');
+            item.className = `bus-route-item ${isChecked ? 'selected' : ''} ${rData.activeCount === 0 ? 'inactive-route' : ''}`;
+            const routeColor = getRouteColor(routeId);
+            
+            item.innerHTML = `
+                <div class="bus-route-left">
+                    <input type="checkbox" value="${routeId}" ${isChecked ? 'checked' : ''}>
+                    <span class="route-badge" style="background-color: ${routeColor}">${rData.name}</span>
+                    <span class="route-desc">${rData.desc || 'Route ' + rData.name}</span>
+                </div>
+                <span class="bus-count-badge">${rData.activeCount} live</span>
+            `;
+            
+            item.addEventListener('click', (e) => {
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (e.target !== cb) {
+                    cb.checked = !cb.checked;
+                }
+                
+                if (cb.checked) {
+                    selectedRouteIds.add(routeId);
+                    item.classList.add('selected');
+                } else {
+                    selectedRouteIds.delete(routeId);
+                    item.classList.remove('selected');
+                }
+                
+                updateMarkersOnMap();
+            });
+            
+            container.appendChild(item);
+        });
+    }
+
+    function updateInfoWindowContent(vehicleId) {
+        if (!activeInfoWindow || activeInfoWindowVehicleId !== vehicleId) return;
+        const data = busMarkers[vehicleId];
+        if (!data) return;
+        
+        const cleanName = formatRouteId(data.routeId);
+        const localTime = new Date(data.timestamp).toLocaleTimeString();
+        const currentLat = data.marker.getPosition().lat().toFixed(5);
+        const currentLng = data.marker.getPosition().lng().toFixed(5);
+        
+        const content = `
+            <div class="bus-info-window">
+                <h3>myBAS Route ${cleanName}</h3>
+                <p><strong>Plate:</strong> ${data.licensePlate}</p>
+                <p><strong>Speed:</strong> ${data.speed} km/h</p>
+                <p><strong>Last Updated:</strong> ${localTime}</p>
+                <p><strong>Coordinates:</strong> ${currentLat}, ${currentLng}</p>
+            </div>
+        `;
+        activeInfoWindow.setContent(content);
+    }
+
+    function updateMarkersOnMap() {
+        if (!busMap) return;
+        
+        const now = Date.now();
+        const seenVehicles = new Set();
+        
+        activeBuses.forEach(bus => {
+            const cleanRouteId = formatRouteId(bus.routeId);
+            if (!selectedRouteIds.has(cleanRouteId)) {
+                if (busMarkers[bus.vehicleId]) {
+                    busMarkers[bus.vehicleId].marker.setMap(null);
+                    delete busMarkers[bus.vehicleId];
+                }
+                return;
+            }
+            
+            seenVehicles.add(bus.vehicleId);
+            const routeColor = getRouteColor(bus.routeId);
+            const cleanName = formatRouteId(bus.routeId);
+            
+            if (busMarkers[bus.vehicleId]) {
+                const data = busMarkers[bus.vehicleId];
+                
+                // Calculate speed from coordinate shift if the API speed is unavailable/0
+                let calculatedSpeed = Number(bus.speed);
+                if (calculatedSpeed <= 0.05 && bus.timestamp > data.timestamp) {
+                    const distKm = getDistance(data.targetPos.lat, data.targetPos.lng, bus.lat, bus.lng);
+                    const hours = (bus.timestamp - data.timestamp) / 3600000;
+                    if (hours > 0) {
+                        const rawSpeed = distKm / hours;
+                        if (rawSpeed >= 0 && rawSpeed < 130) {
+                            calculatedSpeed = rawSpeed;
+                        }
+                    }
+                }
+                
+                data.startPos = {
+                    lat: data.marker.getPosition().lat(),
+                    lng: data.marker.getPosition().lng()
+                };
+                data.targetPos = { lat: bus.lat, lng: bus.lng };
+                data.startTime = now;
+                data.targetTime = now + 15000;
+                
+                data.speed = calculatedSpeed.toFixed(1);
+                data.timestamp = bus.timestamp;
+                data.licensePlate = bus.licensePlate;
+                
+                updateInfoWindowContent(bus.vehicleId);
+            } else {
+                const markerIcon = {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: routeColor,
+                    fillOpacity: 0.9,
+                    strokeColor: "#ffffff",
+                    strokeWeight: 2.5,
+                    scale: 14
+                };
+                
+                const marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(bus.lat, bus.lng),
+                    map: busMap,
+                    icon: markerIcon,
+                    title: `Route ${cleanName} (${bus.licensePlate})`,
+                    label: {
+                        text: cleanName,
+                        color: "#ffffff",
+                        fontSize: "9px",
+                        fontWeight: "800"
+                    }
+                });
+                
+                marker.addListener('click', () => {
+                    if (!activeInfoWindow) {
+                        activeInfoWindow = new google.maps.InfoWindow();
+                        activeInfoWindow.addListener('closeclick', () => {
+                            activeInfoWindowVehicleId = null;
+                        });
+                    }
+                    activeInfoWindowVehicleId = bus.vehicleId;
+                    updateInfoWindowContent(bus.vehicleId);
+                    activeInfoWindow.open(busMap, marker);
+                });
+                
+                busMarkers[bus.vehicleId] = {
+                    marker,
+                    startPos: { lat: bus.lat, lng: bus.lng },
+                    targetPos: { lat: bus.lat, lng: bus.lng },
+                    startTime: now,
+                    targetTime: now,
+                    routeId: bus.routeId,
+                    speed: bus.speed,
+                    licensePlate: bus.licensePlate,
+                    timestamp: bus.timestamp
+                };
+            }
+        });
+        
+        for (const vehicleId in busMarkers) {
+            if (!seenVehicles.has(vehicleId)) {
+                busMarkers[vehicleId].marker.setMap(null);
+                delete busMarkers[vehicleId];
+            }
+        }
+    }
+
+    function animateMarkers() {
+        const now = Date.now();
+        for (const vehicleId in busMarkers) {
+            const data = busMarkers[vehicleId];
+            if (data.startTime && data.targetTime && data.targetTime > data.startTime) {
+                const duration = data.targetTime - data.startTime;
+                const elapsed = now - data.startTime;
+                let t = elapsed / duration;
+                t = Math.max(0, Math.min(1, t));
+                
+                const lat = data.startPos.lat + (data.targetPos.lat - data.startPos.lat) * t;
+                const lng = data.startPos.lng + (data.targetPos.lng - data.startPos.lng) * t;
+                
+                data.marker.setPosition(new google.maps.LatLng(lat, lng));
+                
+                // Real-time update open InfoWindow coordinate values
+                if (activeInfoWindowVehicleId === vehicleId) {
+                    updateInfoWindowContent(vehicleId);
+                }
+            }
+        }
+        busAnimFrame = requestAnimationFrame(animateMarkers);
+    }
+
+    const btnRegionJohor = document.getElementById('btn-region-johor');
+    const btnRegionMelaka = document.getElementById('btn-region-melaka');
+
+    function switchRegion(region) {
+        if (activeRegion === region) return;
+        activeRegion = region;
+        
+        // Update active class on selector tabs
+        if (btnRegionJohor) btnRegionJohor.classList.toggle('active', region === 'johor');
+        if (btnRegionMelaka) btnRegionMelaka.classList.toggle('active', region === 'melaka');
+        
+        // Clear all markers from map
+        for (const vehicleId in busMarkers) {
+            if (busMarkers[vehicleId].marker) {
+                busMarkers[vehicleId].marker.setMap(null);
+            }
+        }
+        busMarkers = {};
+        
+        // Reset InfoWindow state
+        activeInfoWindowVehicleId = null;
+        if (activeInfoWindow) activeInfoWindow.close();
+        
+        // Clear routes state
+        selectedRouteIds.clear();
+        hasInitializedSelection = false;
+        busRoutesMap = {};
+        
+        // Update map camera
+        if (busMap) {
+            const config = regionConfigs[activeRegion];
+            busMap.setCenter(config.center);
+            busMap.setZoom(config.zoom);
+        }
+        
+        // Fetch new data
+        fetchBusData();
+    }
+
+    if (btnRegionJohor) {
+        btnRegionJohor.addEventListener('click', () => switchRegion('johor'));
+    }
+    if (btnRegionMelaka) {
+        btnRegionMelaka.addEventListener('click', () => switchRegion('melaka'));
+    }
+
+    const btnRefresh = document.getElementById('btn-refresh-bus');
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', () => {
+            fetchBusData();
+        });
+    }
+
+    const btnSelectAll = document.getElementById('btn-select-all-bus');
+    if (btnSelectAll) {
+        btnSelectAll.addEventListener('click', () => {
+            for (const routeId in busRoutesMap) {
+                selectedRouteIds.add(routeId);
+            }
+            updateRouteChecklist();
+            updateMarkersOnMap();
+        });
+    }
+
+    const btnDeselectAll = document.getElementById('btn-deselect-all-bus');
+    if (btnDeselectAll) {
+        btnDeselectAll.addEventListener('click', () => {
+            selectedRouteIds.clear();
+            updateRouteChecklist();
+            updateMarkersOnMap();
+        });
+    }
+
+    const chkHideInactive = document.getElementById('chk-hide-inactive');
+    if (chkHideInactive) {
+        chkHideInactive.addEventListener('change', () => {
+            updateRouteChecklist();
+        });
+    }
+
+    // Toggle Tracker Sidebar Visibility
+    const btnHideBusSidebar = document.getElementById('btn-hide-bus-sidebar');
+    const btnShowBusSidebar = document.getElementById('btn-show-bus-sidebar');
+    const busLayout = document.querySelector('.bus-layout');
+
+    if (btnHideBusSidebar && btnShowBusSidebar && busLayout) {
+        btnHideBusSidebar.addEventListener('click', () => {
+            busLayout.classList.add('sidebar-hidden');
+            btnShowBusSidebar.classList.remove('hidden');
+            if (busMap) {
+                google.maps.event.trigger(busMap, 'resize');
+            }
+        });
+
+        btnShowBusSidebar.addEventListener('click', () => {
+            busLayout.classList.remove('sidebar-hidden');
+            btnShowBusSidebar.classList.add('hidden');
+            if (busMap) {
+                google.maps.event.trigger(busMap, 'resize');
+            }
+        });
+    }
 });

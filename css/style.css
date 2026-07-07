@@ -1384,3 +1384,367 @@ body.light-theme .fare-pref-btn.active {
     text-decoration: underline;
 }
 
+/* --- Bus View Layout & Styling --- */
+.bus-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.bus-sidebar {
+    width: 320px;
+    height: calc(100% - 2.5rem);
+    margin: 1.25rem 0 1.25rem 1.25rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-header h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.region-selector {
+    display: flex;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.25rem;
+    margin-bottom: 1rem;
+    gap: 0.25rem;
+}
+
+.region-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.region-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--button-secondary-bg);
+}
+
+.region-btn.active {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+.live-indicator {
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    animation: live-blink 1.5s infinite;
+}
+
+@keyframes live-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.bus-status-text {
+    font-size: 0.775rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bus-controls {
+    margin-bottom: 1rem;
+}
+
+.bus-bulk-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    transition: color var(--transition-speed) ease;
+}
+
+.btn-text:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+.bus-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 0.25rem;
+}
+
+.bus-route-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.75rem;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.bus-route-item:hover {
+    border-color: var(--accent-color);
+    background-color: var(--button-secondary-bg);
+}
+
+.bus-route-item.selected {
+    background-color: rgba(59, 130, 246, 0.08);
+    border-color: var(--accent-color);
+}
+
+.bus-route-left {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.bus-route-left input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-color);
+}
+
+.route-badge {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.route-desc {
+    font-size: 0.725rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.bus-count-badge {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.bus-map-container {
+    flex: 1;
+    height: calc(100% - 2.5rem);
+    margin: 1.25rem;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.bus-map {
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+}
+
+/* Custom Marker Info Window Styling */
+.bus-info-window {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #1e293b;
+    padding: 0.25rem;
+}
+
+.bus-info-window h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.bus-info-window p {
+    margin: 0.15rem 0;
+    font-size: 0.775rem;
+    color: #475569;
+}
+
+.bus-info-window strong {
+    color: #0f172a;
+}
+
+.bus-toggle-inactive {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    user-select: none;
+    cursor: pointer;
+}
+
+.bus-toggle-inactive input[type="checkbox"] {
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent-color);
+}
+
+/* PC and Mobile text switches */
+.pc-text {
+    display: inline;
+}
+.mobile-text {
+    display: none;
+}
+
+/* PC Web Default: Hide toggle buttons completely */
+.sidebar-footer {
+    display: none !important;
+}
+.floating-bus-btn {
+    display: none !important;
+}
+
+/* Floating Show Tracker Button - Placed inside Map Container, top-centered */
+.floating-bus-btn {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    transform: translate(-50%, 0) !important;
+    z-index: 20;
+    border-radius: 30px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.floating-bus-btn.hidden {
+    display: none !important;
+}
+
+/* Show tracker button should not move on hover */
+.floating-bus-btn:hover {
+    transform: translate(-50%, 0) !important;
+}
+
+/* Sidebar Hidden State Layout Toggles (Desktop) */
+.bus-layout.sidebar-hidden .bus-sidebar {
+    display: none !important;
+}
+
+.bus-layout.sidebar-hidden .bus-map-container {
+    height: calc(100% - 2.5rem) !important;
+    width: calc(100% - 2.5rem) !important;
+    margin: 1.25rem !important;
+}
+
+/* Responsive Bus Tab View (Mobile only layout toggle) */
+@media (max-width: 768px) {
+    .bus-layout {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .pc-text {
+        display: none;
+    }
+    .mobile-text {
+        display: inline;
+    }
+    
+    /* Show buttons on mobile */
+    .sidebar-footer {
+        display: block !important;
+    }
+    
+    .floating-bus-btn {
+        display: flex !important;
+    }
+    .floating-bus-btn.hidden {
+        display: none !important;
+    }
+
+    /* DEFAULT MOBILE STATE: Show sidebar card full-page, hide map container */
+    .bus-layout:not(.sidebar-hidden) .bus-sidebar {
+        width: calc(100% - 2.5rem) !important;
+        height: calc(100% - 2.5rem) !important;
+        max-height: none !important;
+        margin: 1.25rem !important;
+        padding: 1.25rem !important;
+        display: flex !important;
+    }
+
+    .bus-layout:not(.sidebar-hidden) .bus-map-container {
+        display: none !important;
+    }
+
+    /* SIDEBAR HIDDEN STATE: Hide sidebar card, show map container full-page */
+    .bus-layout.sidebar-hidden .bus-sidebar {
+        display: none !important;
+    }
+
+    .bus-layout.sidebar-hidden .bus-map-container {
+        display: block !important;
+        width: calc(100% - 2.5rem) !important;
+        height: calc(100% - 2.5rem) !important;
+        margin: 1.25rem !important;
+    }
+}
+
+/* Faded opacity styling for inactive bus route cards */
+.bus-route-item.inactive-route {
+    opacity: 0.55;
+    background-color: rgba(30, 41, 59, 0.2);
+}
+
+
+
