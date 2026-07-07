@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
-    function convertApiRoute(apiRoute) {
+    function convertApiRoute(apiRoute, excluded) {
         const edges = [];
         const path = [];
         let transfers = 0;
@@ -282,6 +282,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (leg.type === "transit" && leg.steps && leg.steps.length > 0) {
                 const apiLine = leg.route_details ? leg.route_details.route_short_name : "";
                 const lineId = mapApiLineId(apiLine);
+                
+                if (excluded && excluded.includes(lineId)) {
+                    throw new Error(`Route uses excluded line: ${lineId}`);
+                }
                 
                 for (let j = 0; j < leg.steps.length; j++) {
                     const step = leg.steps[j];
@@ -363,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    async function fetchMyRapidRoute(origin, dest) {
+    async function fetchMyRapidRoute(origin, dest, excluded) {
         const originGeo = await geocodeStation(origin);
         const destGeo = await geocodeStation(dest);
         
@@ -390,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(data.message || "No routes returned by MyRapid API");
         }
         
-        return convertApiRoute(data.routes[0]);
+        return convertApiRoute(data.routes[0], excluded);
     }
 
     function renderRouteResults(route) {
@@ -451,15 +455,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmitPlan.disabled = true;
         btnSubmitPlan.innerHTML = 'Calculating Route... ⏳';
         
+        const excluded = [];
+        const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:not(:checked)');
+        checkboxes.forEach(cb => excluded.push(cb.value));
+        
         try {
-            const route = await fetchMyRapidRoute(origin, dest);
+            const route = await fetchMyRapidRoute(origin, dest, excluded);
             renderRouteResults(route);
         } catch (err) {
-            console.warn("MyRapid API failed, falling back to local Dijkstra planner:", err);
-            
-            const excluded = [];
-            const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:not(:checked)');
-            checkboxes.forEach(cb => excluded.push(cb.value));
+            console.warn("MyRapid API failed or returned excluded routes, falling back to local Dijkstra planner:", err);
             
             const route = transitData.findRoute(origin, dest, excluded);
             if (!route) {
