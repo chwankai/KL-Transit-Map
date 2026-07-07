@@ -300,7 +300,7 @@ body {
     width: 360px;
     padding: 1.5rem;
     border-right: 1px solid var(--border-color);
-    background-color: var(--sidebar-bg);
+    background-color: var(--results-bg);
     overflow-y: auto;
     transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
 }
@@ -791,7 +791,7 @@ body.light-theme .time-mode-tabs {
 
 /* Light theme support */
 body.light-theme .fare-pref-tabs {
-    background: rgba(0, 0, 0, 0.05);
+    background: white;
     border-color: rgba(0, 0, 0, 0.1);
 }
 
