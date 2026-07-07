@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=1.8">
+    <link rel="stylesheet" href="css/style.css?v=1.9">
     <!-- Favicon -->
     <link rel="icon" href="images/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="images/apple-favicon.png">
@@ -75,9 +75,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Exclude Lines</label>
-                                    <div class="exclude-checklist" id="exclude-lines-checklist">
-                                        <!-- Populated dynamically -->
+                                    <label>Time</label>
+                                    <div class="time-mode-tabs" id="time-mode-container">
+                                        <button type="button" class="fare-pref-btn active" data-mode="depart">Depart at</button>
+                                        <button type="button" class="fare-pref-btn" data-mode="arrive">Arrive by</button>
+                                    </div>
+                                    <div class="time-picker-row" id="time-picker-row">
+                                        <button type="button" id="btn-time-now" class="btn-time-now">Now</button>
+                                        <input type="date" id="time-date-input" class="time-input">
+                                        <input type="time" id="time-time-input" class="time-input">
                                     </div>
                                 </div>
                                 <button type="submit" id="btn-submit-plan" class="btn btn-primary btn-block">Search Journey 🚀</button>
@@ -89,37 +95,55 @@
                     <div class="planner-results">
                         <div id="results-placeholder" class="results-placeholder glass-card">
                             <div class="placeholder-icon">🧭</div>
-                            <p>Select your origin, destination, and line preferences, then click "Search Journey" to plan your route.</p>
+                            <p>Select your origin and destination, then click "Search Journey" to plan your route.</p>
                         </div>
                         <div id="results-container" class="results-container hidden">
-                            <div class="results-header glass-card">
-                                <div class="fare-container" id="res-fare-container">
-                                    <div class="fare-item" id="fare-item-cashless">
-                                        <span class="fare-label">Cashless</span>
-                                        <span class="fare-value" id="res-fare">RM 0.00</span>
-                                    </div>
-                                    <div class="fare-item" id="fare-item-cash">
-                                        <span class="fare-label">Cash</span>
-                                        <span class="fare-value cash-value" id="res-fare-cash">RM 0.00</span>
-                                    </div>
-                                    <div class="fare-item" id="fare-item-concession">
-                                        <span class="fare-label">Concession</span>
-                                        <span class="fare-value concession-value" id="res-fare-concession">RM 0.00</span>
-                                    </div>
-                                </div>
-                                <div class="journey-meta">
-                                    <div class="meta-item">
-                                        <span class="meta-label">Distance</span>
-                                        <span class="meta-value" id="res-dist">0.0 km</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="meta-label">Transfers</span>
-                                        <span class="meta-value" id="res-transfers">0</span>
-                                    </div>
+                            <!-- Route selector cards (top) -->
+                            <div class="route-cards-section" id="route-cards-section">
+                                <div class="route-cards-label">Recommended Routes</div>
+                                <div class="route-cards-grid" id="route-cards-grid">
+                                    <!-- Populated dynamically -->
                                 </div>
                             </div>
+
+                            <!-- Journey detail card (bottom) -->
                             <div class="route-details glass-card">
-                                <h3>Journey Directions</h3>
+                                <!-- ETA bar -->
+                                <div class="eta-bar" id="eta-bar">
+                                    <div class="eta-times">
+                                        <span class="eta-depart" id="eta-depart">--:--</span>
+                                        <span class="eta-arrow">→</span>
+                                        <span class="eta-arrive" id="eta-arrive">--:--</span>
+                                    </div>
+                                    <div class="eta-meta">
+                                        <span id="eta-duration">-- min</span>
+                                        <span class="eta-dot">·</span>
+                                        <span id="eta-dist">-- km</span>
+                                        <span class="eta-dot">·</span>
+                                        <span id="eta-transfers">--</span>
+                                    </div>
+                                </div>
+                                <!-- Fare strip -->
+                                <div class="fare-strip" id="fare-strip">
+                                    <div class="fare-container" id="res-fare-container">
+                                        <div class="fare-item" id="fare-item-cashless">
+                                            <span class="fare-label">Cashless</span>
+                                            <span class="fare-value" id="res-fare">RM 0.00</span>
+                                        </div>
+                                        <div class="fare-item" id="fare-item-cash">
+                                            <span class="fare-label">Cash</span>
+                                            <span class="fare-value cash-value" id="res-fare-cash">RM 0.00</span>
+                                        </div>
+                                        <div class="fare-item" id="fare-item-concession">
+                                            <span class="fare-label">Concession</span>
+                                            <span class="fare-value concession-value" id="res-fare-concession">RM 0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Journey timeline -->
+                                <div class="route-timeline-header">
+                                    <h3>Journey Directions</h3>
+                                </div>
                                 <div class="route-timeline" id="route-timeline-container">
                                     <!-- Populated dynamically -->
                                 </div>
@@ -171,9 +195,9 @@
 
     
     <!-- Route Database and Finder Logic -->
-    <script src="js/transit-data.js?v=1.8"></script>
+    <script src="js/transit-data.js?v=1.9"></script>
     
     <!-- Application Orchestrator -->
-    <script src="js/app.js?v=1.8"></script>
+    <script src="js/app.js?v=1.9"></script>
 </body>
 </html>

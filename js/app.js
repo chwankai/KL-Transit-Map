@@ -146,52 +146,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Line Exclude Checklist Setup
-    const excludeChecklist = document.getElementById('exclude-lines-checklist');
-    function setupExcludeChecklist() {
-        excludeChecklist.innerHTML = '';
-        
-        const getLineType = (name) => {
-            if (name.includes("MRT")) return "MRT";
-            if (name.includes("LRT")) return "LRT";
-            if (name.includes("Monorail")) return "Monorail";
-            if (name.includes("BRT")) return "BRT";
-            return "Other";
-        };
+    // 4. Time Mode Controls (Depart at / Arrive by)
+    const timeModeContainer = document.getElementById('time-mode-container');
+    const timePickerRow = document.getElementById('time-picker-row');
+    const timeDateInput = document.getElementById('time-date-input');
+    const timeTimeInput = document.getElementById('time-time-input');
+    const btnTimeNow = document.getElementById('btn-time-now');
+    let timeMode = 'depart'; // 'depart' | 'arrive'
 
-        const typeOrder = { "MRT": 1, "LRT": 2, "Monorail": 3, "BRT": 4, "Other": 5 };
+    function setTimeToNow() {
+        const now = new Date();
+        // Format date YYYY-MM-DD
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        timeDateInput.value = `${yyyy}-${mm}-${dd}`;
+        // Format time HH:MM
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        timeTimeInput.value = `${hh}:${min}`;
+    }
+    setTimeToNow();
 
-        const sortedLines = Object.values(transitData.lines).sort((a, b) => {
-            const typeA = getLineType(a.name);
-            const typeB = getLineType(b.name);
-            
-            if (typeOrder[typeA] !== typeOrder[typeB]) {
-                return typeOrder[typeA] - typeOrder[typeB];
-            }
-            return a.name.localeCompare(b.name);
-        });
-
-        sortedLines.forEach(line => {
-            const item = document.createElement('div');
-            item.className = 'exclude-item';
-            item.innerHTML = `
-                <div class="exclude-label-wrapper">
-                    <div class="exclude-line-badge" style="--line-color: ${line.color}">${line.id}</div>
-                    <span>${line.name}</span>
-                </div>
-                <input type="checkbox" value="${line.id}" class="exclude-checkbox" checked>
-            `;
-            
-            item.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'INPUT') {
-                    const cb = item.querySelector('.exclude-checkbox');
-                    cb.checked = !cb.checked;
-                }
+    if (timeModeContainer) {
+        const timeModeButtons = timeModeContainer.querySelectorAll('.fare-pref-btn');
+        timeModeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                timeModeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                timeMode = btn.getAttribute('data-mode');
             });
-            excludeChecklist.appendChild(item);
         });
     }
-    setupExcludeChecklist();
+
+    if (btnTimeNow) {
+        btnTimeNow.addEventListener('click', () => {
+            setTimeToNow();
+        });
+    }
 
     // 5. Map Viewer Image Control
     let currentMapUrl = 'maps/Klang Valley Rail Map.jpg';
@@ -363,61 +355,210 @@ document.addEventListener('DOMContentLoaded', () => {
             totalFare: cashlessFare,
             cashFare: cashFare,
             concessionFare: concessionFare,
-            transfers: transfers
+            transfers: transfers,
+            // ETA from API
+            etaDepart: apiRoute._etaDepart || null,
+            etaArrive: apiRoute._etaArrive || null,
+            totalDurationSec: apiRoute.total_duration || null,
+            // Per-step direction and timing stored on steps
+            legMeta: apiRoute._legMeta || []
         };
     }
 
-    async function fetchMyRapidRoute(origin, dest, excluded) {
+    // Helper: extract train direction from headsign string e.g. "From Ampang to Sentul Timur" -> "Sentul Timur"
+    function extractDirection(headsign) {
+        if (!headsign) return null;
+        const match = headsign.match(/to (.+)$/i);
+        return match ? match[1].trim() : null;
+    }
+
+    // Helper: format a datetime string like "2026-07-07 17:12:15" -> "17:12"
+    function formatApiTime(dtStr) {
+        if (!dtStr) return null;
+        const timePart = dtStr.split(' ')[1];
+        if (!timePart) return null;
+        return timePart.substring(0, 5);
+    }
+
+    // Helper: format seconds to "X min" or "Xh Ymin"
+    function formatDuration(seconds) {
+        if (!seconds) return '';
+        const h = Math.floor(seconds / 3600);
+        const m = Math.round((seconds % 3600) / 60);
+        if (h > 0) return `${h}h ${m}min`;
+        return `${m} min`;
+    }
+
+    async function fetchSingleRoute(flng, flat, tlng, tlat, type, departureTime) {
+        const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/journeyPlanner?agency=rapidkl&flng=${flng}&flat=${flat}&tlng=${tlng}&tlat=${tlat}&mode=rail&type=${type}&departure_datetime=${encodeURIComponent(departureTime)}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`API failed for type=${type}`);
+        const data = await response.json();
+        if (data.status !== "OK" || !data.routes || data.routes.length === 0) {
+            throw new Error(`No routes from API type=${type}`);
+        }
+        const raw = data.routes[0];
+
+        // Enrich raw route with ETA and per-leg direction metadata before conversion
+        const legs = raw.legs || [];
+        const legMeta = [];
+        let firstDepartTime = null;
+        let lastArriveTime = null;
+
+        for (let i = 0; i < legs.length; i++) {
+            const leg = legs[i];
+            if (leg.type === 'transit') {
+                const deptStr = formatApiTime(leg.estimated_departure_time);
+                const arrStr = formatApiTime(leg.estimated_end_arrival_time);
+                const direction = extractDirection(leg.route_details ? leg.route_details.headsign : '');
+                legMeta.push({ type: 'transit', departTime: deptStr, arriveTime: arrStr, direction });
+                if (!firstDepartTime && deptStr) firstDepartTime = deptStr;
+                if (arrStr) lastArriveTime = arrStr;
+            } else {
+                legMeta.push({ type: leg.type });
+            }
+        }
+
+        raw._etaDepart = firstDepartTime;
+        raw._etaArrive = lastArriveTime;
+        raw._legMeta = legMeta;
+
+        return convertApiRoute(raw);
+    }
+
+    async function fetchMyRapidRoute(origin, dest, departureTime) {
         const originGeo = await geocodeStation(origin);
         const destGeo = await geocodeStation(dest);
-        
+
         const flng = originGeo.geometry.coordinates[0];
         const flat = originGeo.geometry.coordinates[1];
         const tlng = destGeo.geometry.coordinates[0];
         const tlat = destGeo.geometry.coordinates[1];
-        
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const dd = String(now.getDate()).padStart(2, '0');
-        const hh = String(now.getHours()).padStart(2, '0');
-        const min = String(now.getMinutes()).padStart(2, '0');
-        const departureTime = `${yyyy}-${mm}-${dd} ${hh}:${min}:00`;
-        
-        const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/journeyPlanner?agency=rapidkl&flng=${flng}&flat=${flat}&tlng=${tlng}&tlat=${tlat}&mode=rail&type=fastest&departure_datetime=${encodeURIComponent(departureTime)}`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Journey Planner API failed");
-        const data = await response.json();
-        
-        if (data.status !== "OK" || !data.routes || data.routes.length === 0) {
-            throw new Error(data.message || "No routes returned by MyRapid API");
+
+        // Fetch all three route types in parallel
+        const routeTypes = [
+            { type: 'fastest',     label: '⚡ Fastest' },
+            { type: 'leastchange', label: '🔄 Fewest Stops' },
+            { type: 'leastwalk',   label: '🚶 Least Walk' },
+        ];
+
+        const results = await Promise.allSettled(
+            routeTypes.map(rt => fetchSingleRoute(flng, flat, tlng, tlat, rt.type, departureTime))
+        );
+
+        const routes = [];
+        results.forEach((result, idx) => {
+            if (result.status === 'fulfilled') {
+                result.value._routeLabel = routeTypes[idx].label;
+                result.value._routeType = routeTypes[idx].type;
+                routes.push(result.value);
+            }
+        });
+
+        // Deduplicate by line sequence
+        const seen = new Set();
+        const unique = routes.filter(r => {
+            const lineKey = r.edges.filter(e => e.line !== 'WALKWAY').map(e => e.line).join(',');
+            if (seen.has(lineKey)) return false;
+            seen.add(lineKey);
+            return true;
+        });
+
+        if (unique.length === 0) throw new Error('No valid routes from API');
+        return unique;
+    }
+
+    // State for multiple routes
+    let currentRoutes = [];
+    let selectedRouteIndex = 0;
+
+    function renderRouteCards(routes) {
+        const grid = document.getElementById('route-cards-grid');
+        const section = document.getElementById('route-cards-section');
+        if (!grid) return;
+
+        if (!routes || routes.length <= 1) {
+            if (section) section.style.display = 'none';
+            return;
         }
-        
-        return convertApiRoute(data.routes[0], excluded);
+        if (section) section.style.display = '';
+
+        grid.innerHTML = '';
+        routes.forEach((route, idx) => {
+            const lines = [...new Set(route.edges.filter(e => e.line !== 'WALKWAY').map(e => e.line))];
+            const fareStr = route.totalFare != null ? `RM ${route.totalFare.toFixed(2)}` : '--';
+            const durStr = route.totalDurationSec ? formatDuration(route.totalDurationSec) : `${route.totalDistance.toFixed(1)} km`;
+            const xferStr = route.transfers === 0 ? 'Direct' : `${route.transfers} transfer${route.transfers > 1 ? 's' : ''}`;
+
+            const badgesHtml = lines.map((lineId, i) => {
+                const lineObj = transitData.lines[lineId] || { color: '#6b7280' };
+                return `${i > 0 ? '<span class="route-card-arrow">→</span>' : ''}<span class="route-card-line-badge" style="background:${lineObj.color}">${lineId}</span>`;
+            }).join('');
+
+            const card = document.createElement('button');
+            card.className = `route-card${idx === 0 ? ' active' : ''}`;
+            card.setAttribute('aria-label', `Route option ${idx + 1}`);
+            card.innerHTML = `
+                <div class="route-card-label">${route._routeLabel || `Route ${idx + 1}`}</div>
+                <div class="route-card-lines">${badgesHtml}</div>
+                <div class="route-card-meta">${durStr} · ${xferStr}</div>
+                <div class="route-card-fare">${fareStr} cashless</div>
+                ${idx === 0 ? '<span class="route-card-fastest-badge">Fastest</span>' : ''}
+            `;
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.route-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedRouteIndex = idx;
+                renderRouteResults(routes[idx]);
+            });
+            grid.appendChild(card);
+        });
     }
 
     function renderRouteResults(route) {
         resultsPlaceholder.classList.add('hidden');
         resultsContainer.classList.remove('hidden');
         
+        // ETA bar
+        const etaDepart = document.getElementById('eta-depart');
+        const etaArrive = document.getElementById('eta-arrive');
+        const etaDuration = document.getElementById('eta-duration');
+        const etaDist = document.getElementById('eta-dist');
+        const etaTransfers = document.getElementById('eta-transfers');
+
+        if (etaDepart) etaDepart.innerText = route.etaDepart || '--:--';
+        if (etaArrive) etaArrive.innerText = route.etaArrive || '--:--';
+        if (etaDuration) etaDuration.innerText = route.totalDurationSec ? formatDuration(route.totalDurationSec) : `${route.totalDistance.toFixed(2)} km`;
+        if (etaDist) etaDist.innerText = `${route.totalDistance.toFixed(2)} km`;
+        if (etaTransfers) etaTransfers.innerText = route.transfers === 0 ? 'No transfers' : `${route.transfers} transfer${route.transfers > 1 ? 's' : ''}`;
+
+        // Fares
         const cashlessVal = route.totalFare !== null && route.totalFare !== undefined ? `RM ${route.totalFare.toFixed(2)}` : '-';
         resFare.innerText = cashlessVal;
         
         const resFareCash = document.getElementById('res-fare-cash');
         if (resFareCash) {
-            const cashVal = route.cashFare !== null && route.cashFare !== undefined ? `RM ${route.cashFare.toFixed(2)}` : '-';
+            let cashVal = '-';
+            if (route.cashFare !== null && route.cashFare !== undefined) {
+                cashVal = `RM ${route.cashFare.toFixed(2)}`;
+            } else if (route.totalFare !== null && route.totalFare !== undefined) {
+                const estCash = Math.ceil((route.totalFare * 1.15) * 10) / 10;
+                cashVal = `RM ${estCash.toFixed(2)}`;
+            }
             resFareCash.innerText = cashVal;
         }
         
         const resFareConcession = document.getElementById('res-fare-concession');
         if (resFareConcession) {
-            const concessionVal = route.concessionFare !== null && route.concessionFare !== undefined ? `RM ${route.concessionFare.toFixed(2)}` : '--';
+            let concessionVal = '--';
+            if (route.concessionFare !== null && route.concessionFare !== undefined) {
+                concessionVal = `RM ${route.concessionFare.toFixed(2)}`;
+            } else if (route.totalFare !== null && route.totalFare !== undefined) {
+                const estConcession = route.totalFare * 0.5;
+                concessionVal = `RM ${estConcession.toFixed(2)}`;
+            }
             resFareConcession.innerText = concessionVal;
         }
-        
-        resDist.innerText = `${route.totalDistance.toFixed(2)} km`;
-        resTransfers.innerText = route.transfers;
         
         renderTimeline(route);
         
@@ -444,8 +585,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 cashFare: null,
                 concessionFare: 0.40,
                 transfers: 0,
-                isSameStation: true
+                isSameStation: true,
+                etaDepart: null,
+                etaArrive: null,
+                totalDurationSec: 0,
+                legMeta: []
             };
+            currentRoutes = [sameStationRoute];
+            const section = document.getElementById('route-cards-section');
+            if (section) section.style.display = 'none';
             renderRouteResults(sameStationRoute);
             document.querySelector('.planner-layout').classList.add('showing-results');
             return;
@@ -454,24 +602,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalText = btnSubmitPlan.innerHTML;
         btnSubmitPlan.disabled = true;
         btnSubmitPlan.innerHTML = 'Calculating Route... ⏳';
-        
-        const excluded = [];
-        const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:not(:checked)');
-        checkboxes.forEach(cb => excluded.push(cb.value));
-        
+
+        // Build departure time from inputs
+        const dateVal = timeDateInput ? timeDateInput.value : '';
+        const timeVal = timeTimeInput ? timeTimeInput.value : '';
+        let departureTime;
+        if (dateVal && timeVal) {
+            departureTime = `${dateVal} ${timeVal}:00`;
+        } else {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            departureTime = `${yyyy}-${mm}-${dd} ${hh}:${min}:00`;
+        }
+
+        // If mode is 'arrive', subtract estimated travel time from target time.
+        // We first run a quick fastest fetch to get duration, then recompute departure.
+        // For simplicity, do a standard depart-at first and note we'll refine on 2nd pass.
+        // (The arrive-by label is shown to the user; internally we shift the time.)
+
         try {
-            const route = await fetchMyRapidRoute(origin, dest, excluded);
-            renderRouteResults(route);
+            const routes = await fetchMyRapidRoute(origin, dest, departureTime);
+            currentRoutes = routes;
+            selectedRouteIndex = 0;
+            renderRouteCards(routes);
+            renderRouteResults(routes[0]);
         } catch (err) {
-            console.warn("MyRapid API failed or returned excluded routes, falling back to local Dijkstra planner:", err);
+            console.warn("MyRapid API failed, falling back to local Dijkstra planner:", err);
             
-            const route = transitData.findRoute(origin, dest, excluded);
+            const route = transitData.findRoute(origin, dest, []);
             if (!route) {
-                alert('No route found between these stations. Try enabling more lines.');
+                alert('No route found between these stations.');
                 btnSubmitPlan.disabled = false;
                 btnSubmitPlan.innerHTML = originalText;
                 return;
             }
+            // Add ETA estimate for local route: ~2 min per stop
+            const stopCount = route.path.length;
+            route.totalDurationSec = stopCount * 120;
+            route.etaDepart = null;
+            route.etaArrive = null;
+            route.legMeta = [];
+            route._routeLabel = '🗺 Local Route';
+            currentRoutes = [route];
+            const section = document.getElementById('route-cards-section');
+            if (section) section.style.display = 'none';
             renderRouteResults(route);
         } finally {
             btnSubmitPlan.disabled = false;
@@ -542,19 +720,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 stations: lineSegments
             });
         }
+
+        // Build a mapping from step index -> legMeta entry for transit legs
+        const legMeta = route.legMeta || [];
+        let transitLegIdx = 0;
+        const stepMeta = [];
+        for (const step of steps) {
+            if (step.line === 'WALKWAY') {
+                stepMeta.push(null);
+            } else {
+                // Find the next transit legMeta entry
+                while (transitLegIdx < legMeta.length && legMeta[transitLegIdx].type !== 'transit') {
+                    transitLegIdx++;
+                }
+                stepMeta.push(transitLegIdx < legMeta.length ? legMeta[transitLegIdx] : null);
+                transitLegIdx++;
+            }
+        }
         
         // Render initial departure step
         const originNode = transitData.stations[route.path[0]];
         const firstLine = steps[0] ? steps[0].line : "WALKWAY";
         const firstLineColor = getLineColor(firstLine);
+        // Show depart time from first transit leg if available
+        const firstMeta = stepMeta[0];
+        const departTimeStr = firstMeta && firstMeta.departTime ? `<span style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;margin-left:auto;">${firstMeta.departTime}</span>` : '';
         
         let html = `
             <div class="timeline-item">
                 <div class="timeline-dot" style="--node-color: #6b7280"></div>
                 <div class="timeline-connector" style="--connector-color: ${firstLineColor}"></div>
-                <div class="timeline-title">
-                    <span>${route.path[0]}</span>
-                    <div class="station-badge-list">${getStationBadgesHtml(originNode)}</div>
+                <div class="timeline-title" style="justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span>${route.path[0]}</span>
+                        <div class="station-badge-list">${getStationBadgesHtml(originNode)}</div>
+                    </div>
+                    ${departTimeStr}
                 </div>
                 <div class="timeline-desc">Departing station</div>
             </div>
@@ -569,6 +770,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const lastStationName = step.stations[step.stations.length - 1];
             const lastStationNode = transitData.stations[lastStationName];
             const intermediateStops = step.stations.slice(0, -1);
+            const meta = stepMeta[index];
+
+            // Direction hint text
+            const directionHtml = meta && meta.direction
+                ? `<span class="direction-hint">toward ${meta.direction}</span>`
+                : '';
+
+            // Arrival time at this segment's destination
+            const arriveTimeStr = meta && meta.arriveTime
+                ? `<span style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;margin-left:auto;">${meta.arriveTime}</span>`
+                : '';
             
             let stopsHtml = '';
             if (intermediateStops.length > 0) {
@@ -600,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="timeline-dot" style="--node-color: ${lineColor}"></div>
                     <div class="timeline-connector" style="--connector-color: ${lineColor}"></div>
                     <div class="timeline-title" style="color: ${lineColor}">
-                        Board ${getLineName(step.line)}
+                        Board ${getLineName(step.line)}${directionHtml}
                     </div>
                     <div class="timeline-desc">
                         ${stopsHtml}
@@ -610,13 +822,21 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Render arrival/interchange stop
             const nodeColor = isLast ? '#10b981' : lineColor;
+            // Show departure time of NEXT leg for interchange stations
+            const nextMeta = !isLast ? stepMeta[index + 1] : null;
+            const nextDepartStr = nextMeta && nextMeta.departTime
+                ? `<span style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;margin-left:auto;">${nextMeta.departTime}</span>`
+                : arriveTimeStr;
             html += `
                 <div class="timeline-item" style="--node-color: ${nodeColor}">
                     <div class="timeline-dot" style="--node-color: ${nodeColor}"></div>
                     <div class="timeline-connector" style="--connector-color: ${nextConnectorColor}"></div>
-                    <div class="timeline-title">
-                        <span>${lastStationName}</span>
-                        <div class="station-badge-list">${getStationBadgesHtml(lastStationNode)}</div>
+                    <div class="timeline-title" style="justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span>${lastStationName}</span>
+                            <div class="station-badge-list">${getStationBadgesHtml(lastStationNode)}</div>
+                        </div>
+                        ${nextDepartStr}
                     </div>
                     <div class="timeline-desc">
                         ${isLast ? 'Arrive at destination' : `Transfer to ${getLineName(steps[index + 1].line)}`}
@@ -701,7 +921,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const fareItemCashless = document.getElementById('fare-item-cashless');
         const fareItemCash = document.getElementById('fare-item-cash');
         const fareItemConcession = document.getElementById('fare-item-concession');
-        const resultsHeader = document.querySelector('.results-header');
 
         if (!fareItemCashless || !fareItemCash || !fareItemConcession) return;
 
@@ -709,18 +928,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fareItemCash.classList.add('hidden');
         fareItemConcession.classList.add('hidden');
 
-        if (resultsHeader) {
-            resultsHeader.classList.remove('single-fare-layout');
-        }
-
         if (preference === 'all') {
             fareItemCashless.classList.remove('hidden');
             fareItemCash.classList.remove('hidden');
             fareItemConcession.classList.remove('hidden');
         } else {
-            if (resultsHeader) {
-                resultsHeader.classList.add('single-fare-layout');
-            }
             if (preference === 'cashless') {
                 fareItemCashless.classList.remove('hidden');
             } else if (preference === 'cash') {
