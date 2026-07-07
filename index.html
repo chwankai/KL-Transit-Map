@@ -144,12 +144,13 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="theme-select">App Theme</label>
-                    <select id="theme-select" class="form-control">
-                        <option value="dark">Dark Mode 🌙</option>
-                        <option value="light">Light Mode ☀️</option>
-                        <option value="system" selected>Follow System 🖥️</option>
-                    </select>
+                    <label>App Theme</label>
+                    <div class="fare-pref-tabs" id="theme-pref-container">
+                        <button type="button" class="fare-pref-btn" data-theme="dark">Dark 🌙</button>
+                        <button type="button" class="fare-pref-btn" data-theme="light">Light ☀️</button>
+                        <button type="button" class="fare-pref-btn" data-theme="system">System 🖥️</button>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Fare Display Preference</label>
                     <div class="fare-pref-tabs" id="fare-pref-container">

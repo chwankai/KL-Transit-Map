@@ -647,7 +647,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Theme Control Logic
-    const themeSelect = document.getElementById('theme-select');
+    const themePrefContainer = document.getElementById('theme-pref-container');
+    const themePrefButtons = themePrefContainer ? themePrefContainer.querySelectorAll('.fare-pref-btn') : [];
     
     function applyTheme(theme) {
         document.body.classList.remove('light-theme');
@@ -661,11 +662,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    themeSelect.addEventListener('change', () => {
-        const selectedTheme = themeSelect.value;
-        localStorage.setItem('theme_preference', selectedTheme);
-        applyTheme(selectedTheme);
-    });
+    if (themePrefButtons.length > 0) {
+        themePrefButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                themePrefButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const selectedTheme = btn.getAttribute('data-theme');
+                localStorage.setItem('theme_preference', selectedTheme);
+                applyTheme(selectedTheme);
+            });
+        });
+    }
     
     // Listen for system theme preferences changes dynamically
     const systemMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -730,7 +737,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadSavedConfig() {
         // Load theme configuration
         const savedTheme = localStorage.getItem('theme_preference') || 'system';
-        themeSelect.value = savedTheme;
+        if (themePrefContainer) {
+            themePrefButtons.forEach(btn => {
+                if (btn.getAttribute('data-theme') === savedTheme) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
         applyTheme(savedTheme);
 
         // Load Google Maps API Key
