@@ -93,9 +93,19 @@
                         </div>
                         <div id="results-container" class="results-container hidden">
                             <div class="results-header glass-card">
-                                <div class="fare-display">
-                                    <span class="fare-label">Cashless Fare</span>
-                                    <span class="fare-value" id="res-fare">RM 0.00</span>
+                                <div class="fare-container" id="res-fare-container">
+                                    <div class="fare-item" id="fare-item-cashless">
+                                        <span class="fare-label">Cashless</span>
+                                        <span class="fare-value" id="res-fare">RM 0.00</span>
+                                    </div>
+                                    <div class="fare-item" id="fare-item-cash">
+                                        <span class="fare-label">Cash</span>
+                                        <span class="fare-value cash-value" id="res-fare-cash">RM 0.00</span>
+                                    </div>
+                                    <div class="fare-item" id="fare-item-concession">
+                                        <span class="fare-label">Concession</span>
+                                        <span class="fare-value concession-value" id="res-fare-concession">RM 0.00</span>
+                                    </div>
                                 </div>
                                 <div class="journey-meta">
                                     <div class="meta-item">
@@ -140,6 +150,19 @@
                         <option value="light">Light Mode ☀️</option>
                         <option value="system" selected>Follow System 🖥️</option>
                     </select>
+                <div class="form-group">
+                    <label>Fare Display Preference</label>
+                    <div class="fare-pref-tabs" id="fare-pref-container">
+                        <button type="button" class="fare-pref-btn active" data-pref="all">All</button>
+                        <button type="button" class="fare-pref-btn" data-pref="cashless">Cashless</button>
+                        <button type="button" class="fare-pref-btn" data-pref="cash">Cash</button>
+                        <button type="button" class="fare-pref-btn" data-pref="concession">Concession</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gmaps-key-input">Google Maps API Key</label>
+                    <input type="password" id="gmaps-key-input" class="form-control" placeholder="Enter key (saved to localStorage)...">
+                    <small class="form-help-text">Leave blank to use default keyless mode (shows watermark).</small>
                 </div>
             </div>
         </div>

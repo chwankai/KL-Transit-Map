@@ -223,7 +223,198 @@ document.addEventListener('DOMContentLoaded', () => {
     const timelineContainer = document.getElementById('route-timeline-container');
     const btnSubmitPlan = document.getElementById('btn-submit-plan');
 
-    btnSubmitPlan.addEventListener('click', (e) => {
+    // --- MyRapid Journey Planner API Integration ---
+    async function geocodeStation(stationName) {
+        const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/geocode?scope=WMcentral&agency=rapidkl&input=${encodeURIComponent(stationName)}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Geocoding failed for ${stationName}`);
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) {
+            throw new Error(`No coordinates found for ${stationName}`);
+        }
+        // Prioritize matching rail transit stations
+        const railCategories = ['KJ', 'KG', 'PY', 'AG', 'SP', 'MR', 'BRT', 'SA', 'MRT', 'LRT', 'Monorail', 'PYL', 'KGL', 'KJL', 'AGL', 'SPL', 'MRL', 'SAL'];
+        const railResult = data.results.find(r => railCategories.includes(r.category) || railCategories.includes(r.type));
+        return railResult || data.results[0];
+    }
+
+    function mapApiLineId(apiLineId) {
+        const mapping = {
+            "KJL": "KJ",
+            "AGL": "AG",
+            "SPL": "SP",
+            "KGL": "KG",
+            "PYL": "PY",
+            "MRL": "MR",
+            "SAL": "SA",
+            "BRT": "BRT"
+        };
+        return mapping[apiLineId] || apiLineId;
+    }
+
+    function findStationByCodeOrName(code, name) {
+        const cleanCode = code ? code.trim().toUpperCase() : '';
+        if (cleanCode) {
+            for (const [stationName, stationObj] of Object.entries(transitData.stations)) {
+                if (stationObj.codes.some(c => c.toUpperCase() === cleanCode)) {
+                    return stationName;
+                }
+            }
+        }
+        
+        let cleanName = name ? name.replace(/\s*-\s*.+$/, '').trim().toUpperCase() : '';
+        for (const stationName of Object.keys(transitData.stations)) {
+            if (stationName.toUpperCase() === cleanName) {
+                return stationName;
+            }
+        }
+        return name;
+    }
+
+    function convertApiRoute(apiRoute) {
+        const edges = [];
+        const path = [];
+        let transfers = 0;
+        const legs = apiRoute.legs || [];
+        
+        for (let i = 0; i < legs.length; i++) {
+            const leg = legs[i];
+            if (leg.type === "transit" && leg.steps && leg.steps.length > 0) {
+                const apiLine = leg.route_details ? leg.route_details.route_short_name : "";
+                const lineId = mapApiLineId(apiLine);
+                
+                for (let j = 0; j < leg.steps.length; j++) {
+                    const step = leg.steps[j];
+                    const stationName = findStationByCodeOrName(step.stop_id, step.stop_name);
+                    
+                    if (path.length === 0 || path[path.length - 1] !== stationName) {
+                        path.push(stationName);
+                    }
+                    
+                    if (j > 0) {
+                        const prevStep = leg.steps[j - 1];
+                        const prevStation = findStationByCodeOrName(prevStep.stop_id, prevStep.stop_name);
+                        edges.push({
+                            from: prevStation,
+                            to: stationName,
+                            line: lineId,
+                            distance: (leg.distance / (leg.steps.length - 1)) / 1000
+                        });
+                    }
+                }
+            } else if (leg.type === "pedestrain" || leg.type === "pedestrian") {
+                transfers++;
+                let fromStation = null;
+                let toStation = null;
+                
+                if (i > 0 && legs[i-1].steps && legs[i-1].steps.length > 0) {
+                    const prevSteps = legs[i-1].steps;
+                    const lastStep = prevSteps[prevSteps.length - 1];
+                    fromStation = findStationByCodeOrName(lastStep.stop_id, lastStep.stop_name);
+                }
+                if (i < legs.length - 1 && legs[i+1].steps && legs[i+1].steps.length > 0) {
+                    const nextSteps = legs[i+1].steps;
+                    const firstStep = nextSteps[0];
+                    toStation = findStationByCodeOrName(firstStep.stop_id, firstStep.stop_name);
+                }
+                
+                if (fromStation && toStation) {
+                    if (path.length === 0 || path[path.length - 1] !== fromStation) {
+                        path.push(fromStation);
+                    }
+                    path.push(toStation);
+                    edges.push({
+                        from: fromStation,
+                        to: toStation,
+                        line: "WALKWAY",
+                        distance: (leg.distance || 0) / 1000
+                    });
+                }
+            }
+        }
+        
+        let transitLines = [];
+        legs.forEach(leg => {
+            if (leg.type === "transit" && leg.route_details) {
+                transitLines.push(leg.route_details.route_short_name);
+            }
+        });
+        transfers = Math.max(0, transitLines.length - 1);
+        
+        const cashlessFare = apiRoute.alt_fare_price && apiRoute.alt_fare_price.cashless ? parseFloat(apiRoute.alt_fare_price.cashless) : null;
+        const cashFare = apiRoute.alt_fare_price && apiRoute.alt_fare_price.cash ? parseFloat(apiRoute.alt_fare_price.cash) : null;
+        const concessionFare = apiRoute.alt_fare_price && apiRoute.alt_fare_price.consession ? parseFloat(apiRoute.alt_fare_price.consession) : null;
+        
+        return {
+            path: path,
+            edges: edges,
+            totalDistance: (apiRoute.total_distance || 0) / 1000,
+            totalFare: cashlessFare,
+            cashFare: cashFare,
+            concessionFare: concessionFare,
+            transfers: transfers
+        };
+    }
+
+    async function fetchMyRapidRoute(origin, dest) {
+        const originGeo = await geocodeStation(origin);
+        const destGeo = await geocodeStation(dest);
+        
+        const flng = originGeo.geometry.coordinates[0];
+        const flat = originGeo.geometry.coordinates[1];
+        const tlng = destGeo.geometry.coordinates[0];
+        const tlat = destGeo.geometry.coordinates[1];
+        
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const departureTime = `${yyyy}-${mm}-${dd} ${hh}:${min}:00`;
+        
+        const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/journeyPlanner?agency=rapidkl&flng=${flng}&flat=${flat}&tlng=${tlng}&tlat=${tlat}&mode=mix&type=fastest&departure_datetime=${encodeURIComponent(departureTime)}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Journey Planner API failed");
+        const data = await response.json();
+        
+        if (data.status !== "OK" || !data.routes || data.routes.length === 0) {
+            throw new Error(data.message || "No routes returned by MyRapid API");
+        }
+        
+        return convertApiRoute(data.routes[0]);
+    }
+
+    function renderRouteResults(route) {
+        resultsPlaceholder.classList.add('hidden');
+        resultsContainer.classList.remove('hidden');
+        
+        const cashlessVal = route.totalFare !== null && route.totalFare !== undefined ? `RM ${route.totalFare.toFixed(2)}` : '--';
+        resFare.innerText = cashlessVal;
+        
+        const resFareCash = document.getElementById('res-fare-cash');
+        if (resFareCash) {
+            const cashVal = route.cashFare !== null && route.cashFare !== undefined ? `RM ${route.cashFare.toFixed(2)}` : '-';
+            resFareCash.innerText = cashVal;
+        }
+        
+        const resFareConcession = document.getElementById('res-fare-concession');
+        if (resFareConcession) {
+            const concessionVal = route.concessionFare !== null && route.concessionFare !== undefined ? `RM ${route.concessionFare.toFixed(2)}` : '--';
+            resFareConcession.innerText = concessionVal;
+        }
+        
+        resDist.innerText = `${route.totalDistance.toFixed(2)} km`;
+        resTransfers.innerText = route.transfers;
+        
+        renderTimeline(route);
+        
+        const savedFarePref = localStorage.getItem('fare_display_preference') || 'all';
+        applyFareDisplayPreference(savedFarePref);
+    }
+
+    btnSubmitPlan.addEventListener('click', async (e) => {
         e.preventDefault();
         const origin = originInput.value.trim();
         const dest = destInput.value.trim();
@@ -233,27 +424,49 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const excluded = [];
-        const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:not(:checked)');
-        checkboxes.forEach(cb => excluded.push(cb.value));
-        
-        const route = transitData.findRoute(origin, dest, excluded);
-        
-        if (!route) {
-            alert('No route found between these stations under your exclusions. Try enabling more lines.');
+        if (origin === dest) {
+            const sameStationRoute = {
+                path: [origin],
+                edges: [],
+                totalDistance: 0,
+                totalFare: 0.80,
+                cashFare: null,
+                concessionFare: 0.40,
+                transfers: 0,
+                isSameStation: true
+            };
+            renderRouteResults(sameStationRoute);
+            document.querySelector('.planner-layout').classList.add('showing-results');
             return;
         }
         
-        resultsPlaceholder.classList.add('hidden');
-        resultsContainer.classList.remove('hidden');
+        const originalText = btnSubmitPlan.innerHTML;
+        btnSubmitPlan.disabled = true;
+        btnSubmitPlan.innerHTML = 'Calculating Route... ⏳';
         
-        resFare.innerText = `RM ${route.totalFare.toFixed(2)}`;
-        resDist.innerText = `${route.totalDistance.toFixed(2)} km`;
-        resTransfers.innerText = route.transfers;
+        try {
+            const route = await fetchMyRapidRoute(origin, dest);
+            renderRouteResults(route);
+        } catch (err) {
+            console.warn("MyRapid API failed, falling back to local Dijkstra planner:", err);
+            
+            const excluded = [];
+            const checkboxes = excludeChecklist.querySelectorAll('.exclude-checkbox:not(:checked)');
+            checkboxes.forEach(cb => excluded.push(cb.value));
+            
+            const route = transitData.findRoute(origin, dest, excluded);
+            if (!route) {
+                alert('No route found between these stations. Try enabling more lines.');
+                btnSubmitPlan.disabled = false;
+                btnSubmitPlan.innerHTML = originalText;
+                return;
+            }
+            renderRouteResults(route);
+        } finally {
+            btnSubmitPlan.disabled = false;
+            btnSubmitPlan.innerHTML = originalText;
+        }
         
-        renderTimeline(route);
-
-        // Switch layout to show directions results on mobile
         document.querySelector('.planner-layout').classList.add('showing-results');
     });
 
@@ -277,6 +490,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7. Timeline Formatter
     function renderTimeline(route) {
         timelineContainer.innerHTML = '';
+        
+        if (route.isSameStation || route.path.length === 0) {
+            const stationName = route.path[0] || originInput.value.trim();
+            const stationNode = transitData.stations[stationName];
+            timelineContainer.innerHTML = `
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="--node-color: #10b981"></div>
+                    <div class="timeline-title">
+                        <span>${stationName}</span>
+                        ${stationNode ? `<div class="station-badge-list">${getStationBadgesHtml(stationNode)}</div>` : ''}
+                    </div>
+                    <div class="timeline-desc">Same origin and destination. You are already at your destination.</div>
+                </div>
+            `;
+            return;
+        }
         
         const steps = [];
         let currentLine = null;
@@ -446,11 +675,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Fare Display Preference handling
+    const farePrefContainer = document.getElementById('fare-pref-container');
+    const farePrefButtons = farePrefContainer ? farePrefContainer.querySelectorAll('.fare-pref-btn') : [];
+
+    function applyFareDisplayPreference(preference) {
+        const fareItemCashless = document.getElementById('fare-item-cashless');
+        const fareItemCash = document.getElementById('fare-item-cash');
+        const fareItemConcession = document.getElementById('fare-item-concession');
+
+        if (!fareItemCashless || !fareItemCash || !fareItemConcession) return;
+
+        fareItemCashless.classList.add('hidden');
+        fareItemCash.classList.add('hidden');
+        fareItemConcession.classList.add('hidden');
+
+        if (preference === 'all') {
+            fareItemCashless.classList.remove('hidden');
+            fareItemCash.classList.remove('hidden');
+            fareItemConcession.classList.remove('hidden');
+        } else if (preference === 'cashless') {
+            fareItemCashless.classList.remove('hidden');
+        } else if (preference === 'cash') {
+            fareItemCash.classList.remove('hidden');
+        } else if (preference === 'concession') {
+            fareItemConcession.classList.remove('hidden');
+        }
+    }
+
+    if (farePrefButtons.length > 0) {
+        farePrefButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                farePrefButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const selectedPref = btn.getAttribute('data-pref');
+                localStorage.setItem('fare_display_preference', selectedPref);
+                applyFareDisplayPreference(selectedPref);
+            });
+        });
+    }
+
+    const gmapsKeyInput = document.getElementById('gmaps-key-input');
+
     function loadSavedConfig() {
         // Load theme configuration
         const savedTheme = localStorage.getItem('theme_preference') || 'system';
         themeSelect.value = savedTheme;
         applyTheme(savedTheme);
+
+        // Load Google Maps API Key
+        const savedKey = (typeof CONFIG !== 'undefined' && CONFIG.GMAPS_API_KEY) || localStorage.getItem('gmaps_api_key') || '';
+        if (gmapsKeyInput) {
+            gmapsKeyInput.value = savedKey;
+        }
+
+        // Load Fare Display Preference
+        const savedFarePref = localStorage.getItem('fare_display_preference') || 'all';
+        if (farePrefContainer) {
+            farePrefButtons.forEach(btn => {
+                if (btn.getAttribute('data-pref') === savedFarePref) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        applyFareDisplayPreference(savedFarePref);
+    }
+
+    if (gmapsKeyInput) {
+        gmapsKeyInput.addEventListener('change', () => {
+            const newKey = gmapsKeyInput.value.trim();
+            localStorage.setItem('gmaps_api_key', newKey);
+        });
     }
     
     // Initialize Autocomplete fields
