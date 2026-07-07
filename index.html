@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=1.9">
+    <link rel="stylesheet" href="css/style.css?v=2.0">
     <!-- Favicon -->
     <link rel="icon" href="images/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="images/apple-favicon.png">
@@ -74,16 +74,17 @@
                                         <div id="dest-dropdown" class="select-dropdown"></div>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group time-form-group">
                                     <label>Time</label>
                                     <div class="time-mode-tabs" id="time-mode-container">
-                                        <button type="button" class="fare-pref-btn active" data-mode="depart">Depart at</button>
+                                        <button type="button" class="fare-pref-btn active" data-mode="now">Now</button>
+                                        <button type="button" class="fare-pref-btn" data-mode="depart">Depart at</button>
                                         <button type="button" class="fare-pref-btn" data-mode="arrive">Arrive by</button>
                                     </div>
-                                    <div class="time-picker-row" id="time-picker-row">
-                                        <button type="button" id="btn-time-now" class="btn-time-now">Now</button>
+                                    <div class="time-picker-row hidden" id="time-picker-row">
                                         <input type="date" id="time-date-input" class="time-input">
                                         <input type="time" id="time-time-input" class="time-input">
+                                        <button type="button" id="btn-time-now" class="btn-time-now" title="Reset to now">↺</button>
                                     </div>
                                 </div>
                                 <button type="submit" id="btn-submit-plan" class="btn btn-primary btn-block">Search Journey 🚀</button>
@@ -195,9 +196,9 @@
 
     
     <!-- Route Database and Finder Logic -->
-    <script src="js/transit-data.js?v=1.9"></script>
+    <script src="js/transit-data.js?v=2.0"></script>
     
     <!-- Application Orchestrator -->
-    <script src="js/app.js?v=1.9"></script>
+    <script src="js/app.js?v=2.0"></script>
 </body>
 </html>

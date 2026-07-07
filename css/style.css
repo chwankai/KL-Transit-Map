@@ -341,6 +341,11 @@ body {
     position: relative;
 }
 
+/* Time form group should not create stacking context above dropdowns */
+.time-form-group {
+    z-index: 0;
+}
+
 .form-group label {
     display: block;
     font-size: 0.8rem;
@@ -522,6 +527,10 @@ body.light-theme .time-mode-tabs {
     align-items: center;
 }
 
+.time-picker-row.hidden {
+    display: none !important;
+}
+
 .time-input {
     flex: 1;
     padding: 0.45rem 0.65rem;
@@ -529,10 +538,11 @@ body.light-theme .time-mode-tabs {
     border: 1px solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-primary);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-family: inherit;
     outline: none;
     transition: border-color 0.2s ease;
+    min-width: 0;
 }
 
 .time-input:focus {
@@ -540,16 +550,17 @@ body.light-theme .time-mode-tabs {
 }
 
 .btn-time-now {
-    padding: 0.45rem 0.75rem;
+    padding: 0.45rem 0.6rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.2s ease;
 }
 

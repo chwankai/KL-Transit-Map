@@ -146,27 +146,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Time Mode Controls (Depart at / Arrive by)
+    // 4. Time Mode Controls (Now / Depart at / Arrive by)
     const timeModeContainer = document.getElementById('time-mode-container');
     const timePickerRow = document.getElementById('time-picker-row');
     const timeDateInput = document.getElementById('time-date-input');
     const timeTimeInput = document.getElementById('time-time-input');
     const btnTimeNow = document.getElementById('btn-time-now');
-    let timeMode = 'depart'; // 'depart' | 'arrive'
+    let timeMode = 'now'; // 'now' | 'depart' | 'arrive'
 
     function setTimeToNow() {
         const now = new Date();
-        // Format date YYYY-MM-DD
         const yyyy = now.getFullYear();
         const mm = String(now.getMonth() + 1).padStart(2, '0');
         const dd = String(now.getDate()).padStart(2, '0');
         timeDateInput.value = `${yyyy}-${mm}-${dd}`;
-        // Format time HH:MM
         const hh = String(now.getHours()).padStart(2, '0');
         const min = String(now.getMinutes()).padStart(2, '0');
         timeTimeInput.value = `${hh}:${min}`;
     }
     setTimeToNow();
+
+    function getCurrentDateTime() {
+        // Returns "YYYY-MM-DD HH:MM:00" for right now
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}:00`;
+    }
+
+    function subtractSecondsFromDatetime(dtStr, seconds) {
+        // Subtract 'seconds' from "YYYY-MM-DD HH:MM:00" and return new string
+        const [datePart, timePart] = dtStr.split(' ');
+        const [h, m] = timePart.split(':').map(Number);
+        const totalMinutes = h * 60 + m - Math.ceil(seconds / 60);
+        const [y, mo, d] = datePart.split('-').map(Number);
+        const base = new Date(y, mo - 1, d, 0, totalMinutes, 0);
+        const rh = String(base.getHours()).padStart(2, '0');
+        const rm = String(base.getMinutes()).padStart(2, '0');
+        const rd = String(base.getDate()).padStart(2, '0');
+        const rmo = String(base.getMonth() + 1).padStart(2, '0');
+        return `${base.getFullYear()}-${rmo}-${rd} ${rh}:${rm}:00`;
+    }
 
     if (timeModeContainer) {
         const timeModeButtons = timeModeContainer.querySelectorAll('.fare-pref-btn');
@@ -174,7 +197,19 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 timeModeButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                timeMode = btn.getAttribute('data-mode');
+                const newMode = btn.getAttribute('data-mode');
+                timeMode = newMode;
+                if (newMode === 'now') {
+                    timePickerRow.classList.add('hidden');
+                    setTimeToNow();
+                } else {
+                    // Depart at or Arrive by: show picker
+                    timePickerRow.classList.remove('hidden');
+                    // Pre-fill if empty
+                    if (!timeDateInput.value || !timeTimeInput.value) {
+                        setTimeToNow();
+                    }
+                }
             });
         });
     }
@@ -455,12 +490,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Deduplicate by line sequence
+        // Deduplicate: same lines AND very similar duration (within 2 min) is a duplicate
         const seen = new Set();
         const unique = routes.filter(r => {
             const lineKey = r.edges.filter(e => e.line !== 'WALKWAY').map(e => e.line).join(',');
-            if (seen.has(lineKey)) return false;
-            seen.add(lineKey);
+            const durBucket = Math.round((r.totalDurationSec || 0) / 120); // 2-min bucket
+            const key = `${lineKey}|${durBucket}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
             return true;
         });
 
@@ -475,13 +512,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderRouteCards(routes) {
         const grid = document.getElementById('route-cards-grid');
         const section = document.getElementById('route-cards-section');
-        if (!grid) return;
-
-        if (!routes || routes.length <= 1) {
+        if (!grid || !routes || routes.length === 0) {
             if (section) section.style.display = 'none';
             return;
         }
+        // Always show section so user sees what route was chosen
         if (section) section.style.display = '';
+
+        // Adjust grid cols based on count
+        grid.style.gridTemplateColumns = routes.length === 1
+            ? '1fr'
+            : routes.length === 2
+                ? 'repeat(2, 1fr)'
+                : 'repeat(3, 1fr)';
 
         grid.innerHTML = '';
         routes.forEach((route, idx) => {
@@ -603,28 +646,41 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmitPlan.disabled = true;
         btnSubmitPlan.innerHTML = 'Calculating Route... ⏳';
 
-        // Build departure time from inputs
+        // Build target time from inputs
         const dateVal = timeDateInput ? timeDateInput.value : '';
         const timeVal = timeTimeInput ? timeTimeInput.value : '';
-        let departureTime;
-        if (dateVal && timeVal) {
-            departureTime = `${dateVal} ${timeVal}:00`;
+        let targetTime;
+        if (timeMode !== 'now' && dateVal && timeVal) {
+            targetTime = `${dateVal} ${timeVal}:00`;
         } else {
-            const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const hh = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            departureTime = `${yyyy}-${mm}-${dd} ${hh}:${min}:00`;
+            targetTime = getCurrentDateTime();
         }
 
-        // If mode is 'arrive', subtract estimated travel time from target time.
-        // We first run a quick fastest fetch to get duration, then recompute departure.
-        // For simplicity, do a standard depart-at first and note we'll refine on 2nd pass.
-        // (The arrive-by label is shown to the user; internally we shift the time.)
-
         try {
+            let departureTime = targetTime;
+
+            if (timeMode === 'arrive') {
+                // Arrive by: first get fastest route duration, then subtract to find departure time
+                btnSubmitPlan.innerHTML = 'Estimating arrival... ⏳';
+                try {
+                    const originGeo = await geocodeStation(origin);
+                    const destGeo = await geocodeStation(dest);
+                    const flng = originGeo.geometry.coordinates[0];
+                    const flat = originGeo.geometry.coordinates[1];
+                    const tlng = destGeo.geometry.coordinates[0];
+                    const tlat = destGeo.geometry.coordinates[1];
+                    // Fetch fastest using target time as departure (approximate)
+                    const probeRoute = await fetchSingleRoute(flng, flat, tlng, tlat, 'fastest', targetTime);
+                    if (probeRoute.totalDurationSec) {
+                        // Subtract duration from target arrival to get departure
+                        departureTime = subtractSecondsFromDatetime(targetTime, probeRoute.totalDurationSec);
+                    }
+                } catch (e) {
+                    console.warn('Arrive-by probe failed, using target time as departure:', e);
+                }
+                btnSubmitPlan.innerHTML = 'Calculating Route... ⏳';
+            }
+
             const routes = await fetchMyRapidRoute(origin, dest, departureTime);
             currentRoutes = routes;
             selectedRouteIndex = 0;
@@ -648,8 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
             route.legMeta = [];
             route._routeLabel = '🗺 Local Route';
             currentRoutes = [route];
-            const section = document.getElementById('route-cards-section');
-            if (section) section.style.display = 'none';
+            renderRouteCards([route]);
             renderRouteResults(route);
         } finally {
             btnSubmitPlan.disabled = false;
