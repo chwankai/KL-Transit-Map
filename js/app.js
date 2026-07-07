@@ -383,6 +383,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const cashFare = apiRoute.alt_fare_price && apiRoute.alt_fare_price.cash ? parseFloat(apiRoute.alt_fare_price.cash) : null;
         const concessionFare = apiRoute.alt_fare_price && apiRoute.alt_fare_price.consession ? parseFloat(apiRoute.alt_fare_price.consession) : null;
         
+        // Compute duration: use API total_duration if available, otherwise sum leg distances
+        // The API field name varies; try several known keys
+        const totalDurSec = apiRoute.total_duration
+            || apiRoute.totalDuration
+            || apiRoute.duration
+            || apiRoute.total_time
+            || null;
+
+        // If API didn't give us a duration, compute it from ETAs
+        let computedDur = totalDurSec;
+        if (!computedDur && apiRoute._etaDepart && apiRoute._etaArrive) {
+            // Parse HH:MM strings
+            const [dh, dm] = apiRoute._etaDepart.split(':').map(Number);
+            const [ah, am] = apiRoute._etaArrive.split(':').map(Number);
+            const diffMin = (ah * 60 + am) - (dh * 60 + dm);
+            if (diffMin > 0) computedDur = diffMin * 60;
+        }
+
         return {
             path: path,
             edges: edges,
@@ -394,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ETA from API
             etaDepart: apiRoute._etaDepart || null,
             etaArrive: apiRoute._etaArrive || null,
-            totalDurationSec: apiRoute.total_duration || null,
+            totalDurationSec: computedDur,
             // Per-step direction and timing stored on steps
             legMeta: apiRoute._legMeta || []
         };
@@ -490,16 +508,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Deduplicate: same lines AND very similar duration (within 2 min) is a duplicate
-        const seen = new Set();
-        const unique = routes.filter(r => {
-            const lineKey = r.edges.filter(e => e.line !== 'WALKWAY').map(e => e.line).join(',');
-            const durBucket = Math.round((r.totalDurationSec || 0) / 120); // 2-min bucket
-            const key = `${lineKey}|${durBucket}`;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-        });
+        // Keep ALL routes — do NOT deduplicate.
+        // Even if fastest/leastchange/leastwalk return the same line path,
+        // we show all cards so the user sees which optimization each represents.
+        const unique = routes.filter(r => r !== null);
 
         if (unique.length === 0) throw new Error('No valid routes from API');
         return unique;
