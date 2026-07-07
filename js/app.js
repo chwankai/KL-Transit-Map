@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return stationName;
             }
         }
-        return name;
+        return null;
     }
 
     function convertApiRoute(apiRoute) {
@@ -287,6 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const step = leg.steps[j];
                     const stationName = findStationByCodeOrName(step.stop_id, step.stop_name);
                     
+                    if (!stationName) {
+                        throw new Error(`Route contains non-rail station: ${step.stop_name}`);
+                    }
+                    
                     if (path.length === 0 || path[path.length - 1] !== stationName) {
                         path.push(stationName);
                     }
@@ -294,6 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (j > 0) {
                         const prevStep = leg.steps[j - 1];
                         const prevStation = findStationByCodeOrName(prevStep.stop_id, prevStep.stop_name);
+                        if (!prevStation) {
+                            throw new Error(`Route contains non-rail station: ${prevStep.stop_name}`);
+                        }
                         edges.push({
                             from: prevStation,
                             to: stationName,
@@ -373,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const min = String(now.getMinutes()).padStart(2, '0');
         const departureTime = `${yyyy}-${mm}-${dd} ${hh}:${min}:00`;
         
-        const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/journeyPlanner?agency=rapidkl&flng=${flng}&flat=${flat}&tlng=${tlng}&tlat=${tlat}&mode=mix&type=fastest&departure_datetime=${encodeURIComponent(departureTime)}`;
+        const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/journeyPlanner?agency=rapidkl&flng=${flng}&flat=${flat}&tlng=${tlng}&tlat=${tlat}&mode=rail&type=fastest&departure_datetime=${encodeURIComponent(departureTime)}`;
         
         const response = await fetch(url);
         if (!response.ok) throw new Error("Journey Planner API failed");
