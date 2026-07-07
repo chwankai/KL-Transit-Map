@@ -1026,6 +1026,58 @@ body.light-theme .fare-pref-btn.active {
         padding: 1.25rem;
         overflow-y: auto;
     }
+
+    /* Responsive Results Header layout (Mobile) */
+    /* Multi-fare layout (default, showing all 3) */
+    .results-header {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem 0 !important;
+    }
+    
+    .results-header .fare-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.5rem;
+    }
+    
+    .results-header .fare-item {
+        flex: 1;
+        min-width: 0; /* Let them shrink to fit side-by-side */
+    }
+    
+    .results-header .journey-meta {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 2rem;
+        width: 100%;
+        padding-top: 0.5rem;
+        border-top: 1px dashed var(--border-color);
+    }
+    
+    /* Single-fare layout (when user selects cashless, cash, or concession only) */
+    .results-header.single-fare-layout {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0;
+    }
+    
+    .results-header.single-fare-layout .fare-container {
+        width: auto;
+    }
+    
+    .results-header.single-fare-layout .journey-meta {
+        width: auto;
+        border-top: none;
+        padding-top: 0;
+        justify-content: flex-end;
+    }
 }
 
 @media (max-width: 480px) {

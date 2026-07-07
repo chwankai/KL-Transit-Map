@@ -683,6 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fareItemCashless = document.getElementById('fare-item-cashless');
         const fareItemCash = document.getElementById('fare-item-cash');
         const fareItemConcession = document.getElementById('fare-item-concession');
+        const resultsHeader = document.querySelector('.results-header');
 
         if (!fareItemCashless || !fareItemCash || !fareItemConcession) return;
 
@@ -690,16 +691,25 @@ document.addEventListener('DOMContentLoaded', () => {
         fareItemCash.classList.add('hidden');
         fareItemConcession.classList.add('hidden');
 
+        if (resultsHeader) {
+            resultsHeader.classList.remove('single-fare-layout');
+        }
+
         if (preference === 'all') {
             fareItemCashless.classList.remove('hidden');
             fareItemCash.classList.remove('hidden');
             fareItemConcession.classList.remove('hidden');
-        } else if (preference === 'cashless') {
-            fareItemCashless.classList.remove('hidden');
-        } else if (preference === 'cash') {
-            fareItemCash.classList.remove('hidden');
-        } else if (preference === 'concession') {
-            fareItemConcession.classList.remove('hidden');
+        } else {
+            if (resultsHeader) {
+                resultsHeader.classList.add('single-fare-layout');
+            }
+            if (preference === 'cashless') {
+                fareItemCashless.classList.remove('hidden');
+            } else if (preference === 'cash') {
+                fareItemCash.classList.remove('hidden');
+            } else if (preference === 'concession') {
+                fareItemConcession.classList.remove('hidden');
+            }
         }
     }
 
