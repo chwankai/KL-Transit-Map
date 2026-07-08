@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from "react";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Hub {
@@ -185,18 +185,6 @@ export const SvgBusMap: React.FC<SvgBusMapProps> = ({
     <div className="relative w-full h-full bg-slate-950 overflow-hidden select-none border border-white/5 rounded-2xl">
       {/* SVG Viewport Toolbar */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-900/80 p-1.5 shadow-2xl backdrop-blur-md">
-        <button
-          onClick={() => setScale((prev) => Math.min(prev + 0.25, 4))}
-          className="rounded-xl p-2.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
-        >
-          <ZoomIn className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => setScale((prev) => Math.max(prev - 0.25, 0.5))}
-          className="rounded-xl p-2.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
-        >
-          <ZoomOut className="h-5 w-5" />
-        </button>
         <button
           onClick={handleReset}
           className="rounded-xl p-2.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all"

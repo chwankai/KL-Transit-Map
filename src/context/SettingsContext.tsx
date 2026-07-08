@@ -40,20 +40,26 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem("gmaps_api_key", key);
   };
 
-  // Apply theme class to document body
+  // Apply theme class to document
   useEffect(() => {
-    const root = window.document.body;
-    root.classList.remove("light-theme");
+    const root = window.document.documentElement;
+    const body = window.document.body;
+    root.classList.remove("dark");
+    body.classList.remove("light-theme");
 
     const applySystemTheme = () => {
       const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (!systemIsDark) {
-        root.classList.add("light-theme");
+      if (systemIsDark) {
+        root.classList.add("dark");
+      } else {
+        body.classList.add("light-theme");
       }
     };
 
     if (theme === "light") {
-      root.classList.add("light-theme");
+      body.classList.add("light-theme");
+    } else if (theme === "dark") {
+      root.classList.add("dark");
     } else if (theme === "system") {
       applySystemTheme();
     }
@@ -61,7 +67,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Listen to media changes if system theme is selected
     if (theme === "system") {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const handler = () => applySystemTheme();
+      const handler = () => {
+        root.classList.remove("dark");
+        body.classList.remove("light-theme");
+        applySystemTheme();
+      };
       mediaQuery.addEventListener("change", handler);
       return () => mediaQuery.removeEventListener("change", handler);
     }

@@ -13,14 +13,14 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-slate-100 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card text-text-primary shadow-2xl backdrop-blur-md animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-          <h2 className="text-lg font-semibold tracking-wide">Settings</h2>
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-lg font-semibold tracking-wide text-text-primary">Settings</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-slate-400 hover:bg-white/10 hover:text-slate-100 transition-colors"
+            className="rounded-full p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -30,10 +30,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         <div className="p-6 space-y-6">
           {/* Theme Preference */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               App Theme
             </label>
-            <div className="grid grid-cols-3 gap-2 rounded-xl bg-white/5 p-1 border border-white/10">
+            <div className="grid grid-cols-3 gap-2 rounded-xl bg-button-secondary p-1 border border-border">
               {(
                 [
                   { id: "light", label: "Light", icon: Sun },
@@ -46,8 +46,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onClick={() => setTheme(id)}
                   className={`flex flex-col items-center gap-1.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
                     theme === id
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                      ? "bg-blue-600 text-white shadow-md font-bold"
+                      : "text-text-secondary hover:text-text-primary hover:bg-button-secondary/50"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -59,10 +59,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
 
           {/* Fare Preference */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Fare Display Preference
             </label>
-            <div className="grid grid-cols-4 gap-1.5 rounded-xl bg-white/5 p-1 border border-white/10">
+            <div className="grid grid-cols-4 gap-1.5 rounded-xl bg-button-secondary p-1 border border-border">
               {(
                 [
                   { id: "all", label: "All" },
@@ -76,8 +76,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
                   onClick={() => setFarePref(id)}
                   className={`py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all ${
                     farePref === id
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                      ? "bg-blue-600 text-white shadow-md font-bold"
+                      : "text-text-secondary hover:text-text-primary hover:bg-button-secondary/50"
                   }`}
                 >
                   {label}
@@ -89,8 +89,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
           {/* Google Maps API Key */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Key className="h-4 w-4 text-slate-400" />
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <Key className="h-4 w-4 text-text-secondary" />
+              <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                 Google Maps API Key
               </label>
             </div>
@@ -99,9 +99,9 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
               value={gmapsApiKey}
               onChange={(e) => setGmapsApiKey(e.target.value)}
               placeholder="Enter API key..."
-              className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-slate-950/50 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+              className="w-full px-4 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary placeholder-text-secondary/50 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             />
-            <p className="text-[10px] text-slate-500 leading-normal">
+            <p className="text-[10px] text-text-secondary leading-normal">
               Used for fallback geocoding services. Leave blank for default keyless configuration.
             </p>
           </div>

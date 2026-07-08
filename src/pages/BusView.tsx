@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { decodeVehiclePositions } from "../lib/bus-decoder";
 import type { DecodedVehicle } from "../lib/bus-decoder";
 import { SvgBusMap } from "../components/bus/SvgBusMap";
+import { Footer } from "../components/layout/Footer";
 import { RefreshCw, CheckSquare, Square, EyeOff, LayoutList, Check, Map } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -166,7 +167,7 @@ export const BusView: React.FC = () => {
   };
 
   const deselectAll = () => {
-    setSelectedRouteIds(new Set());
+    setSelectedRouteIds((new Set()));
   };
 
   const visibleRoutes = useMemo(() => {
@@ -178,7 +179,7 @@ export const BusView: React.FC = () => {
   }, [region, hideInactive, activeBusCounts]);
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-background relative">
+    <div className="flex h-full w-full overflow-hidden bg-background text-text-primary relative">
       {/* Search Bus / Show Tracker Floating Button - Mobile only */}
       {!isSidebarOpen && (
         <button
@@ -198,28 +199,28 @@ export const BusView: React.FC = () => {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -280, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 30 }}
-            className="absolute md:relative inset-y-0 left-0 w-[300px] md:w-[320px] z-20 flex-shrink-0 p-4 border-r border-border/80 bg-slate-900/95 dark:bg-slate-950/85 backdrop-blur-md overflow-hidden flex flex-col gap-4 shadow-2xl md:shadow-none"
+            className="absolute md:relative inset-y-0 left-0 w-[300px] md:w-[320px] z-20 flex-shrink-0 p-4 border-r border-border bg-sidebar/95 backdrop-blur-md overflow-hidden flex flex-col gap-4 shadow-2xl md:shadow-none"
           >
             {/* Header Title */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                <h2 className="text-sm font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
                   myBAS Live Tracker
                 </h2>
-                <span className="bg-red-500/20 text-red-400 border border-red-500/30 text-[8px] font-extrabold px-1 rounded select-none animate-pulse-soft">
+                <span className="bg-red-500/20 text-red-500 border border-red-500/30 text-[8px] font-extrabold px-1.5 py-0.5 rounded select-none animate-pulse-soft">
                   LIVE
                 </span>
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="md:hidden text-[10px] font-bold text-slate-500 hover:text-white"
+                className="md:hidden text-[10px] font-bold text-text-secondary hover:text-text-primary"
               >
                 Hide
               </button>
             </div>
 
             {/* Region Selector tabs */}
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-white/5 p-0.5 border border-white/10 flex-shrink-0">
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-button-secondary p-0.5 border border-border flex-shrink-0">
               {(["johor", "melaka"] as const).map((reg) => (
                 <button
                   key={reg}
@@ -227,7 +228,7 @@ export const BusView: React.FC = () => {
                   className={`py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                     region === reg
                       ? "bg-blue-600 text-white shadow-md"
-                      : "text-slate-400 hover:text-slate-200"
+                      : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
                   {reg}
@@ -236,12 +237,12 @@ export const BusView: React.FC = () => {
             </div>
 
             {/* Live Counts Status label */}
-            <div className="text-[10px] text-text-secondary leading-relaxed bg-white/5 border border-white/10 rounded-xl p-2.5 flex-shrink-0 flex items-center justify-between">
+            <div className="text-[10px] text-text-secondary leading-relaxed bg-button-secondary/50 border border-border rounded-xl p-2.5 flex-shrink-0 flex items-center justify-between">
               <span>{statusText}</span>
               <button
                 onClick={fetchPositions}
                 disabled={isRefreshing}
-                className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
                 title="Refresh Feed"
               >
                 <RefreshCw className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} />
@@ -250,24 +251,24 @@ export const BusView: React.FC = () => {
 
             {/* Control buttons */}
             <div className="space-y-2 flex-shrink-0">
-              <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400">
-                <button onClick={selectAll} className="hover:text-white flex items-center gap-1">
+              <div className="flex justify-between items-center text-[10px] font-semibold text-text-secondary">
+                <button onClick={selectAll} className="hover:text-text-primary flex items-center gap-1">
                   <CheckSquare className="h-3.5 w-3.5" />
                   Select All
                 </button>
-                <button onClick={deselectAll} className="hover:text-white flex items-center gap-1">
+                <button onClick={deselectAll} className="hover:text-text-primary flex items-center gap-1">
                   <Square className="h-3.5 w-3.5" />
                   Deselect All
                 </button>
               </div>
 
               {/* Hide Inactive */}
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 select-none">
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-text-secondary select-none">
                 <input
                   type="checkbox"
                   checked={hideInactive}
                   onChange={(e) => setHideInactive(e.target.checked)}
-                  className="rounded bg-slate-950 border-white/15 text-blue-500 focus:ring-0"
+                  className="rounded bg-input border-border text-blue-600 focus:ring-0"
                 />
                 Hide Inactive Routes
               </label>
@@ -284,34 +285,34 @@ export const BusView: React.FC = () => {
                   <button
                     key={route.id}
                     onClick={() => toggleRoute(route.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left border transition-all ${
+                    className={`w-full flex items-start justify-between px-3 py-2 rounded-xl text-left border transition-all ${
                       isSelected
-                        ? "border-white/10 bg-white/5"
-                        : "border-transparent bg-transparent hover:bg-white/5"
+                        ? "border-border bg-button-secondary/30"
+                        : "border-transparent bg-transparent hover:bg-button-secondary/35"
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-start gap-2.5 min-w-0 flex-1 pr-1.5">
                       <span
-                        className={`h-4 w-4 rounded-lg flex-shrink-0 border flex items-center justify-center transition-all ${
+                        className={`h-4 w-4 mt-0.5 rounded-lg flex-shrink-0 border flex items-center justify-center transition-all ${
                           isSelected
                             ? "bg-blue-600 border-blue-600 text-white"
-                            : "border-white/10 bg-slate-950"
+                            : "border-border bg-input"
                         }`}
                       >
                         {isSelected && <Check className="h-3 w-3" />}
                       </span>
                       <span
                         style={{ backgroundColor: color }}
-                        className="text-[9px] font-extrabold text-white px-2 py-0.5 rounded shadow-md uppercase tracking-wide flex-shrink-0"
+                        className="text-[8px] font-extrabold text-white px-1.5 py-0.5 mt-0.5 rounded shadow-md uppercase tracking-wide flex-shrink-0"
                       >
                         {route.name}
                       </span>
-                      <span className="text-[11px] text-slate-300 font-medium truncate">
+                      <span className="text-[11px] text-text-secondary font-semibold break-words whitespace-normal leading-tight">
                         {route.desc}
                       </span>
                     </div>
                     {count > 0 && (
-                      <span className="text-[9px] font-bold bg-green-500/10 text-green-400 border border-green-500/25 px-1.5 py-0.5 rounded-full select-none">
+                      <span className="text-[9px] font-bold bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/25 px-1.5 py-0.5 rounded-full select-none flex-shrink-0 whitespace-nowrap text-center min-w-[48px]">
                         {count} live
                       </span>
                     )}
@@ -320,22 +321,24 @@ export const BusView: React.FC = () => {
               })}
 
               {visibleRoutes.length === 0 && (
-                <div className="h-[120px] flex flex-col items-center justify-center text-center text-slate-600">
+                <div className="h-[120px] flex flex-col items-center justify-center text-center text-text-secondary">
                   <EyeOff className="h-8 w-8 mb-2 animate-pulse" />
                   <p className="text-xs">No active routes matching filters.</p>
                 </div>
               )}
             </div>
 
-            {/* Sidebar toggle back to map */}
-            <div className="mt-auto border-t border-white/5 pt-3 flex-shrink-0">
+            {/* Sidebar toggle back to map & Footer */}
+            <div className="mt-auto border-t border-border pt-3 flex-shrink-0 space-y-3">
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="w-full py-2.5 rounded-xl border border-white/10 bg-slate-950 text-slate-300 font-semibold text-xs hover:text-white active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="w-full py-2.5 rounded-xl border border-border bg-button-secondary text-text-secondary font-semibold text-xs hover:text-text-primary active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <Map className="h-4 w-4" />
                 Hide Sidebar
               </button>
+              
+              <Footer />
             </div>
           </motion.div>
         )}

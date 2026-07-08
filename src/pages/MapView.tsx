@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ZoomIn, ZoomOut, RotateCcw, Map as MapIcon } from "lucide-react";
+import { RotateCcw, Map as MapIcon } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const MapView: React.FC = () => {
@@ -24,13 +24,7 @@ export const MapView: React.FC = () => {
     setPosition({ x: 0, y: 0 });
   };
 
-  const handleZoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.25, 4));
-  };
 
-  const handleZoomOut = () => {
-    setScale((prev) => Math.max(prev - 0.25, 0.5));
-  };
 
   // Mouse drag handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -121,24 +115,10 @@ export const MapView: React.FC = () => {
   return (
     <div className="relative w-full h-full bg-[#0d0e12] overflow-hidden select-none">
       {/* Floating Toolbar */}
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-900/70 p-1.5 shadow-2xl backdrop-blur-md">
-        <button
-          onClick={handleZoomIn}
-          className="rounded-xl p-2.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-90"
-          title="Zoom In"
-        >
-          <ZoomIn className="h-5 w-5" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          className="rounded-xl p-2.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-90"
-          title="Zoom Out"
-        >
-          <ZoomOut className="h-5 w-5" />
-        </button>
+      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-2xl border border-border bg-card p-1.5 shadow-2xl backdrop-blur-md">
         <button
           onClick={handleReset}
-          className="rounded-xl p-2.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-90"
+          className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
           title="Reset View"
         >
           <RotateCcw className="h-5 w-5" />
