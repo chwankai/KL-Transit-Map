@@ -468,33 +468,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.status !== "OK" || !data.routes || data.routes.length === 0) {
             throw new Error(`No routes from API type=${type}`);
         }
-        const raw = data.routes[0];
+        
+        const validRoutes = [];
+        for (const raw of data.routes) {
+            try {
+                // Enrich raw route with ETA and per-leg direction metadata before conversion
+                const legs = raw.legs || [];
+                const legMeta = [];
+                let firstDepartTime = null;
+                let lastArriveTime = null;
 
-        // Enrich raw route with ETA and per-leg direction metadata before conversion
-        const legs = raw.legs || [];
-        const legMeta = [];
-        let firstDepartTime = null;
-        let lastArriveTime = null;
+                for (let i = 0; i < legs.length; i++) {
+                    const leg = legs[i];
+                    if (leg.type === 'transit') {
+                        const deptStr = formatApiTime(leg.estimated_departure_time);
+                        const arrStr = formatApiTime(leg.estimated_end_arrival_time);
+                        const direction = extractDirection(leg.route_details ? leg.route_details.headsign : '');
+                        legMeta.push({ type: 'transit', departTime: deptStr, arriveTime: arrStr, direction });
+                        if (!firstDepartTime && deptStr) firstDepartTime = deptStr;
+                        if (arrStr) lastArriveTime = arrStr;
+                    } else {
+                        legMeta.push({ type: leg.type });
+                    }
+                }
 
-        for (let i = 0; i < legs.length; i++) {
-            const leg = legs[i];
-            if (leg.type === 'transit') {
-                const deptStr = formatApiTime(leg.estimated_departure_time);
-                const arrStr = formatApiTime(leg.estimated_end_arrival_time);
-                const direction = extractDirection(leg.route_details ? leg.route_details.headsign : '');
-                legMeta.push({ type: 'transit', departTime: deptStr, arriveTime: arrStr, direction });
-                if (!firstDepartTime && deptStr) firstDepartTime = deptStr;
-                if (arrStr) lastArriveTime = arrStr;
-            } else {
-                legMeta.push({ type: leg.type });
+                raw._etaDepart = firstDepartTime;
+                raw._etaArrive = lastArriveTime;
+                raw._legMeta = legMeta;
+
+                const converted = convertApiRoute(raw);
+                validRoutes.push(converted);
+            } catch (err) {
+                console.warn(`Skipping invalid sub-route:`, err.message);
             }
         }
 
-        raw._etaDepart = firstDepartTime;
-        raw._etaArrive = lastArriveTime;
-        raw._legMeta = legMeta;
-
-        return convertApiRoute(raw);
+        if (validRoutes.length === 0) throw new Error(`No valid rail routes from API type=${type}`);
+        return validRoutes;
     }
 
     async function fetchMyRapidRoute(origin, dest, departureTime) {
@@ -520,19 +530,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const routes = [];
         results.forEach((result, idx) => {
             if (result.status === 'fulfilled') {
-                result.value._routeLabel = routeTypes[idx].label;
-                result.value._routeType = routeTypes[idx].type;
-                routes.push(result.value);
+                result.value.forEach((route, subIdx) => {
+                    const label = subIdx === 0 
+                        ? routeTypes[idx].label 
+                        : `${routeTypes[idx].label} (Option ${subIdx + 1})`;
+                    route._routeLabel = label;
+                    route._routeType = routeTypes[idx].type;
+                    routes.push(route);
+                });
             }
         });
 
-        // Keep ALL routes — do NOT deduplicate.
-        // Even if fastest/leastchange/leastwalk return the same line path,
-        // we show all cards so the user sees which optimization each represents.
-        const unique = routes.filter(r => r !== null);
+        // Deduplicate distinct routes by comparing path sequence
+        const seen = new Set();
+        const unique = [];
+        for (const r of routes) {
+            const pathKey = r.path.join('->');
+            if (seen.has(pathKey)) continue;
+            seen.add(pathKey);
+            unique.push(r);
+        }
 
         if (unique.length === 0) throw new Error('No valid routes from API');
-        return unique;
+        return unique.slice(0, 3);
     }
 
     // State for multiple routes
@@ -700,10 +720,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const tlng = destGeo.geometry.coordinates[0];
                     const tlat = destGeo.geometry.coordinates[1];
                     // Fetch fastest using target time as departure (approximate)
-                    const probeRoute = await fetchSingleRoute(flng, flat, tlng, tlat, 'fastest', targetTime);
-                    if (probeRoute.totalDurationSec) {
+                    const probeRoutes = await fetchSingleRoute(flng, flat, tlng, tlat, 'fastest', targetTime);
+                    if (probeRoutes && probeRoutes.length > 0 && probeRoutes[0].totalDurationSec) {
                         // Subtract duration from target arrival to get departure
-                        departureTime = subtractSecondsFromDatetime(targetTime, probeRoute.totalDurationSec);
+                        departureTime = subtractSecondsFromDatetime(targetTime, probeRoutes[0].totalDurationSec);
                     }
                 } catch (e) {
                     console.warn('Arrive-by probe failed, using target time as departure:', e);
@@ -1057,7 +1077,9 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme(savedTheme);
 
         // Load Google Maps API Key
-        const savedKey = (typeof CONFIG !== 'undefined' && CONFIG.GMAPS_API_KEY) || localStorage.getItem('gmaps_api_key') || '';
+        const savedKey = localStorage.getItem('gmaps_api_key') !== null
+            ? localStorage.getItem('gmaps_api_key')
+            : ((typeof CONFIG !== 'undefined' && CONFIG.GMAPS_API_KEY) || '');
         if (gmapsKeyInput) {
             gmapsKeyInput.value = savedKey;
         }
@@ -1291,7 +1313,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startBusTracking() {
-        const apiKey = (typeof CONFIG !== 'undefined' && CONFIG.GMAPS_API_KEY) || localStorage.getItem('gmaps_api_key') || '';
+        const apiKey = localStorage.getItem('gmaps_api_key') !== null
+            ? localStorage.getItem('gmaps_api_key')
+            : ((typeof CONFIG !== 'undefined' && CONFIG.GMAPS_API_KEY) || '');
         loadGoogleMaps(apiKey, () => {
             initMap();
             fetchBusData();

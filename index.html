@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="KL Transit Map">
-    <title>Klang Valley Transit Map & Router</title>
+    <title>KL Transit Map</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,13 +20,13 @@
     <div class="app-container">
         <!-- Header -->
         <header class="header">
-            <div class="logo-area">
+            <a class="logo-area" href="https://kl-map.vercel.app/" style="cursor: pointer;text-decoration: none;">
                 <div class="logo-icon">🚇</div>
                 <div class="logo-text">
                     <h1 id="app-title">KL Transit Map</h1>
                     <span class="subtext">Integrated Route Planner</span>
                 </div>
-            </div>
+            </a>
             <nav class="nav-links">
                 <button id="nav-map" class="nav-btn active">🗺️ Map</button>
                 <button id="nav-plan" class="nav-btn">🧭 Plan</button>
@@ -229,11 +229,6 @@
                         <button type="button" class="fare-pref-btn" data-pref="cash">Cash</button>
                         <button type="button" class="fare-pref-btn" data-pref="concession">Concession</button>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="gmaps-key-input">Google Maps API Key</label>
-                    <input type="password" id="gmaps-key-input" class="form-control" placeholder="Enter key (saved to localStorage)...">
-                    <small class="form-help-text">Leave blank to use default keyless mode (shows watermark).</small>
                 </div>
                 <div class="form-group">
                     <label for="gmaps-key-input">Google Maps API Key</label>

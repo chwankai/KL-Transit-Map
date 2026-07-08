@@ -300,7 +300,7 @@ body {
     width: 360px;
     padding: 1.5rem;
     border-right: 1px solid var(--border-color);
-    background-color: var(--results-bg);
+    background-color: transparent;
     overflow-y: auto;
     transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
 }
@@ -308,7 +308,7 @@ body {
 .planner-results {
     flex: 1;
     padding: 1.5rem;
-    background-color: var(--results-bg);
+    background-color: transparent;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
