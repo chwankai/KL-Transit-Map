@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #080c14;
+  --card-bg: rgba(17, 24, 39, 0.75);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  
+  --header-bg: rgba(8, 12, 20, 0.8);
+  --logo-gradient: linear-gradient(to right, #ffffff, #9ca3af);
+  --dropdown-bg: rgba(13, 18, 30, 0.95);
+  --input-bg: rgba(8, 12, 20, 0.7);
+  --sidebar-bg: rgba(13, 18, 30, 0.45);
+  --results-bg: rgba(5, 8, 15, 0.5);
+  --button-secondary-bg: rgba(255, 255, 255, 0.05);
+
+  --nav-active-text: #ffffff;
+  --nav-active-bg: rgba(59, 130, 246, 0.15);
+  --nav-active-border: rgba(59, 130, 246, 0.3);
+  --nav-active-shadow: rgba(59, 130, 246, 0.2);
+  --card-title-gradient: linear-gradient(to right, #ffffff, #9ca3af);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.2);
+}
+
+body.light-theme {
+  --bg-color: #fcfbfa; /* Warm paper white */
+  --card-bg: rgba(254, 253, 252, 0.9); /* High contrast warm card */
+  --border-color: rgba(67, 62, 56, 0.08); /* Soft warm gray-brown border */
+  --text-primary: #2d2a26; /* Deep warm charcoal */
+  --text-secondary: #7c7267; /* Muted warm taupe */
+  --accent-color: #1d4ed8; /* High-contrast royal blue */
+  --accent-hover: #1e40af;
+  
+  --header-bg: rgba(252, 251, 250, 0.85);
+  --logo-gradient: linear-gradient(to right, #2d2a26, #7c7267);
+  --dropdown-bg: rgba(254, 253, 252, 0.98);
+  --input-bg: rgba(254, 253, 252, 0.95);
+  --sidebar-bg: rgba(246, 243, 238, 0.65); /* Warm sand tone */
+  --results-bg: rgba(252, 251, 250, 0.65);
+  --button-secondary-bg: rgba(45, 42, 38, 0.05);
+
+  --nav-active-text: var(--accent-color);
+  --nav-active-bg: rgba(29, 78, 216, 0.1);
+  --nav-active-border: rgba(29, 78, 216, 0.2);
+  --nav-active-shadow: rgba(29, 78, 216, 0.05);
+  --card-title-gradient: linear-gradient(to right, #2d2a26, #7c7267);
+  --scrollbar-thumb: rgba(45, 42, 38, 0.15);
+  --scrollbar-thumb-hover: rgba(45, 42, 38, 0.25);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Apple style Glassmorphism card */
+.glass-panel {
+  background-color: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation utilities */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}

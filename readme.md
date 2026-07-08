@@ -1,35 +1,32 @@
-# KL Transit Map
+# React + TypeScript + Vite
 
-## Overview
-A sleek, modern web application visualizing the Klang Valley transit system. It features an interactive map with dark‑mode glassmorphism design, vibrant gradient backgrounds, and smooth micro‑animations for an engaging user experience.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Features
-- **Interactive Map**: Clickable stations and real‑time transit line highlights.
-- **Premium UI**: Dark mode, glassmorphism cards, dynamic gradients, and subtle hover animations.
-- **Responsive Design**: Works beautifully on desktop and mobile devices.
-- **Easy Integration**: Simple HTML/JS entry point, no external frameworks required.
+Currently, two official plugins are available:
 
-## Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/chwankai/KL_Transit_Map.git
-   cd KL_Transit_Map
-   ```
-2. Open `index.html` in a modern browser (Chrome, Safari, Firefox).
-3. No additional build steps are required – the app uses vanilla HTML, CSS, and JavaScript.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Usage
-- Open `index.html` to view the map.
-- Hover over stations to see tooltips with route information.
-- Click on a line to isolate that route.
+## React Compiler
 
-## Contributing
-Feel free to submit issues or pull requests. Follow these steps:
-1. Fork the repo.
-2. Create a feature branch.
-3. Make your changes.
-4. Ensure the UI remains premium and responsive.
-5. Open a pull request.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## License
-This project is licensed under the MIT License.
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
+```
+
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

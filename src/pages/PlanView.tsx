@@ -1,0 +1,651 @@
+import React, { useState, useEffect, useRef } from "react";
+import { stations, lines, findRoute } from "../lib/transit-data";
+import type { Route } from "../lib/transit-data";
+import { fetchMyRapidRoute, getCurrentDateTime, subtractSecondsFromDatetime, geocodeStation, fetchSingleRoute } from "../lib/routing";
+import { useSettings } from "../context/SettingsContext";
+import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+export const PlanView: React.FC = () => {
+  const { farePref } = useSettings();
+  const [origin, setOrigin] = useState("");
+  const [dest, setDest] = useState("");
+  const [timeMode, setTimeMode] = useState<"now" | "depart" | "arrive">("now");
+  const [dateInput, setDateInput] = useState("");
+  const [timeInput, setTimeInput] = useState("");
+
+  const [originInputFocused, setOriginInputFocused] = useState(false);
+  const [destInputFocused, setDestInputFocused] = useState(false);
+  const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
+  const [destSuggestions, setDestSuggestions] = useState<string[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [routes, setRoutes] = useState<Route[]>([]);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [expandedStops, setExpandedStops] = useState<Record<number, boolean>>({});
+
+  const originRef = useRef<HTMLDivElement>(null);
+  const destRef = useRef<HTMLDivElement>(null);
+
+  const sortedStationNames = Object.keys(stations).sort();
+
+  // Initialize date/time inputs
+  useEffect(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    setDateInput(`${yyyy}-${mm}-${dd}`);
+
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    setTimeInput(`${hh}:${min}`);
+  }, []);
+
+  // Update origin/dest autocompletes
+  useEffect(() => {
+    if (!origin) {
+      setOriginSuggestions([]);
+    } else {
+      const match = sortedStationNames.filter((name) =>
+        name.toLowerCase().includes(origin.toLowerCase())
+      );
+      setOriginSuggestions(match.slice(0, 8));
+    }
+  }, [origin]);
+
+  useEffect(() => {
+    if (!dest) {
+      setDestSuggestions([]);
+    } else {
+      const match = sortedStationNames.filter((name) =>
+        name.toLowerCase().includes(dest.toLowerCase())
+      );
+      setDestSuggestions(match.slice(0, 8));
+    }
+  }, [dest]);
+
+  // Click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (originRef.current && !originRef.current.contains(e.target as Node)) {
+        setOriginInputFocused(false);
+      }
+      if (destRef.current && !destRef.current.contains(e.target as Node)) {
+        setDestInputFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSwap = () => {
+    const tmp = origin;
+    setOrigin(dest);
+    setDest(tmp);
+  };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!origin || !dest) return;
+
+    if (origin.trim().toLowerCase() === dest.trim().toLowerCase()) {
+      const sameStationRoute: Route = {
+        path: [origin.trim()],
+        edges: [],
+        totalDistance: 0,
+        totalFare: 0,
+        cashFare: 0,
+        concessionFare: 0,
+        transfers: 0,
+        isSameStation: true,
+        etaDepart: null,
+        etaArrive: null,
+        totalDurationSec: 0,
+        legMeta: [],
+      };
+      setRoutes([sameStationRoute]);
+      setSelectedRouteIndex(0);
+      setErrorMsg(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMsg(null);
+    setExpandedStops({});
+
+    let targetTime = "";
+    if (timeMode !== "now" && dateInput && timeInput) {
+      targetTime = `${dateInput} ${timeInput}:00`;
+    } else {
+      targetTime = getCurrentDateTime();
+    }
+
+    try {
+      let departureTime = targetTime;
+
+      if (timeMode === "arrive") {
+        try {
+          const originGeo = await geocodeStation(origin);
+          const destGeo = await geocodeStation(dest);
+          const flng = originGeo.geometry.coordinates[0];
+          const flat = originGeo.geometry.coordinates[1];
+          const tlng = destGeo.geometry.coordinates[0];
+          const tlat = destGeo.geometry.coordinates[1];
+          const probeRoutes = await fetchSingleRoute(flng, flat, tlng, tlat, "fastest", targetTime);
+          if (probeRoutes && probeRoutes.length > 0 && probeRoutes[0].totalDurationSec) {
+            departureTime = subtractSecondsFromDatetime(targetTime, probeRoutes[0].totalDurationSec);
+          }
+        } catch (e) {
+          console.warn("Arrive-by estimation failed, falling back:", e);
+        }
+      }
+
+      const results = await fetchMyRapidRoute(origin, dest, departureTime);
+      setRoutes(results);
+      setSelectedRouteIndex(0);
+    } catch (err: any) {
+      console.warn("RapidKL API failed, falling back to local Dijkstra:", err);
+      const localRoute = findRoute(origin, dest, []);
+      if (localRoute) {
+        // Estimate duration: ~2 min per stop
+        const stopCount = localRoute.path.length;
+        localRoute.totalDurationSec = stopCount * 120;
+        localRoute._routeLabel = "🗺 Local Route";
+        setRoutes([localRoute]);
+        setSelectedRouteIndex(0);
+      } else {
+        setErrorMsg("No route found between selected stations.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getLineColor = (lineId: string) => {
+    return lines[lineId]?.color || "#6b7280";
+  };
+
+  const getLineName = (lineId: string) => {
+    return lines[lineId]?.name || lineId;
+  };
+
+  const getStationBadges = (stationName: string) => {
+    const node = stations[stationName];
+    if (!node || !node.codes) return null;
+    return (
+      <div className="flex gap-1">
+        {node.codes.map((code) => {
+          const lineId = code.replace(/[0-9]/g, "");
+          const color = getLineColor(lineId);
+          return (
+            <span
+              key={code}
+              style={{ backgroundColor: color }}
+              className="text-[9px] font-extrabold text-white px-1.5 py-0.5 rounded shadow-sm"
+            >
+              {code}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const formatDuration = (seconds: number | null | undefined) => {
+    if (!seconds) return "";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.round((seconds % 3600) / 60);
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m} min`;
+  };
+
+  const activeRoute = routes[selectedRouteIndex];
+
+  // Helper to compile steps for rendering timeline
+  const getRouteSegments = (route: Route) => {
+    const segments: { line: string; stations: string[] }[] = [];
+    let currentLine: string | null = null;
+    let lineSegments: string[] = [];
+
+    route.edges.forEach((edge) => {
+      if (edge.line !== currentLine) {
+        if (currentLine) {
+          segments.push({ line: currentLine, stations: lineSegments });
+        }
+        currentLine = edge.line;
+        lineSegments = [];
+      }
+      lineSegments.push(edge.to);
+    });
+
+    if (currentLine && lineSegments.length > 0) {
+      segments.push({ line: currentLine, stations: lineSegments });
+    }
+
+    return segments;
+  };
+
+  const segments = activeRoute ? getRouteSegments(activeRoute) : [];
+
+  return (
+    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background">
+      {/* Sidebar Selector Form */}
+      <div className="w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border/80 overflow-y-auto bg-slate-900/40 dark:bg-slate-950/20">
+        <div className="glass-panel rounded-2xl p-5 shadow-xl border border-white/5 bg-slate-900/60 dark:bg-slate-950/40">
+          <h2 className="text-base font-bold mb-4 tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Find Route
+          </h2>
+
+          <form onSubmit={handleSearch} className="space-y-4">
+            {/* Origin */}
+            <div ref={originRef} className="relative">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                Origin Station
+              </label>
+              <div className="relative mt-1">
+                <input
+                  type="text"
+                  value={origin}
+                  onChange={(e) => setOrigin(e.target.value)}
+                  onFocus={() => setOriginInputFocused(true)}
+                  placeholder="Type station name..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-slate-950/60 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              {originInputFocused && originSuggestions.length > 0 && (
+                <div className="absolute left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-xl border border-white/10 bg-slate-900 shadow-2xl backdrop-blur-md">
+                  {originSuggestions.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => {
+                        setOrigin(name);
+                        setOriginInputFocused(false);
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-slate-300 hover:bg-white/10 hover:text-white"
+                    >
+                      {name}
+                      {getStationBadges(name)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Swap Button */}
+            <div className="flex justify-center -my-2.5">
+              <button
+                type="button"
+                onClick={handleSwap}
+                className="rounded-full border border-white/10 bg-slate-900 p-2 text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all hover:scale-110 active:scale-95"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Destination */}
+            <div ref={destRef} className="relative">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                Destination Station
+              </label>
+              <div className="relative mt-1">
+                <input
+                  type="text"
+                  value={dest}
+                  onChange={(e) => setDest(e.target.value)}
+                  onFocus={() => setDestInputFocused(true)}
+                  placeholder="Type station name..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-slate-950/60 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              {destInputFocused && destSuggestions.length > 0 && (
+                <div className="absolute left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-xl border border-white/10 bg-slate-900 shadow-2xl backdrop-blur-md">
+                  {destSuggestions.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => {
+                        setDest(name);
+                        setDestInputFocused(false);
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-slate-300 hover:bg-white/10 hover:text-white"
+                    >
+                      {name}
+                      {getStationBadges(name)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Time mode selector */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                Time
+              </label>
+              <div className="grid grid-cols-3 gap-1 rounded-xl bg-white/5 p-0.5 border border-white/10">
+                {(["now", "depart", "arrive"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setTimeMode(mode)}
+                    className={`py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold capitalize transition-all ${
+                      timeMode === mode
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    {mode === "now" ? "Now" : mode === "depart" ? "Depart" : "Arrive"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Date/Time pickers */}
+            {timeMode !== "now" && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="grid grid-cols-2 gap-2"
+              >
+                <input
+                  type="date"
+                  value={dateInput}
+                  onChange={(e) => setDateInput(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-white/10 bg-slate-950/60 text-xs text-slate-200 focus:outline-none"
+                />
+                <input
+                  type="time"
+                  value={timeInput}
+                  onChange={(e) => setTimeInput(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-white/10 bg-slate-950/60 text-xs text-slate-200 focus:outline-none"
+                />
+              </motion.div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading || !origin || !dest}
+              className="w-full py-3 rounded-xl bg-blue-600 font-semibold text-xs tracking-wider uppercase text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:scale-100"
+            >
+              {isLoading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  <Search className="h-4 w-4" />
+                  Search Journey
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Main Results / Detailed Column */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        <AnimatePresence mode="wait">
+          {errorMsg && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-3 p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400"
+            >
+              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <span className="text-xs font-semibold">{errorMsg}</span>
+            </motion.div>
+          )}
+
+          {!routes.length && !isLoading && !errorMsg && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="h-[300px] flex flex-col items-center justify-center text-center text-text-secondary border border-dashed border-white/10 rounded-2xl p-6"
+            >
+              <Compass className="h-12 w-12 text-slate-600 mb-3 animate-pulse" />
+              <h3 className="text-sm font-bold text-slate-300">Plan a Journey</h3>
+              <p className="text-xs max-w-xs mt-1 leading-relaxed">
+                Select your origin and destination stations on the left panel, and find your fastest route.
+              </p>
+            </motion.div>
+          )}
+
+          {routes.length > 0 && (
+            <motion.div
+              key={origin + dest}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-4"
+            >
+              {/* Route Recommendation Cards */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                  Recommended Routes
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {routes.map((route, idx) => {
+                    const activeLines = [
+                      ...new Set(route.edges.filter((e) => e.line !== "WALKWAY").map((e) => e.line)),
+                    ];
+                    const active = idx === selectedRouteIndex;
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedRouteIndex(idx)}
+                        className={`flex flex-col text-left p-4 rounded-xl border transition-all ${
+                          active
+                            ? "border-blue-600/60 bg-blue-600/10 shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                            : "border-white/10 bg-slate-900/40 hover:bg-slate-900/65"
+                        }`}
+                      >
+                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wide">
+                          {route._routeLabel || `Option ${idx + 1}`}
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5 my-2">
+                          {activeLines.map((lineId, i) => (
+                            <React.Fragment key={lineId}>
+                              {i > 0 && <span className="text-[10px] text-slate-500">→</span>}
+                              <span
+                                style={{ backgroundColor: getLineColor(lineId) }}
+                                className="text-[8px] font-extrabold text-white px-1.5 py-0.5 rounded shadow-sm uppercase"
+                              >
+                                {lineId}
+                              </span>
+                            </React.Fragment>
+                          ))}
+                        </div>
+                        <div className="mt-auto flex justify-between items-end w-full">
+                          <span className="text-xs font-semibold text-slate-400">
+                            {route.transfers === 0 ? "Direct" : `${route.transfers} xfer`}
+                          </span>
+                          <span className="text-sm font-bold text-white">
+                            {formatDuration(route.totalDurationSec) || `${route.totalDistance.toFixed(1)} km`}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Route Details Card */}
+              {activeRoute && (
+                <div className="glass-panel rounded-2xl p-5 shadow-xl border border-white/5 bg-slate-900/40 dark:bg-slate-950/20">
+                  {/* Journey Stats Bar */}
+                  <div className="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-white/5 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
+                        <Clock className="h-3.5 w-3.5 text-blue-400" />
+                        <span className="text-xs font-bold">
+                          {formatDuration(activeRoute.totalDurationSec)}
+                        </span>
+                      </div>
+                      <span className="text-xs text-text-secondary">
+                        {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers} transfers
+                      </span>
+                    </div>
+
+                    {/* Fare breakdown */}
+                    <div className="flex gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+                      {/* Cashless */}
+                      {(farePref === "all" || farePref === "cashless") && (
+                        <div className="px-3 py-1.5 text-center">
+                          <div className="text-[9px] font-bold text-text-secondary uppercase">Cashless</div>
+                          <div className="text-xs font-extrabold text-white">RM {activeRoute.totalFare.toFixed(2)}</div>
+                        </div>
+                      )}
+                      {/* Cash */}
+                      {(farePref === "all" || farePref === "cash") && (
+                        <div className="px-3 py-1.5 text-center border-l border-white/5">
+                          <div className="text-[9px] font-bold text-text-secondary uppercase">Cash</div>
+                          <div className="text-xs font-extrabold text-white">
+                            {activeRoute.cashFare ? `RM ${activeRoute.cashFare.toFixed(2)}` : "--"}
+                          </div>
+                        </div>
+                      )}
+                      {/* Concession */}
+                      {(farePref === "all" || farePref === "concession") && (
+                        <div className="px-3 py-1.5 text-center border-l border-white/5">
+                          <div className="text-[9px] font-bold text-text-secondary uppercase">Concession</div>
+                          <div className="text-xs font-extrabold text-white">
+                            {activeRoute.concessionFare ? `RM ${activeRoute.concessionFare.toFixed(2)}` : "--"}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Route Timeline */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+                      Journey Directions
+                    </h3>
+
+                    <div className="relative pl-6 space-y-5 border-l-2 border-slate-700/60 ml-2">
+                      {/* Start Node */}
+                      <div className="relative">
+                        <span className="absolute -left-[30px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-slate-800 border-2 border-slate-500" />
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-100">{activeRoute.path[0]}</span>
+                          {getStationBadges(activeRoute.path[0])}
+                          {activeRoute.etaDepart && (
+                            <span className="text-[10px] text-slate-400 font-semibold ml-auto">{activeRoute.etaDepart}</span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-500 font-medium">Departing Station</p>
+                      </div>
+
+                      {/* Segments & Stops */}
+                      {segments.map((seg, idx) => {
+                        const isWalk = seg.line === "WALKWAY";
+                        const color = getLineColor(seg.line);
+                        const isExpanded = expandedStops[idx] || false;
+                        const intermediateStops = seg.stations.slice(0, -1);
+                        const meta = activeRoute.legMeta?.[idx] || null;
+
+                        return (
+                          <div key={idx} className="relative space-y-2">
+                            {/* Segment Line indicator */}
+                            <span
+                              style={{ backgroundColor: color }}
+                              className="absolute -left-[30px] top-1.5 h-4 w-4 rounded-full border-2 border-white/10"
+                            />
+
+                            <div className="flex flex-wrap items-center justify-between">
+                              <span style={{ color: isWalk ? "#9ca3af" : color }} className="text-xs font-bold">
+                                {isWalk ? "Pedestrian Walkway" : `Board ${getLineName(seg.line)}`}
+                                {meta?.direction && (
+                                  <span className="text-[10px] text-slate-500 font-normal ml-1">
+                                    toward {meta.direction}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+
+                            {/* Ride Toggle */}
+                            {intermediateStops.length > 0 ? (
+                              <div className="pl-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExpandedStops((prev) => ({ ...prev, [idx]: !isExpanded }))
+                                  }
+                                  className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-slate-200 transition-colors"
+                                >
+                                  Ride {seg.stations.length} stop{seg.stations.length > 1 ? "s" : ""}
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-3 w-3" />
+                                  ) : (
+                                    <ChevronDown className="h-3 w-3" />
+                                  )}
+                                </button>
+
+                                {/* Stops List */}
+                                <AnimatePresence>
+                                  {isExpanded && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      className="overflow-hidden mt-1.5 space-y-1.5 pl-2 border-l border-white/10"
+                                    >
+                                      {intermediateStops.map((stop) => (
+                                        <div key={stop} className="flex items-center justify-between text-[11px] text-slate-400">
+                                          <div className="flex items-center gap-2">
+                                            <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
+                                            <span>{stop}</span>
+                                          </div>
+                                          {getStationBadges(stop)}
+                                        </div>
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-slate-500 pl-2">
+                                {isWalk ? "Walk to interchange station" : "Ride 1 stop"}
+                              </span>
+                            )}
+
+                            {/* Transfer/Arrival Node */}
+                            {idx < segments.length && (
+                              <div className="relative pt-3 pl-0">
+                                <span className="absolute -left-[30px] top-[14px] flex h-4 w-4 items-center justify-center rounded-full bg-slate-800 border-2 border-slate-500" />
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-slate-100">{seg.stations[seg.stations.length - 1]}</span>
+                                  {getStationBadges(seg.stations[seg.stations.length - 1])}
+                                  {meta?.arriveTime && (
+                                    <span className="text-[10px] text-slate-400 font-semibold ml-auto">{meta.arriveTime}</span>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-slate-500 font-medium">
+                                  {idx === segments.length - 1
+                                    ? "Arrive at destination"
+                                    : `Transfer to ${getLineName(segments[idx + 1].line)}`}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
