@@ -26,6 +26,10 @@ export const PlanView: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [expandedStops, setExpandedStops] = useState<Record<number, boolean>>({});
 
+  // Keep track of search parameters to prevent unneeded result panel refreshes
+  const [searchedOrigin, setSearchedOrigin] = useState("");
+  const [searchedDest, setSearchedDest] = useState("");
+
   // Mobile layout overlay pull down controls
   const [isMobileFormOpen, setIsMobileFormOpen] = useState(true);
 
@@ -94,6 +98,8 @@ export const PlanView: React.FC = () => {
     setOrigin("");
     setDest("");
     setRoutes([]);
+    setSearchedOrigin("");
+    setSearchedDest("");
     setErrorMsg(null);
     setIsMobileFormOpen(true);
   };
@@ -119,6 +125,8 @@ export const PlanView: React.FC = () => {
       };
       setRoutes([sameStationRoute]);
       setSelectedRouteIndex(0);
+      setSearchedOrigin(origin);
+      setSearchedDest(dest);
       setErrorMsg(null);
       setIsMobileFormOpen(false); // Hide form overlay on mobile after search
       return;
@@ -158,6 +166,8 @@ export const PlanView: React.FC = () => {
       const results = await fetchMyRapidRoute(origin, dest, departureTime);
       setRoutes(results);
       setSelectedRouteIndex(0);
+      setSearchedOrigin(origin);
+      setSearchedDest(dest);
       setIsMobileFormOpen(false); // Hide form overlay on mobile after search
     } catch (err: any) {
       console.warn("RapidKL API failed, falling back to local Dijkstra:", err);
@@ -166,9 +176,11 @@ export const PlanView: React.FC = () => {
         // Estimate duration: ~2 min per stop
         const stopCount = localRoute.path.length;
         localRoute.totalDurationSec = stopCount * 120;
-        localRoute._routeLabel = "🗺 Local Route";
+        localRoute._routeLabel = "Best";
         setRoutes([localRoute]);
         setSelectedRouteIndex(0);
+        setSearchedOrigin(origin);
+        setSearchedDest(dest);
         setIsMobileFormOpen(false); // Hide form overlay on mobile after search
       } else {
         setErrorMsg("No route found between selected stations.");
@@ -192,7 +204,12 @@ export const PlanView: React.FC = () => {
     return (
       <div className="flex gap-1 flex-wrap">
         {node.codes.map((code) => {
-          const lineId = code.replace(/[0-9]/g, "");
+          // Extract alphabetical line prefix correctly (e.g. KG18A -> KG, SB3 -> SB)
+          const match = code.match(/^[a-zA-Z]+/);
+          let lineId = match ? match[0] : "";
+          if (lineId === "SB") {
+            lineId = "BRT";
+          }
           const color = getLineColor(lineId);
           return (
             <span
@@ -299,7 +316,7 @@ export const PlanView: React.FC = () => {
                         setOrigin(name);
                         setOriginInputFocused(false);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-border/40 last:border-b-0"
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
                     >
                       {name}
                       {getStationBadges(name)}
@@ -345,7 +362,7 @@ export const PlanView: React.FC = () => {
                         setDest(name);
                         setDestInputFocused(false);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-border/40 last:border-b-0"
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
                     >
                       {name}
                       {getStationBadges(name)}
@@ -456,7 +473,7 @@ export const PlanView: React.FC = () => {
 
             {routes.length > 0 && (
               <motion.div
-                key={origin + dest}
+                key={searchedOrigin + searchedDest}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -502,7 +519,7 @@ export const PlanView: React.FC = () => {
                           </div>
                           <div className="mt-auto flex justify-between items-end w-full">
                             <span className="text-xs font-semibold text-text-secondary">
-                              {route.transfers === 0 ? "Direct" : `${route.transfers} xfer`}
+                              {route.transfers === 0 ? "Direct" : `${route.transfers} ${route.transfers === 1 ? "Transfer" : "Transfers"}`}
                             </span>
                             <span className="text-sm font-bold text-text-primary">
                               {formatDuration(route.totalDurationSec) || `${route.totalDistance.toFixed(1)} km`}
@@ -527,7 +544,7 @@ export const PlanView: React.FC = () => {
                           </span>
                         </div>
                         <span className="text-xs text-text-secondary font-medium">
-                          {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers} transfers
+                          {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? "Direct" : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? "Transfer" : "Transfers"}`}
                         </span>
                       </div>
 
@@ -570,7 +587,7 @@ export const PlanView: React.FC = () => {
                       <div className="relative pl-6 border-l-2 border-border ml-2 space-y-5">
                         {/* Start Node */}
                         <div className="relative">
-                          <span className="absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
+                          <span className="absolute -left-[33px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-bold text-text-primary">{activeRoute.path[0]}</span>
                             {getStationBadges(activeRoute.path[0])}
@@ -594,7 +611,7 @@ export const PlanView: React.FC = () => {
                               {/* Segment Line indicator */}
                               <span
                                 style={{ backgroundColor: color }}
-                                className="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full border-2 border-border"
+                                className="absolute -left-[33px] top-1.5 h-4 w-4 rounded-full border-2 border-border"
                               />
 
                               <div className="flex flex-wrap items-center justify-between">
@@ -657,7 +674,7 @@ export const PlanView: React.FC = () => {
                               {/* Transfer/Arrival Node */}
                               {idx < segments.length && (
                                 <div className="relative pt-3 pl-0">
-                                  <span className="absolute -left-[31px] top-[14px] flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
+                                  <span className="absolute -left-[33px] top-[14px] flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
                                     {getStationBadges(seg.stations[seg.stations.length - 1])}

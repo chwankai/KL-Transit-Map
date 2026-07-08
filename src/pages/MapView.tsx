@@ -54,7 +54,7 @@ export const MapView: React.FC = () => {
     const direction = e.deltaY < 0 ? 1 : -1;
     setScale((prev) => {
       const nextScale = prev + direction * zoomFactor;
-      return Math.max(0.5, Math.min(nextScale, 4));
+      return Math.max(1, Math.min(nextScale, 4));
     });
   };
 
@@ -90,7 +90,7 @@ export const MapView: React.FC = () => {
       const delta = dist - lastTouchDistance.current;
       setScale((prev) => {
         const nextScale = prev + delta * 0.007;
-        return Math.max(0.5, Math.min(nextScale, 4));
+        return Math.max(1, Math.min(nextScale, 4));
       });
       lastTouchDistance.current = dist;
     }
@@ -157,14 +157,14 @@ export const MapView: React.FC = () => {
             y: position.y,
             scale: scale,
           }}
-          className="relative max-w-full max-h-full flex items-center justify-center"
+          className="relative w-full md:w-auto max-w-full max-h-full flex items-center justify-center"
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
         >
           <img
             ref={imageRef}
             src={mapUrl}
             alt="Klang Valley Rail Map"
-            className="pointer-events-none select-none min-w-[100vw] min-h-[80vh] md:min-w-0 md:min-h-0 md:max-h-[90vh] object-cover md:object-contain rounded-lg shadow-2xl border border-border"
+            className="pointer-events-none select-none w-full h-auto object-contain md:max-h-[90vh] rounded-lg shadow-2xl border border-border"
           />
         </motion.div>
       </div>

@@ -22,12 +22,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Top Header - Unified Mobile & Desktop */}
       <header className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 h-[64px] border-b border-border bg-card backdrop-blur-md z-40">
         <Link to="/" className="flex items-center gap-2 sm:gap-3 select-none">
-          <div className="text-xl sm:text-2xl">🚇</div>
-          <div className="flex flex-col -space-y-0.5 sm:-space-y-1">
-            <h1 className="text-xs sm:text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent leading-none">
+          <div className="text-xl sm:text-2xl flex items-center justify-center">🚇</div>
+          <div className="flex flex-col md:gap-0.5">
+            <h1 className="text-xs sm:text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent leading-tight md:leading-snug">
               KL Transit Map
             </h1>
-            <span className="hidden md:inline text-[8px] font-medium uppercase tracking-wider text-text-secondary select-none leading-none mt-0.5">
+            <span className="hidden md:inline text-[9px] font-semibold uppercase tracking-wider text-text-secondary select-none leading-tight mt-0.5">
               Integrated Route Planner
             </span>
           </div>
@@ -48,7 +48,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : "text-text-secondary hover:text-text-primary hover:bg-button-secondary/50"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <Icon className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
                   <span className="inline">{label}</span>
                 </Link>
               );

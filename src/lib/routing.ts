@@ -294,6 +294,11 @@ export async function fetchMyRapidRoute(
     unique.push(r);
   }
 
+  unique.forEach((route, idx) => {
+    if (idx === 0) route._routeLabel = "Best";
+    else route._routeLabel = `Alternative ${idx}`;
+  });
+
   if (unique.length === 0) throw new Error("No valid routes from API");
   return unique.slice(0, 3);
 }
