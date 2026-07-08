@@ -17,6 +17,10 @@ export default {
         "text-primary": "var(--text-primary)",
         "text-secondary": "var(--text-secondary)",
         "button-secondary": "var(--button-secondary-bg)",
+        sidebar: "var(--sidebar-bg)",
+        input: "var(--input-bg)",
+        dropdown: "var(--dropdown-bg)",
+        results: "var(--results-bg)",
         accent: {
           DEFAULT: "var(--accent-color)",
           hover: "var(--accent-hover)",

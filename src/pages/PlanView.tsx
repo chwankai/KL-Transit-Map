@@ -47,26 +47,26 @@ export const PlanView: React.FC = () => {
     setTimeInput(`${hh}:${min}`);
   }, []);
 
-  // Update origin/dest autocompletes
+  // Update origin/dest autocompletes to show full list on empty input
   useEffect(() => {
     if (!origin) {
-      setOriginSuggestions([]);
+      setOriginSuggestions(sortedStationNames);
     } else {
       const match = sortedStationNames.filter((name) =>
         name.toLowerCase().includes(origin.toLowerCase())
       );
-      setOriginSuggestions(match.slice(0, 8));
+      setOriginSuggestions(match);
     }
   }, [origin]);
 
   useEffect(() => {
     if (!dest) {
-      setDestSuggestions([]);
+      setDestSuggestions(sortedStationNames);
     } else {
       const match = sortedStationNames.filter((name) =>
         name.toLowerCase().includes(dest.toLowerCase())
       );
-      setDestSuggestions(match.slice(0, 8));
+      setDestSuggestions(match);
     }
   }, [dest]);
 
@@ -90,7 +90,7 @@ export const PlanView: React.FC = () => {
     setDest(tmp);
   };
 
-  const handleClear = () => {
+  const handleSearchAgain = () => {
     setOrigin("");
     setDest("");
     setRoutes([]);
@@ -198,7 +198,7 @@ export const PlanView: React.FC = () => {
             <span
               key={code}
               style={{ backgroundColor: color }}
-              className="text-[9px] font-extrabold text-white px-1.5 py-0.5 rounded shadow-sm"
+              className="text-[9px] font-extrabold text-white px-1.5 py-0.5 rounded shadow-sm animate-fade-in"
             >
               {code}
             </span>
@@ -290,7 +290,7 @@ export const PlanView: React.FC = () => {
                 />
               </div>
               {originInputFocused && originSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-dropdown shadow-2xl backdrop-blur-md">
+                <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
                   {originSuggestions.map((name) => (
                     <button
                       key={name}
@@ -299,7 +299,7 @@ export const PlanView: React.FC = () => {
                         setOrigin(name);
                         setOriginInputFocused(false);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-text-primary hover:bg-button-secondary/80 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-border/40 last:border-b-0"
                     >
                       {name}
                       {getStationBadges(name)}
@@ -336,7 +336,7 @@ export const PlanView: React.FC = () => {
                 />
               </div>
               {destInputFocused && destSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-dropdown shadow-2xl backdrop-blur-md">
+                <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
                   {destSuggestions.map((name) => (
                     <button
                       key={name}
@@ -345,7 +345,7 @@ export const PlanView: React.FC = () => {
                         setDest(name);
                         setDestInputFocused(false);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-text-primary hover:bg-button-secondary/80 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-2 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-border/40 last:border-b-0"
                     >
                       {name}
                       {getStationBadges(name)}
@@ -368,7 +368,7 @@ export const PlanView: React.FC = () => {
                     onClick={() => setTimeMode(mode)}
                     className={`py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold capitalize transition-all ${
                       timeMode === mode
-                        ? "bg-blue-600 text-white shadow-md"
+                        ? "bg-blue-600 text-white shadow-md font-bold"
                         : "text-text-secondary hover:text-text-primary"
                     }`}
                   >
@@ -402,45 +402,29 @@ export const PlanView: React.FC = () => {
             )}
 
             {/* Form actions row */}
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={isLoading || !origin || !dest}
-                className="flex-1 py-3 rounded-xl bg-blue-600 font-semibold text-xs tracking-wider uppercase text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:scale-100"
-              >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Calculating...
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-4 w-4" />
-                    Search Journey
-                  </>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClear}
-                className="w-12 h-12 flex items-center justify-center rounded-xl border border-border bg-button-secondary text-text-secondary hover:text-text-primary hover:bg-button-secondary/80 active:scale-95 transition-all flex-shrink-0"
-                title="Clear Search"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading || !origin || !dest}
+              className="w-full py-3 rounded-xl bg-blue-600 font-bold text-xs tracking-wider uppercase text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:scale-100"
+            >
+              {isLoading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  <Search className="h-4 w-4" />
+                  Search Journey
+                </>
+              )}
+            </button>
           </form>
-        </div>
-
-        {/* Sidebar Non-Sticky Footer (Desktop only or when always showing) */}
-        <div className="hidden md:block mt-6">
-          <Footer />
         </div>
       </div>
 
       {/* Main Results / Detailed Column */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full">
+      <div className="flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full bg-results">
         <div className="space-y-5">
           <AnimatePresence mode="wait">
             {errorMsg && (
@@ -583,10 +567,10 @@ export const PlanView: React.FC = () => {
                         Journey Directions
                       </h3>
 
-                      <div className="relative pl-6 space-y-5 border-l-2 border-border ml-2">
+                      <div className="relative pl-6 border-l-2 border-border ml-2 space-y-5">
                         {/* Start Node */}
                         <div className="relative">
-                          <span className="absolute -left-[30px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
+                          <span className="absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-bold text-text-primary">{activeRoute.path[0]}</span>
                             {getStationBadges(activeRoute.path[0])}
@@ -610,7 +594,7 @@ export const PlanView: React.FC = () => {
                               {/* Segment Line indicator */}
                               <span
                                 style={{ backgroundColor: color }}
-                                className="absolute -left-[30px] top-1.5 h-4 w-4 rounded-full border-2 border-border"
+                                className="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full border-2 border-border"
                               />
 
                               <div className="flex flex-wrap items-center justify-between">
@@ -673,7 +657,7 @@ export const PlanView: React.FC = () => {
                               {/* Transfer/Arrival Node */}
                               {idx < segments.length && (
                                 <div className="relative pt-3 pl-0">
-                                  <span className="absolute -left-[30px] top-[14px] flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
+                                  <span className="absolute -left-[31px] top-[14px] flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
                                     {getStationBadges(seg.stations[seg.stations.length - 1])}
@@ -700,7 +684,7 @@ export const PlanView: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        {/* Non-Sticky Footer (Appears at bottom of results or page flow) */}
+        {/* Non-Sticky Footer (Appears at bottom of results area only) */}
         <div className="mt-8 border-t border-border/20 pt-4 flex-shrink-0">
           <Footer />
         </div>
@@ -710,11 +694,11 @@ export const PlanView: React.FC = () => {
       {routes.length > 0 && !isMobileFormOpen && (
         <div className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
           <button
-            onClick={() => setIsMobileFormOpen(true)}
+            onClick={handleSearchAgain}
             className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-5 py-3 text-xs font-bold shadow-2xl active:scale-95 transition-all whitespace-nowrap"
           >
             <Search className="h-4 w-4" />
-            Return
+            Search Again
           </button>
         </div>
       )}

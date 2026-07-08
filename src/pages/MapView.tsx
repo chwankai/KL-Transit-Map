@@ -113,7 +113,7 @@ export const MapView: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-[#0d0e12] overflow-hidden select-none">
+    <div className="relative w-full h-full bg-background overflow-hidden select-none">
       {/* Floating Toolbar */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-2xl border border-border bg-card p-1.5 shadow-2xl backdrop-blur-md">
         <button
@@ -131,7 +131,7 @@ export const MapView: React.FC = () => {
           onClick={() =>
             setMapType((prev) => (prev === "standard" ? "upcoming" : "standard"))
           }
-          className="flex items-center gap-2 rounded-2xl border border-white/10 bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xl hover:bg-blue-700 transition-all active:scale-95 select-none"
+          className="flex items-center gap-2 rounded-2xl border border-border bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xl hover:bg-blue-700 transition-all active:scale-95 select-none"
         >
           <MapIcon className="h-4 w-4" />
           {mapType === "standard" ? "Show Upcoming Circle Line" : "Show Standard Map"}
@@ -157,14 +157,14 @@ export const MapView: React.FC = () => {
             y: position.y,
             scale: scale,
           }}
-          className="relative max-w-full max-h-full"
+          className="relative max-w-full max-h-full flex items-center justify-center"
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
         >
           <img
             ref={imageRef}
             src={mapUrl}
             alt="Klang Valley Rail Map"
-            className="pointer-events-none select-none max-h-[85vh] md:max-h-[90vh] object-contain rounded-lg shadow-2xl border border-white/5"
+            className="pointer-events-none select-none min-w-[100vw] min-h-[80vh] md:min-w-0 md:min-h-0 md:max-h-[90vh] object-cover md:object-contain rounded-lg shadow-2xl border border-border"
           />
         </motion.div>
       </div>
