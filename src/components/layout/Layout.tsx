@@ -11,14 +11,14 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
-  const { hideBusButton } = useSettings();
+  const { hideBusButton, t } = useSettings();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const navItems = [
-    { path: "/", label: "Map", icon: Map },
-    { path: "/lines", label: "Line", icon: Train },
-    { path: "/plan", label: "Plan", icon: Compass },
-    ...(!hideBusButton ? [{ path: "/bus", label: "Bus", icon: Bus }] : []),
+    { path: "/", labelKey: "map", icon: Map },
+    { path: "/lines", labelKey: "line", icon: Train },
+    { path: "/plan", labelKey: "plan", icon: Compass },
+    ...(!hideBusButton ? [{ path: "/bus", labelKey: "bus", icon: Bus }] : []),
   ];
 
   return (
@@ -32,7 +32,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               KL Transit Map
             </h1>
             <span className="text-[9px] font-semibold uppercase tracking-wider text-text-secondary select-none leading-tight mt-0.5">
-              Integrated Route Planner
+              {t("integratedPlanner")}
             </span>
           </div>
         </Link>
@@ -40,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Right side controls */}
         <div className="flex items-center gap-1 sm:gap-2">
           <nav className="flex items-center gap-2 sm:gap-3">
-            {navItems.map(({ path, label, icon: Icon }) => {
+            {navItems.map(({ path, labelKey, icon: Icon }) => {
               const isActive = location.pathname === path;
               return (
                 <Link
@@ -53,7 +53,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   }`}
                 >
                   <Icon className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-                  <span className="leading-none mt-0.5 md:mt-0">{label}</span>
+                  <span className="leading-none mt-0.5 md:mt-0">{t(labelKey)}</span>
                 </Link>
               );
             })}

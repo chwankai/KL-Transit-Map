@@ -3,9 +3,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Train, Footprints, Search, X } from "lucide-react";
 import { lines, stations, lineStations } from "../lib/transit-data";
 import { Footer } from "../components/layout/Footer";
+import { useSettings } from "../context/SettingsContext";
 
 export const LinesView: React.FC = () => {
   const navigate = useNavigate();
+  const { t, tStation, tLine } = useSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,14 +65,14 @@ export const LinesView: React.FC = () => {
             <button
               onClick={() => navigate("/")}
               className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary transition-all active:scale-90 shadow-md flex-shrink-0"
-              title="Back to Map"
+              title={t("backToMap")}
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Explore Network</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{t("exploreNetwork")}</div>
               <h1 className="text-xl font-bold tracking-tight text-text-primary">
-                {isSearching ? "Global Search" : "Transit Lines"}
+                {isSearching ? t("globalSearchResults") : t("transitLines")}
               </h1>
             </div>
           </div>
@@ -85,7 +87,7 @@ export const LinesView: React.FC = () => {
                 ? "bg-blue-600/15 border-blue-500 text-blue-500"
                 : "border-border bg-card text-text-secondary hover:text-text-primary"
             }`}
-            title="Search stations"
+            title={t("searchPlaceholder")}
           >
             {showSearch || isSearching ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
@@ -96,7 +98,7 @@ export const LinesView: React.FC = () => {
           <div className="relative animate-fade-in">
             <input
               type="text"
-              placeholder="Search all Klang Valley stations by name or code..."
+              placeholder={t("searchAllPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2.5 pl-10 rounded-xl border border-border bg-card text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:border-blue-500 transition-all shadow-sm"
@@ -146,10 +148,10 @@ export const LinesView: React.FC = () => {
                   </div>
                   <div>
                     <h2 className="text-base font-bold text-text-primary leading-tight">
-                      {selectedLine.name}
+                      {tLine(selectedLine.name)}
                     </h2>
                     <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mt-0.5">
-                      Route Code: {selectedLine.id}
+                      {t("routeCode")}: {selectedLine.id}
                     </p>
                   </div>
                 </div>
@@ -158,7 +160,7 @@ export const LinesView: React.FC = () => {
                     {selectedStations.length}
                   </span>
                   <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mt-0.5">
-                    Stations
+                    {t("stationsCount")}
                   </p>
                 </div>
               </div>
@@ -171,7 +173,7 @@ export const LinesView: React.FC = () => {
           <div className="space-y-2">
             {globalFiltered.length === 0 ? (
               <div className="text-center py-8 text-text-secondary text-sm border border-dashed border-border rounded-2xl bg-card">
-                No stations match your search globally.
+                {t("noGlobalSearchMatches")}
               </div>
             ) : (
               globalFiltered.map((st) => {
@@ -186,7 +188,7 @@ export const LinesView: React.FC = () => {
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors">
-                        {st.name}
+                        {tStation(st.name)}
                       </span>
                     </div>
 
@@ -198,10 +200,10 @@ export const LinesView: React.FC = () => {
                           <div
                             key={conn.to}
                             className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
-                            title={`Walkway to ${conn.to}`}
+                            title={`${t("walkTo")} ${tStation(conn.to)}`}
                           >
                             <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                            <span>{conn.to}</span>
+                            <span>{t("transferToWalkway")} {tStation(conn.to)}</span>
                             {targetNode && (
                               <div className="flex gap-1">
                                 {targetNode.codes.map((code) => {
@@ -298,7 +300,7 @@ export const LinesView: React.FC = () => {
                       {st.code}
                     </span>
                     <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors">
-                      {st.name}
+                      {tStation(st.name)}
                     </span>
                   </div>
 
@@ -311,10 +313,10 @@ export const LinesView: React.FC = () => {
                         <div
                           key={conn.to}
                           className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
-                          title={`Walkway to ${conn.to}`}
+                          title={`${t("walkTo")} ${tStation(conn.to)}`}
                         >
                           <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                          <span>{conn.to}</span>
+                          <span>{t("transferToWalkway")} {tStation(conn.to)}</span>
                           {targetNode && (
                             <div className="flex gap-1">
                               {targetNode.codes.map((code) => {
