@@ -37,12 +37,20 @@ export const LinesView: React.FC = () => {
     }) || lineId;
   };
 
-  // Filter stations based on search query
-  const filteredStations = selectedStations.filter((st) => {
-    if (!searchQuery) return true;
+  // Global search matching stations across all lines
+  const allStations = Object.entries(stations).map(([name, node]) => ({
+    name,
+    codes: node.codes,
+    lines: node.lines,
+    connections: node.connections,
+  }));
+
+  const globalFiltered = allStations.filter((st) => {
     const query = searchQuery.toLowerCase().trim();
-    return st.name.toLowerCase().includes(query) || st.code.toLowerCase().includes(query);
-  });
+    return st.name.toLowerCase().includes(query) || st.codes.some((c) => c.toLowerCase().includes(query));
+  }).sort((a, b) => a.name.localeCompare(b.name));
+
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
     <div className="flex flex-col h-full w-full bg-background text-text-primary overflow-y-auto animate-fade-in select-none">
@@ -60,7 +68,9 @@ export const LinesView: React.FC = () => {
             </button>
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Explore Network</div>
-              <h1 className="text-xl font-bold tracking-tight text-text-primary">Transit Lines</h1>
+              <h1 className="text-xl font-bold tracking-tight text-text-primary">
+                {isSearching ? "Global Search" : "Transit Lines"}
+              </h1>
             </div>
           </div>
 
@@ -70,22 +80,22 @@ export const LinesView: React.FC = () => {
               if (showSearch) setSearchQuery("");
             }}
             className={`p-2.5 rounded-xl border transition-all active:scale-90 shadow-md flex-shrink-0 ${
-              showSearch
+              showSearch || isSearching
                 ? "bg-blue-600/15 border-blue-500 text-blue-500"
                 : "border-border bg-card text-text-secondary hover:text-text-primary"
             }`}
             title="Search stations"
           >
-            {showSearch ? <X className="h-4.5 w-4.5" /> : <Search className="h-4.5 w-4.5" />}
+            {showSearch || isSearching ? <X className="h-4.5 w-4.5" /> : <Search className="h-4.5 w-4.5" />}
           </button>
         </div>
 
         {/* Search Input field */}
-        {showSearch && (
+        {(showSearch || isSearching) && (
           <div className="relative animate-fade-in">
             <input
               type="text"
-              placeholder="Search station name or code..."
+              placeholder="Search all Klang Valley stations by name or code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2.5 pl-10 rounded-xl border border-border bg-card text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:border-blue-500 transition-all shadow-sm"
@@ -95,69 +105,151 @@ export const LinesView: React.FC = () => {
           </div>
         )}
 
-        {/* Lines Selector - Wrapped Tabs */}
-        <div className="flex flex-wrap gap-2 pb-2">
-          {sortedLines.map((line) => {
-            const isSelected = selectedLineId === line.id;
-            return (
-              <button
-                key={line.id}
-                onClick={() => setSelectedLineId(line.id)}
-                style={{
-                  borderColor: isSelected ? line.color : "var(--border)",
-                  backgroundColor: isSelected ? `${line.color}15` : "var(--card)",
-                  color: isSelected ? line.color : "var(--text-secondary)",
-                }}
-                className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-bold transition-all active:scale-95 shadow-sm hover:text-text-primary hover:border-text-secondary"
-              >
-                <span
-                  style={{ backgroundColor: line.color }}
-                  className="w-2.5 h-2.5 rounded-full"
-                />
-                {line.id}
-              </button>
-            );
-          })}
-        </div>
+        {/* Normal layout: Tabs and summary if not searching */}
+        {!isSearching && (
+          <>
+            {/* Lines Selector - Wrapped Tabs */}
+            <div className="flex flex-wrap gap-2 pb-2">
+              {sortedLines.map((line) => {
+                const isSelected = selectedLineId === line.id;
+                return (
+                  <button
+                    key={line.id}
+                    onClick={() => setSelectedLineId(line.id)}
+                    style={{
+                      borderColor: isSelected ? line.color : "var(--border)",
+                      backgroundColor: isSelected ? `${line.color}15` : "var(--card)",
+                      color: isSelected ? line.color : "var(--text-secondary)",
+                    }}
+                    className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-bold transition-all active:scale-95 shadow-sm hover:text-text-primary hover:border-text-secondary"
+                  >
+                    <span
+                      style={{ backgroundColor: line.color }}
+                      className="w-2.5 h-2.5 rounded-full"
+                    />
+                    {line.id}
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Line Summary */}
-        {selectedLine && (
-          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-lg flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div
-                style={{ backgroundColor: selectedLine.color }}
-                className="p-3 rounded-xl text-white shadow-md flex items-center justify-center animate-pulse"
-              >
-                <Train className="h-6 w-6" />
+            {/* Line Summary */}
+            {selectedLine && (
+              <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-lg flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div
+                    style={{ backgroundColor: selectedLine.color }}
+                    className="p-3 rounded-xl text-white shadow-md flex items-center justify-center animate-pulse"
+                  >
+                    <Train className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-text-primary leading-tight">
+                      {selectedLine.name}
+                    </h2>
+                    <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mt-0.5">
+                      Route Code: {selectedLine.id}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-black text-text-primary leading-none">
+                    {selectedStations.length}
+                  </span>
+                  <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mt-0.5">
+                    Stations
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base font-bold text-text-primary leading-tight">
-                  {selectedLine.name}
-                </h2>
-                <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mt-0.5">
-                  Route Code: {selectedLine.id}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-2xl font-black text-text-primary leading-none">
-                {selectedStations.length}
-              </span>
-              <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mt-0.5">
-                Stations
-              </p>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
-        {/* Stations List */}
-        <div className="space-y-2">
-          {filteredStations.length === 0 ? (
-            <div className="text-center py-8 text-text-secondary text-sm border border-dashed border-border rounded-2xl bg-card">
-              No stations match your search.
-            </div>
-          ) : (
-            filteredStations.map((st, idx) => {
+        {/* Global Search Results List */}
+        {isSearching ? (
+          <div className="space-y-2">
+            {globalFiltered.length === 0 ? (
+              <div className="text-center py-8 text-text-secondary text-sm border border-dashed border-border rounded-2xl bg-card">
+                No stations match your search globally.
+              </div>
+            ) : (
+              globalFiltered.map((st) => {
+                const walkwayTransfers = st.connections.filter((c) => c.line === "WALKWAY");
+                
+                // Show all codes for the station
+                return (
+                  <div
+                    key={st.name}
+                    onClick={() => navigate(`/station/${encodeURIComponent(st.name)}`)}
+                    className="group relative flex items-center justify-between p-4 rounded-2xl border border-border bg-card hover:bg-button-secondary/30 transition-all duration-200 active:scale-[0.99] cursor-pointer shadow-sm overflow-hidden"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors">
+                        {st.name}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {/* Walkway Transfers */}
+                      {walkwayTransfers.map((conn) => {
+                        const targetNode = stations[conn.to];
+                        return (
+                          <div
+                            key={conn.to}
+                            className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
+                            title={`Walkway to ${conn.to}`}
+                          >
+                            <Footprints className="h-3.5 w-3.5 text-text-secondary" />
+                            <span>{conn.to}</span>
+                            {targetNode && (
+                              <div className="flex gap-1">
+                                {targetNode.codes.map((code) => {
+                                  const match = code.match(/^[a-zA-Z]+/);
+                                  let lId = match ? match[0] : "";
+                                  if (lId === "SB") lId = "BRT";
+                                  return (
+                                    <span
+                                      key={code}
+                                      style={{ backgroundColor: getLineColor(lId) }}
+                                      className="text-[8px] font-extrabold text-white px-1 py-0.5 rounded leading-none"
+                                    >
+                                      {code}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+
+                      {/* Display all station codes */}
+                      <div className="flex items-center gap-1.5">
+                        {st.codes.map((code) => {
+                          const match = code.match(/^[a-zA-Z]+/);
+                          let lId = match ? match[0] : "";
+                          if (lId === "SB") lId = "BRT";
+                          return (
+                            <span
+                              key={code}
+                              style={{ backgroundColor: getLineColor(lId) }}
+                              className="text-[9px] font-black text-white px-2 py-0.5 rounded shadow-sm leading-none"
+                            >
+                              {code}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          /* Normal Stations List of selected line */
+          <div className="space-y-2">
+            {selectedStations.map((st, idx) => {
               const node = stations[st.name];
               if (!node) return null;
 
@@ -211,7 +303,40 @@ export const LinesView: React.FC = () => {
 
                   {/* Right: Interchange Codes and Walkway Icons */}
                   <div className="flex items-center gap-2 flex-wrap justify-end">
-                    {/* Standard Interchanges */}
+                    {/* Walkway Transfers FIRST so standard interchanges render to their right */}
+                    {walkwayTransfers.map((conn) => {
+                      const targetNode = stations[conn.to];
+                      return (
+                        <div
+                          key={conn.to}
+                          className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
+                          title={`Walkway to ${conn.to}`}
+                        >
+                          <Footprints className="h-3.5 w-3.5 text-text-secondary" />
+                          <span>{conn.to}</span>
+                          {targetNode && (
+                            <div className="flex gap-1">
+                              {targetNode.codes.map((code) => {
+                                const match = code.match(/^[a-zA-Z]+/);
+                                let lId = match ? match[0] : "";
+                                if (lId === "SB") lId = "BRT";
+                                return (
+                                  <span
+                                    key={code}
+                                    style={{ backgroundColor: getLineColor(lId) }}
+                                    className="text-[8px] font-extrabold text-white px-1 py-0.5 rounded leading-none"
+                                  >
+                                    {code}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {/* Standard Interchanges SECOND so they occupy the rightmost space */}
                     {sortedInterchanges.length > 0 && (
                       <div className="flex items-center gap-1.5">
                         {sortedInterchanges.map((lineId) => {
@@ -229,45 +354,12 @@ export const LinesView: React.FC = () => {
                         })}
                       </div>
                     )}
-
-                    {/* Walkway Transfers */}
-                    {walkwayTransfers.map((conn) => {
-                      const targetNode = stations[conn.to];
-                      return (
-                        <div
-                          key={conn.to}
-                          className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
-                          title={`Walkway to ${conn.to}`}
-                        >
-                          <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                          <span>{conn.to}</span>
-                          {targetNode && (
-                            <div className="flex gap-1">
-                              {targetNode.codes.map((code) => {
-                                const match = code.match(/^[a-zA-Z]+/);
-                                let lineId = match ? match[0] : "";
-                                if (lineId === "SB") lineId = "BRT";
-                                return (
-                                  <span
-                                    key={code}
-                                    style={{ backgroundColor: getLineColor(lineId) }}
-                                    className="text-[8px] font-extrabold text-white px-1 py-0.5 rounded leading-none"
-                                  >
-                                    {code}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
                   </div>
                 </div>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
