@@ -28,11 +28,11 @@ export const MapView: React.FC = () => {
     const iw = imageRef.current.clientWidth || rect.width;
     const ih = imageRef.current.clientHeight || rect.height;
 
-    // Minimum 100px of scaled image must remain visible on screen boundaries
-    const minX = -iw * currentScale + 100;
-    const maxX = rect.width - 100;
-    const minY = -ih * currentScale + 100;
-    const maxY = rect.height - 100;
+    // Center coordinates based limits:
+    const minX = -rect.width / 2 + 100 - (iw * currentScale) / 2;
+    const maxX = rect.width / 2 - 100 + (iw * currentScale) / 2;
+    const minY = -rect.height / 2 + 100 - (ih * currentScale) / 2;
+    const maxY = rect.height / 2 - 100 + (ih * currentScale) / 2;
 
     return {
       x: Math.max(minX, Math.min(x, maxX)),
@@ -74,8 +74,8 @@ export const MapView: React.FC = () => {
     const direction = e.deltaY < 0 ? 1 : -1;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
+    const cx = e.clientX - rect.left - rect.width / 2;
+    const cy = e.clientY - rect.top - rect.height / 2;
 
     setScale((prevScale) => {
       const nextScale = Math.max(1, Math.min(prevScale + direction * zoomFactor, 4));
@@ -123,8 +123,8 @@ export const MapView: React.FC = () => {
       const rect = containerRef.current.getBoundingClientRect();
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
-      const cx = (touch1.clientX + touch2.clientX) / 2 - rect.left;
-      const cy = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+      const cx = (touch1.clientX + touch2.clientX) / 2 - rect.left - rect.width / 2;
+      const cy = (touch1.clientY + touch2.clientY) / 2 - rect.top - rect.height / 2;
 
       const dist = Math.hypot(
         touch1.clientX - touch2.clientX,
