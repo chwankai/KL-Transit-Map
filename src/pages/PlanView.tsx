@@ -554,20 +554,32 @@ export const PlanView: React.FC = () => {
                   <div
                     key={idx}
                     onClick={() => handleSelectSavedRoute(route)}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl border border-border bg-input hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] active:scale-98"
+                    className="w-full flex items-start gap-2 p-2.5 rounded-xl border border-border bg-input hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] active:scale-98"
                   >
-                    <div className="flex flex-col text-left max-w-[80%]">
-                      <span className="text-[10px] font-bold text-text-primary truncate">{route.origin}</span>
-                      <span className="text-[9px] text-text-secondary truncate">to {route.dest}</span>
-                    </div>
                     <button
                       type="button"
                       onClick={(e) => handleDeleteSavedRoute(e, idx)}
-                      className="p-1 rounded-lg text-text-secondary hover:bg-red-500/15 hover:text-red-500 transition-colors"
+                      className="p-1 rounded-lg text-text-secondary hover:bg-red-500/15 hover:text-red-500 transition-colors flex-shrink-0 mt-0.5"
                       title="Delete Saved Route"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      {/* Origin Row */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold text-text-primary truncate">{route.origin}</span>
+                        <div className="flex-shrink-0">{getStationBadges(route.origin)}</div>
+                      </div>
+                      {/* Down Arrow Row */}
+                      <div className="text-[9px] text-text-secondary font-extrabold pl-1 leading-none select-none">
+                        ↓
+                      </div>
+                      {/* Destination Row */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold text-text-primary truncate">{route.dest}</span>
+                        <div className="flex-shrink-0">{getStationBadges(route.dest)}</div>
+                      </div>
+                    </div>
                   </div>
                 ))
               )}
