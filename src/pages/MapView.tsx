@@ -46,6 +46,21 @@ export const MapView: React.FC = () => {
     return lineId;
   };
 
+  const getStationCoord = (key: string): { lat: number; lng: number } | null => {
+    if (!key) return null;
+    const cleanKey = key.trim().toUpperCase();
+    
+    if ((stationCoords as any)[cleanKey]) return (stationCoords as any)[cleanKey];
+    if ((stationCoords as any)[key]) return (stationCoords as any)[key];
+    
+    // Heuristic matching: strip symbols, spaces
+    const normalizedKey = cleanKey.replace(/[^A-Z0-9]/g, "");
+    const foundKey = Object.keys(stationCoords).find(k => k.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() === normalizedKey);
+    if (foundKey) return (stationCoords as any)[foundKey];
+    
+    return null;
+  };
+
   // Sync scale mode preference
   useEffect(() => {
     localStorage.setItem("show_real_scale", String(showRealScale));
@@ -264,12 +279,12 @@ export const MapView: React.FC = () => {
     const drawnTracks = new Set<string>();
 
     Object.entries(stations).forEach(([name, node]) => {
-      const s1 = (stationCoords as any)[node.codes[0]] || (stationCoords as any)[name];
+      const s1 = getStationCoord(node.codes[0]) || getStationCoord(name);
       if (!s1) return;
 
       node.connections.forEach((conn) => {
         const destNode = Object.values(stations).find(st => st.name === conn.to);
-        const s2 = destNode ? ((stationCoords as any)[destNode.codes[0]] || (stationCoords as any)[conn.to]) : null;
+        const s2 = destNode ? (getStationCoord(destNode.codes[0]) || getStationCoord(conn.to)) : null;
         if (!s2) return;
 
         const isWalk = conn.line === "WALKWAY";
@@ -297,19 +312,19 @@ export const MapView: React.FC = () => {
       { from: "KJ27", to: "SA07" }, // Glenmarie
       { from: "KJ15", to: "MR1" },  // KL Sentral
       { from: "KG09", to: "SA01" }, // Bandar Utama
-      { from: "KJ09", to: "PY20" }  // Ampang Park
+      { from: "KJ9", to: "PY20" }   // Ampang Park (KJ9)
     ];
 
     walkwayTransfers.forEach(transfer => {
-      const c1 = (stationCoords as any)[transfer.from];
-      const c2 = (stationCoords as any)[transfer.to];
+      const c1 = getStationCoord(transfer.from);
+      const c2 = getStationCoord(transfer.to);
       if (c1 && c2) {
         L.polyline([[c1.lat, c1.lng], [c2.lat, c2.lng]], {
           color: "#94a3b8",
           weight: 2.5,
           dashArray: "5, 7",
           opacity: 0.85,
-        }).addTo(map);
+         }).addTo(map);
       }
     });
 
@@ -331,7 +346,7 @@ export const MapView: React.FC = () => {
 
       // Popup HTML template loaded on platform dot selection
       const popupHtml = `
-        <div style="text-align: center !important;" class="p-2 space-y-1.5 font-sans leading-snug">
+        <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
           <div class="text-xs font-bold text-slate-900">${name}</div>
           <div class="flex gap-1 flex-wrap justify-center">
             ${node.codes.map(code => {
@@ -339,15 +354,15 @@ export const MapView: React.FC = () => {
               return `<span style="background-color: ${getLineColor(lineId)}; color: white; padding: 2.5px 5.5px; font-size: 8px; font-weight: 800; border-radius: 4px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">${code}</span>`;
             }).join("")}
           </div>
-          <div class="pt-2 border-t border-slate-200 mt-1 flex justify-center">
-            <a href="#/station/${encodeURIComponent(name)}" style="color: white !important;" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[9px] font-extrabold uppercase tracking-wide transition-all no-underline inline-block hover:scale-95 active:scale-95">View Arrival</a>
+          <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
+            <a href="#/station/${encodeURIComponent(name)}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Arrival</a>
           </div>
         </div>
       `;
 
       if (isSharedAmpangSriPetaling || isSingleDotInterchange) {
         // Plot a single dot for parallel Ampang-Sri Petaling connection stations and specific integrated interchanges
-        const coord = (stationCoords as any)[name] || (stationCoords as any)[node.codes[0]];
+        const coord = getStationCoord(name) || getStationCoord(node.codes[0]);
         if (!coord) return;
 
         L.circleMarker([coord.lat, coord.lng], {
@@ -362,7 +377,7 @@ export const MapView: React.FC = () => {
       } else {
         // Plot separate platform dots for other interchanges (like Bandar Utama KG and SA) and single stations
         node.codes.forEach(code => {
-          const coord = (stationCoords as any)[code] || (stationCoords as any)[name];
+          const coord = getStationCoord(code) || getStationCoord(name);
           if (!coord) return;
 
           const lineId = getLineOfCode(code);

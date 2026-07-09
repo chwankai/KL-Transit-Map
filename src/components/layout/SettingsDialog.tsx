@@ -48,9 +48,9 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
             <div className="grid grid-cols-3 gap-2 rounded-xl bg-button-secondary p-1 border border-border">
               {(
                 [
+                  { id: "system", label: "System", icon: Laptop },
                   { id: "light", label: "Light", icon: Sun },
                   { id: "dark", label: "Dark", icon: Moon },
-                  { id: "system", label: "System", icon: Laptop },
                 ] as const
               ).map(({ id, label, icon: Icon }) => (
                 <button
