@@ -3,15 +3,22 @@ import { RotateCcw, Map as MapIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { stations, lines } from "../lib/transit-data";
 import stationCoords from "../../public/station_coords.json";
+import railTracks from "../../public/rail_tracks.json";
+import { useSettings } from "../context/SettingsContext";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export const MapView: React.FC = () => {
+  const { theme } = useSettings();
   const [mapType, setMapType] = useState<"standard" | "upcoming">("standard");
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [showRealScale, setShowRealScale] = useState(false);
+
+  // Read interactive map state preference from localStorage so page redirects maintain view state
+  const [showRealScale, setShowRealScale] = useState(() => {
+    return localStorage.getItem("show_real_scale") === "true";
+  });
 
   const dragStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,6 +36,11 @@ export const MapView: React.FC = () => {
   const getLineColor = (lineId: string) => {
     return lines[lineId]?.color || "#6b7280";
   };
+
+  // Sync scale mode preference
+  useEffect(() => {
+    localStorage.setItem("show_real_scale", String(showRealScale));
+  }, [showRealScale]);
 
   // Clamp map panning offsets to ensure a portion of the map remains visible
   const clampPosition = (x: number, y: number, currentScale: number) => {
@@ -205,7 +217,19 @@ export const MapView: React.FC = () => {
       maxZoom: 18,
     }).addTo(map);
 
-    // Plot tracks (polylines) programmatically based on connection colors
+    // 1. Draw OSM realistic train paths from public/rail_tracks.json
+    if (railTracks && railTracks.length > 0) {
+      railTracks.forEach((track: any) => {
+        L.polyline(track.coords, {
+          color: getLineColor(track.lineId),
+          weight: 4.5,
+          opacity: 0.85,
+        }).addTo(map);
+      });
+    }
+
+    // 2. Draw fallback straight polylines for lines not covered by OSM (e.g. Monorail MR, BRT, WALKWAY)
+    const osmDrawnLines = new Set(["KJ", "SP", "AG", "KG", "SA", "PY"]);
     const drawnTracks = new Set<string>();
 
     Object.entries(stations).forEach(([name, node]) => {
@@ -217,22 +241,27 @@ export const MapView: React.FC = () => {
         if (!s2) return;
 
         const isWalk = conn.line === "WALKWAY";
-        const trackKey = [name, conn.to].sort().join("_") + "_" + conn.line;
+        const isOsmLine = osmDrawnLines.has(conn.line);
 
-        if (!drawnTracks.has(trackKey)) {
-          drawnTracks.add(trackKey);
+        // Only draw straight fallback if it is a walkway or not in the OSM track dataset
+        if (isWalk || !isOsmLine) {
+          const trackKey = [name, conn.to].sort().join("_") + "_" + conn.line;
 
-          L.polyline([[s1.lat, s1.lng], [s2.lat, s2.lng]], {
-            color: isWalk ? "#94a3b8" : getLineColor(conn.line),
-            weight: isWalk ? 2.5 : 4.5,
-            dashArray: isWalk ? "5, 7" : undefined,
-            opacity: isWalk ? 0.65 : 0.85,
-          }).addTo(map);
+          if (!drawnTracks.has(trackKey)) {
+            drawnTracks.add(trackKey);
+
+            L.polyline([[s1.lat, s1.lng], [s2.lat, s2.lng]], {
+              color: isWalk ? "#94a3b8" : getLineColor(conn.line),
+              weight: isWalk ? 2.5 : 4.5,
+              dashArray: isWalk ? "5, 7" : undefined,
+              opacity: isWalk ? 0.65 : 0.85,
+            }).addTo(map);
+          }
         }
       });
     });
 
-    // Plot station dots (circle markers)
+    // 3. Plot station dots (circle markers)
     Object.entries(stations).forEach(([name, node]) => {
       const coord = (stationCoords as any)[name];
       if (!coord) return;
@@ -248,11 +277,11 @@ export const MapView: React.FC = () => {
         fillOpacity: 1,
       }).addTo(map);
 
-      // Popup content template
+      // Popup template center-aligned with view arrival using explicit white link styling
       const popupHtml = `
-        <div class="p-2 space-y-1.5 font-sans leading-snug">
+        <div style="text-align: center !important;" class="p-2 space-y-1.5 font-sans leading-snug">
           <div class="text-xs font-bold text-slate-900">${name}</div>
-          <div class="flex gap-1 flex-wrap">
+          <div class="flex gap-1 flex-wrap justify-center">
             ${node.codes.map(code => {
               const match = code.match(/^[a-zA-Z]+/);
               let lineId = match ? match[0] : "";
@@ -260,8 +289,8 @@ export const MapView: React.FC = () => {
               return `<span style="background-color: ${getLineColor(lineId)}; color: white; padding: 2.5px 5.5px; font-size: 8px; font-weight: 800; border-radius: 4px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">${code}</span>`;
             }).join("")}
           </div>
-          <div class="pt-2 border-t border-slate-200 mt-1 flex justify-end">
-            <a href="#/station/${encodeURIComponent(name)}" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[9px] font-extrabold uppercase tracking-wide transition-all no-underline inline-block hover:scale-95 active:scale-95">View Arrival</a>
+          <div class="pt-2 border-t border-slate-200 mt-1 flex justify-center">
+            <a href="#/station/${encodeURIComponent(name)}" style="color: white !important;" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[9px] font-extrabold uppercase tracking-wide transition-all no-underline inline-block hover:scale-95 active:scale-95">View Arrival</a>
           </div>
         </div>
       `;
@@ -278,7 +307,7 @@ export const MapView: React.FC = () => {
         mapRef.current = null;
       }
     };
-  }, [showRealScale]);
+  }, [showRealScale, theme]);
 
   return (
     <div className="relative w-full h-full bg-background overflow-hidden select-none">
