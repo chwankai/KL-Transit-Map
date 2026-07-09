@@ -4,6 +4,7 @@ import { stations, lines } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
 import { ArrowLeft, Clock, Calendar, ArrowRight, Train, ChevronDown, ChevronUp } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
+import stationSchedules from "../../public/station_schedules.json";
 
 export const StationInfoView: React.FC = () => {
   const { stationName } = useParams<{ stationName: string }>();
@@ -47,7 +48,6 @@ export const StationInfoView: React.FC = () => {
 
   // Determine operational terminals and directions
   const getDirectionsForLine = (lineId: string) => {
-    // Standard terminal list mapping
     const terminalMapping: Record<string, { term1: string; term2: string }> = {
       "KJ": { term1: "Gombak", term2: "Putra Heights" },
       "AG": { term1: "Sentul Timur", term2: "Ampang" },
@@ -63,7 +63,6 @@ export const StationInfoView: React.FC = () => {
     if (!terms) return [];
 
     const dirs = [];
-    // If the station itself is terminal 1, we only have departures toward terminal 2
     if (decodedName !== terms.term1) {
       dirs.push({ destination: terms.term1, directionId: 1 });
     }
@@ -73,33 +72,86 @@ export const StationInfoView: React.FC = () => {
     return dirs;
   };
 
-  // Generate dynamic departures countdowns
-  const getDepartures = (lineId: string, destName: string) => {
-    // Generate countdown offsets based on station name hash and current minutes to keep it deterministic but realistic
-    const nameHash = decodedName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const interval = lineId === "MR" || lineId === "BRT" ? 6 : 5; // 5-6 mins frequency
-    const currentMins = currentTime.getMinutes() + currentTime.getSeconds() / 60;
-    
-    // Base offset from hash
-    const offset = (nameHash + destName.charCodeAt(0)) % interval;
-    const timeUntilNext = interval - ((currentMins - offset + interval) % interval);
-    
-    const minutesList = [
-      Math.round(timeUntilNext),
-      Math.round(timeUntilNext + interval),
-      Math.round(timeUntilNext + interval * 2)
-    ].map(m => m === 0 ? 1 : m);
-
-    return minutesList.map(mins => {
-      const depTime = new Date(currentTime.getTime() + mins * 60 * 1000);
-      const hh = String(depTime.getHours()).padStart(2, "0");
-      const mm = String(depTime.getMinutes()).padStart(2, "0");
-      return { mins, timeStr: `${hh}:${mm}` };
-    });
+  const getDayType = () => {
+    const day = currentTime.getDay();
+    if (day === 0) return "sunday";
+    if (day === 6) return "saturday";
+    return "weekday";
   };
 
-  // Generate full hourly timetables list
-  const getTimetable = (_lineId: string, destName: string) => {
+  const getTimesForDirection = (lineId: string, destName: string): string[] => {
+    const normSearchName = decodedName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    
+    // Find the station key matching normalized name
+    const matchedKey = Object.keys(stationSchedules).find(k =>
+      k.toLowerCase().replace(/[^a-z0-9]/g, "") === normSearchName
+    );
+    if (!matchedKey) return [];
+
+    const stationData = (stationSchedules as any)[matchedKey];
+    if (!stationData || !stationData[lineId]) return [];
+
+    const destNorm = destName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const schedKey = Object.keys(stationData[lineId]).find(k =>
+      k.toLowerCase().replace(/[^a-z0-9]/g, "").includes(destNorm)
+    );
+    if (!schedKey) return [];
+
+    const dayType = getDayType();
+    return stationData[lineId][schedKey][dayType] || [];
+  };
+
+  // Generate real departure countdowns from GTFS stop_times
+  const getDepartures = (lineId: string, destName: string) => {
+    const times = getTimesForDirection(lineId, destName);
+    const currentHH = currentTime.getHours();
+    const currentMM = currentTime.getMinutes();
+    const currentTotalMin = currentHH * 60 + currentMM;
+
+    if (times.length === 0) {
+      // Fallback if no real GTFS matches
+      const nameHash = decodedName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const interval = lineId === "MR" || lineId === "BRT" ? 6 : 5;
+      const currentMins = currentTime.getMinutes() + currentTime.getSeconds() / 60;
+      const offset = (nameHash + destName.charCodeAt(0)) % interval;
+      const timeUntilNext = interval - ((currentMins - offset + interval) % interval);
+      
+      const minutesList = [
+        Math.round(timeUntilNext),
+        Math.round(timeUntilNext + interval),
+        Math.round(timeUntilNext + interval * 2)
+      ].map(m => m === 0 ? 1 : m);
+
+      return minutesList.map(mins => {
+        const depTime = new Date(currentTime.getTime() + mins * 60 * 1000);
+        const hh = String(depTime.getHours()).padStart(2, "0");
+        const mm = String(depTime.getMinutes()).padStart(2, "0");
+        return { mins, timeStr: `${hh}:${mm}` };
+      });
+    }
+
+    // Map each scheduled departure to minutes until departure
+    const upcoming = times
+      .map(t => {
+        const [h, m] = t.split(":").map(Number);
+        let totalMin = h * 60 + m;
+        if (totalMin < currentTotalMin) {
+          totalMin += 24 * 60; // wraps around midnight
+        }
+        return { timeStr: t, mins: totalMin - currentTotalMin };
+      })
+      .sort((a, b) => a.mins - b.mins)
+      .slice(0, 3);
+
+    return upcoming;
+  };
+
+  // Generate full hourly timetables list from GTFS
+  const getTimetable = (lineId: string, destName: string) => {
+    const times = getTimesForDirection(lineId, destName);
+    if (times.length > 0) return times;
+
+    // Fallback if no GTFS found
     const list = [];
     const nameHash = decodedName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const offset = (nameHash + destName.charCodeAt(0)) % 5;

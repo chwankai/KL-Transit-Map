@@ -1,0 +1,4814 @@
+{
+  "AMPANG": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:28"
+        ],
+        "saturday": [
+          "06:28"
+        ],
+        "sunday": [
+          "06:28"
+        ]
+      }
+    }
+  },
+  "CAHAYA": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:02"
+        ],
+        "saturday": [
+          "06:02"
+        ],
+        "sunday": [
+          "06:02"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      }
+    }
+  },
+  "CEMPAKA": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      }
+    }
+  },
+  "PANDAN INDAH": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:05"
+        ],
+        "saturday": [
+          "06:05"
+        ],
+        "sunday": [
+          "06:05"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      }
+    }
+  },
+  "PANDAN JAYA": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      }
+    }
+  },
+  "MALURI": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:19"
+        ],
+        "saturday": [
+          "06:19"
+        ],
+        "sunday": [
+          "06:19"
+        ]
+      }
+    },
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:51"
+        ],
+        "saturday": [
+          "06:51"
+        ],
+        "sunday": [
+          "06:51"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:37"
+        ],
+        "saturday": [
+          "06:37"
+        ],
+        "sunday": [
+          "06:37"
+        ]
+      }
+    }
+  },
+  "MIHARJA": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:17"
+        ],
+        "saturday": [
+          "06:17"
+        ],
+        "sunday": [
+          "06:17"
+        ]
+      }
+    }
+  },
+  "CHAN SOW LIN": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      }
+    },
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:36"
+        ],
+        "saturday": [
+          "06:36"
+        ],
+        "sunday": [
+          "06:36"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:31"
+        ],
+        "saturday": [
+          "06:31"
+        ],
+        "sunday": [
+          "06:31"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:43"
+        ],
+        "saturday": [
+          "06:43"
+        ],
+        "sunday": [
+          "06:43"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      }
+    }
+  },
+  "PUDU": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:45"
+        ],
+        "saturday": [
+          "06:45"
+        ],
+        "sunday": [
+          "06:45"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      }
+    }
+  },
+  "HANG TUAH": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      }
+    },
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:09"
+        ],
+        "saturday": [
+          "06:09"
+        ],
+        "sunday": [
+          "06:09"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:47"
+        ],
+        "saturday": [
+          "06:47"
+        ],
+        "sunday": [
+          "06:47"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      }
+    }
+  },
+  "PLAZA RAKYAT": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:48"
+        ],
+        "saturday": [
+          "06:48"
+        ],
+        "sunday": [
+          "06:48"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      }
+    }
+  },
+  "MASJID JAMEK": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:18"
+        ],
+        "saturday": [
+          "06:18"
+        ],
+        "sunday": [
+          "06:18"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:09"
+        ],
+        "saturday": [
+          "06:09"
+        ],
+        "sunday": [
+          "06:09"
+        ]
+      }
+    },
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:08"
+        ],
+        "saturday": [
+          "07:08"
+        ],
+        "sunday": [
+          "07:08"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:31"
+        ],
+        "saturday": [
+          "06:31"
+        ],
+        "sunday": [
+          "06:31"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:50"
+        ],
+        "saturday": [
+          "06:50"
+        ],
+        "sunday": [
+          "06:50"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:09"
+        ],
+        "saturday": [
+          "06:09"
+        ],
+        "sunday": [
+          "06:09"
+        ]
+      }
+    }
+  },
+  "BANDARAYA - UOB": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:20"
+        ],
+        "saturday": [
+          "06:20"
+        ],
+        "sunday": [
+          "06:20"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:07"
+        ],
+        "saturday": [
+          "06:07"
+        ],
+        "sunday": [
+          "06:07"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:52"
+        ],
+        "saturday": [
+          "06:52"
+        ],
+        "sunday": [
+          "06:52"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:07"
+        ],
+        "saturday": [
+          "06:07"
+        ],
+        "sunday": [
+          "06:07"
+        ]
+      }
+    }
+  },
+  "SULTAN ISMAIL": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:53"
+        ],
+        "saturday": [
+          "06:53"
+        ],
+        "sunday": [
+          "06:53"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      }
+    }
+  },
+  "PWTC": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:04"
+        ],
+        "saturday": [
+          "06:04"
+        ],
+        "sunday": [
+          "06:04"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:55"
+        ],
+        "saturday": [
+          "06:55"
+        ],
+        "sunday": [
+          "06:55"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:04"
+        ],
+        "saturday": [
+          "06:04"
+        ],
+        "sunday": [
+          "06:04"
+        ]
+      }
+    }
+  },
+  "TITIWANGSA": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:25"
+        ],
+        "saturday": [
+          "06:25"
+        ],
+        "sunday": [
+          "06:25"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      }
+    },
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    },
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:42"
+        ],
+        "saturday": [
+          "06:42"
+        ],
+        "sunday": [
+          "06:42"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:57"
+        ],
+        "saturday": [
+          "06:57"
+        ],
+        "sunday": [
+          "06:57"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      }
+    }
+  },
+  "SENTUL": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:01"
+        ],
+        "saturday": [
+          "06:01"
+        ],
+        "sunday": [
+          "06:01"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:58"
+        ],
+        "saturday": [
+          "06:58"
+        ],
+        "sunday": [
+          "06:58"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:01"
+        ],
+        "saturday": [
+          "06:01"
+        ],
+        "sunday": [
+          "06:01"
+        ]
+      }
+    }
+  },
+  "SENTUL TIMUR": {
+    "AG": {
+      "From Ampang to Sentul Timur": {
+        "weekday": [
+          "06:28"
+        ],
+        "saturday": [
+          "06:28"
+        ],
+        "sunday": [
+          "06:28"
+        ]
+      },
+      "From Sentul Timur to Ampang": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "07:00"
+        ],
+        "saturday": [
+          "07:00"
+        ],
+        "sunday": [
+          "07:00"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    }
+  },
+  "SUNWAY-SETIA JAYA": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      }
+    }
+  },
+  "MENTARI": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      }
+    }
+  },
+  "SUNWAY LAGOON": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      }
+    }
+  },
+  "SUNMED": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      }
+    }
+  },
+  "SunU-Monash": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      }
+    }
+  },
+  "SOUTH QUAY-USJ 1": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      }
+    }
+  },
+  "USJ7": {
+    "BRT": {
+      "From Sunway-Setia Jaya to USJ 7": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      },
+      "From USJ 7 to Sunway-Setia Jaya": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    }
+  },
+  "KWASA DAMANSARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:28"
+        ],
+        "saturday": [
+          "07:28"
+        ],
+        "sunday": [
+          "07:28"
+        ]
+      }
+    },
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "07:08"
+        ],
+        "saturday": [
+          "07:08"
+        ],
+        "sunday": [
+          "07:08"
+        ]
+      }
+    }
+  },
+  "KWASA SENTRAL": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:02"
+        ],
+        "saturday": [
+          "06:02"
+        ],
+        "sunday": [
+          "06:02"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:26"
+        ],
+        "saturday": [
+          "07:26"
+        ],
+        "sunday": [
+          "07:26"
+        ]
+      }
+    }
+  },
+  "KOTA DAMANSARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:22"
+        ],
+        "saturday": [
+          "07:22"
+        ],
+        "sunday": [
+          "07:22"
+        ]
+      }
+    }
+  },
+  "SURIAN": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:20"
+        ],
+        "saturday": [
+          "07:20"
+        ],
+        "sunday": [
+          "07:20"
+        ]
+      }
+    }
+  },
+  "MUTIARA DAMANSARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:18"
+        ],
+        "saturday": [
+          "07:18"
+        ],
+        "sunday": [
+          "07:18"
+        ]
+      }
+    }
+  },
+  "BANDAR UTAMA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:14"
+        ],
+        "saturday": [
+          "07:14"
+        ],
+        "sunday": [
+          "07:14"
+        ]
+      }
+    },
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "07:06"
+        ],
+        "saturday": [
+          "07:06"
+        ],
+        "sunday": [
+          "07:06"
+        ]
+      }
+    }
+  },
+  "TAMAN TUN DR ISMAIL": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:17"
+        ],
+        "saturday": [
+          "06:17"
+        ],
+        "sunday": [
+          "06:17"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:11"
+        ],
+        "saturday": [
+          "07:11"
+        ],
+        "sunday": [
+          "07:11"
+        ]
+      }
+    }
+  },
+  "PHILEO DAMANSARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:20"
+        ],
+        "saturday": [
+          "06:20"
+        ],
+        "sunday": [
+          "06:20"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:08"
+        ],
+        "saturday": [
+          "07:08"
+        ],
+        "sunday": [
+          "07:08"
+        ]
+      }
+    }
+  },
+  "PUSAT BANDAR DAMANSARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:04"
+        ],
+        "saturday": [
+          "07:04"
+        ],
+        "sunday": [
+          "07:04"
+        ]
+      }
+    }
+  },
+  "SEMANTAN": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:28"
+        ],
+        "saturday": [
+          "06:28"
+        ],
+        "sunday": [
+          "06:28"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "07:00"
+        ],
+        "saturday": [
+          "07:00"
+        ],
+        "sunday": [
+          "07:00"
+        ]
+      }
+    }
+  },
+  "MUZIUM NEGARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:32"
+        ],
+        "saturday": [
+          "06:32"
+        ],
+        "sunday": [
+          "06:32"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:56"
+        ],
+        "saturday": [
+          "06:56"
+        ],
+        "sunday": [
+          "06:56"
+        ]
+      }
+    }
+  },
+  "PASAR SENI": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:36"
+        ],
+        "saturday": [
+          "06:36"
+        ],
+        "sunday": [
+          "06:36"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:52"
+        ],
+        "saturday": [
+          "06:52"
+        ],
+        "sunday": [
+          "06:52"
+        ]
+      }
+    },
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:05"
+        ],
+        "saturday": [
+          "07:05"
+        ],
+        "sunday": [
+          "07:05"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      }
+    }
+  },
+  "MERDEKA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:39"
+        ],
+        "saturday": [
+          "06:39"
+        ],
+        "sunday": [
+          "06:39"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:49"
+        ],
+        "saturday": [
+          "06:49"
+        ],
+        "sunday": [
+          "06:49"
+        ]
+      }
+    }
+  },
+  "BUKIT BINTANG": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:42"
+        ],
+        "saturday": [
+          "06:42"
+        ],
+        "sunday": [
+          "06:42"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      }
+    },
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      }
+    }
+  },
+  "TUN RAZAK EXCHANGE": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:42"
+        ],
+        "saturday": [
+          "06:42"
+        ],
+        "sunday": [
+          "06:42"
+        ]
+      }
+    },
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:33"
+        ],
+        "saturday": [
+          "06:33"
+        ],
+        "sunday": [
+          "06:33"
+        ]
+      }
+    }
+  },
+  "COCHRANE": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:48"
+        ],
+        "saturday": [
+          "06:48"
+        ],
+        "sunday": [
+          "06:48"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:40"
+        ],
+        "saturday": [
+          "06:40"
+        ],
+        "sunday": [
+          "06:40"
+        ]
+      }
+    }
+  },
+  "TAMAN PERTAMA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:54"
+        ],
+        "saturday": [
+          "06:54"
+        ],
+        "sunday": [
+          "06:54"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      }
+    }
+  },
+  "TAMAN MIDAH": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "06:57"
+        ],
+        "saturday": [
+          "06:57"
+        ],
+        "sunday": [
+          "06:57"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:31"
+        ],
+        "saturday": [
+          "06:31"
+        ],
+        "sunday": [
+          "06:31"
+        ]
+      }
+    }
+  },
+  "TAMAN MUTIARA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:00"
+        ],
+        "saturday": [
+          "07:00"
+        ],
+        "sunday": [
+          "07:00"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:28"
+        ],
+        "saturday": [
+          "06:28"
+        ],
+        "sunday": [
+          "06:28"
+        ]
+      }
+    }
+  },
+  "TAMAN CONNAUGHT": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:04"
+        ],
+        "saturday": [
+          "07:04"
+        ],
+        "sunday": [
+          "07:04"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      }
+    }
+  },
+  "TAMAN SUNTEX": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:07"
+        ],
+        "saturday": [
+          "07:07"
+        ],
+        "sunday": [
+          "07:07"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      }
+    }
+  },
+  "SRI RAYA": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:10"
+        ],
+        "saturday": [
+          "07:10"
+        ],
+        "sunday": [
+          "07:10"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:18"
+        ],
+        "saturday": [
+          "06:18"
+        ],
+        "sunday": [
+          "06:18"
+        ]
+      }
+    }
+  },
+  "BANDAR TUN HUSSEIN ONN": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:13"
+        ],
+        "saturday": [
+          "07:13"
+        ],
+        "sunday": [
+          "07:13"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      }
+    }
+  },
+  "BATU 11 CHERAS": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:15"
+        ],
+        "saturday": [
+          "07:15"
+        ],
+        "sunday": [
+          "07:15"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:13"
+        ],
+        "saturday": [
+          "06:13"
+        ],
+        "sunday": [
+          "06:13"
+        ]
+      }
+    }
+  },
+  "BUKIT DUKUNG": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:19"
+        ],
+        "saturday": [
+          "07:19"
+        ],
+        "sunday": [
+          "07:19"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:09"
+        ],
+        "saturday": [
+          "06:09"
+        ],
+        "sunday": [
+          "06:09"
+        ]
+      }
+    }
+  },
+  "SUNGAI JERNIH": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:23"
+        ],
+        "saturday": [
+          "07:23"
+        ],
+        "sunday": [
+          "07:23"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:05"
+        ],
+        "saturday": [
+          "06:05"
+        ],
+        "sunday": [
+          "06:05"
+        ]
+      }
+    }
+  },
+  "STADIUM KAJANG": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:26"
+        ],
+        "saturday": [
+          "07:26"
+        ],
+        "sunday": [
+          "07:26"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:02"
+        ],
+        "saturday": [
+          "06:02"
+        ],
+        "sunday": [
+          "06:02"
+        ]
+      }
+    }
+  },
+  "KAJANG": {
+    "KG": {
+      "From Kwasa Damansara to Kajang": {
+        "weekday": [
+          "07:28"
+        ],
+        "saturday": [
+          "07:28"
+        ],
+        "sunday": [
+          "07:28"
+        ]
+      },
+      "From Kajang to Kwasa Damansara": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    }
+  },
+  "PUTRA HEIGHTS": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:38"
+        ],
+        "saturday": [
+          "07:38"
+        ],
+        "sunday": [
+          "07:38"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "07:00"
+        ],
+        "saturday": [
+          "07:00"
+        ],
+        "sunday": [
+          "07:00"
+        ]
+      }
+    }
+  },
+  "SUBANG ALAM": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:35"
+        ],
+        "saturday": [
+          "07:35"
+        ],
+        "sunday": [
+          "07:35"
+        ]
+      }
+    }
+  },
+  "ALAM MEGAH": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:32"
+        ],
+        "saturday": [
+          "07:32"
+        ],
+        "sunday": [
+          "07:32"
+        ]
+      }
+    }
+  },
+  "USJ 21": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:28"
+        ],
+        "saturday": [
+          "07:28"
+        ],
+        "sunday": [
+          "07:28"
+        ]
+      }
+    }
+  },
+  "WAWASAN": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:25"
+        ],
+        "saturday": [
+          "07:25"
+        ],
+        "sunday": [
+          "07:25"
+        ]
+      }
+    }
+  },
+  "TAIPAN": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:23"
+        ],
+        "saturday": [
+          "07:23"
+        ],
+        "sunday": [
+          "07:23"
+        ]
+      }
+    }
+  },
+  "USJ 7": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:17"
+        ],
+        "saturday": [
+          "06:17"
+        ],
+        "sunday": [
+          "06:17"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:21"
+        ],
+        "saturday": [
+          "07:21"
+        ],
+        "sunday": [
+          "07:21"
+        ]
+      }
+    }
+  },
+  "SS 18": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:16"
+        ],
+        "saturday": [
+          "07:16"
+        ],
+        "sunday": [
+          "07:16"
+        ]
+      }
+    }
+  },
+  "SS 15": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:14"
+        ],
+        "saturday": [
+          "07:14"
+        ],
+        "sunday": [
+          "07:14"
+        ]
+      }
+    }
+  },
+  "SUBANG JAYA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:27"
+        ],
+        "saturday": [
+          "06:27"
+        ],
+        "sunday": [
+          "06:27"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:10"
+        ],
+        "saturday": [
+          "07:10"
+        ],
+        "sunday": [
+          "07:10"
+        ]
+      }
+    }
+  },
+  "GLENMARIE": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:30"
+        ],
+        "saturday": [
+          "06:30"
+        ],
+        "sunday": [
+          "06:30"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:07"
+        ],
+        "saturday": [
+          "07:07"
+        ],
+        "sunday": [
+          "07:07"
+        ]
+      }
+    }
+  },
+  "ARA DAMANSARA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:05"
+        ],
+        "saturday": [
+          "07:05"
+        ],
+        "sunday": [
+          "07:05"
+        ]
+      }
+    }
+  },
+  "LEMBAH SUBANG": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:35"
+        ],
+        "saturday": [
+          "06:35"
+        ],
+        "sunday": [
+          "06:35"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:03"
+        ],
+        "saturday": [
+          "07:03"
+        ],
+        "sunday": [
+          "07:03"
+        ]
+      }
+    }
+  },
+  "KELANA JAYA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:38"
+        ],
+        "saturday": [
+          "06:38"
+        ],
+        "sunday": [
+          "06:38"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "07:00"
+        ],
+        "saturday": [
+          "07:00"
+        ],
+        "sunday": [
+          "07:00"
+        ]
+      }
+    }
+  },
+  "TAMAN BAHAGIA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:40"
+        ],
+        "saturday": [
+          "06:40"
+        ],
+        "sunday": [
+          "06:40"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:57"
+        ],
+        "saturday": [
+          "06:57"
+        ],
+        "sunday": [
+          "06:57"
+        ]
+      }
+    }
+  },
+  "TAMAN PARAMOUNT": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:43"
+        ],
+        "saturday": [
+          "06:43"
+        ],
+        "sunday": [
+          "06:43"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:54"
+        ],
+        "saturday": [
+          "06:54"
+        ],
+        "sunday": [
+          "06:54"
+        ]
+      }
+    }
+  },
+  "ASIA JAYA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:52"
+        ],
+        "saturday": [
+          "06:52"
+        ],
+        "sunday": [
+          "06:52"
+        ]
+      }
+    }
+  },
+  "TAMAN JAYA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:47"
+        ],
+        "saturday": [
+          "06:47"
+        ],
+        "sunday": [
+          "06:47"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:50"
+        ],
+        "saturday": [
+          "06:50"
+        ],
+        "sunday": [
+          "06:50"
+        ]
+      }
+    }
+  },
+  "UNIVERSITI": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:51"
+        ],
+        "saturday": [
+          "06:51"
+        ],
+        "sunday": [
+          "06:51"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      }
+    }
+  },
+  "KERINCHI": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:53"
+        ],
+        "saturday": [
+          "06:53"
+        ],
+        "sunday": [
+          "06:53"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:44"
+        ],
+        "saturday": [
+          "06:44"
+        ],
+        "sunday": [
+          "06:44"
+        ]
+      }
+    }
+  },
+  "ABDULLAH HUKUM": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:56"
+        ],
+        "saturday": [
+          "06:56"
+        ],
+        "sunday": [
+          "06:56"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:42"
+        ],
+        "saturday": [
+          "06:42"
+        ],
+        "sunday": [
+          "06:42"
+        ]
+      }
+    }
+  },
+  "BANGSAR - BANK RAKYAT": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "06:58"
+        ],
+        "saturday": [
+          "06:58"
+        ],
+        "sunday": [
+          "06:58"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:40"
+        ],
+        "saturday": [
+          "06:40"
+        ],
+        "sunday": [
+          "06:40"
+        ]
+      }
+    }
+  },
+  "KL SENTRAL - REDONE": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:01"
+        ],
+        "saturday": [
+          "07:01"
+        ],
+        "sunday": [
+          "07:01"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:37"
+        ],
+        "saturday": [
+          "06:37"
+        ],
+        "sunday": [
+          "06:37"
+        ]
+      }
+    }
+  },
+  "DANG WANGI": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:10"
+        ],
+        "saturday": [
+          "07:10"
+        ],
+        "sunday": [
+          "07:10"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:28"
+        ],
+        "saturday": [
+          "06:28"
+        ],
+        "sunday": [
+          "06:28"
+        ]
+      }
+    }
+  },
+  "KAMPUNG BARU - CBP COOPBANK PERTAMA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:12"
+        ],
+        "saturday": [
+          "07:12"
+        ],
+        "sunday": [
+          "07:12"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      }
+    }
+  },
+  "KLCC": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:15"
+        ],
+        "saturday": [
+          "07:15"
+        ],
+        "sunday": [
+          "07:15"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      }
+    }
+  },
+  "AMPANG PARK": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:17"
+        ],
+        "saturday": [
+          "07:17"
+        ],
+        "sunday": [
+          "07:17"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:22"
+        ],
+        "saturday": [
+          "06:22"
+        ],
+        "sunday": [
+          "06:22"
+        ]
+      }
+    },
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:31"
+        ],
+        "saturday": [
+          "06:31"
+        ],
+        "sunday": [
+          "06:31"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:37"
+        ],
+        "saturday": [
+          "06:37"
+        ],
+        "sunday": [
+          "06:37"
+        ]
+      }
+    }
+  },
+  "DAMAI": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:19"
+        ],
+        "saturday": [
+          "07:19"
+        ],
+        "sunday": [
+          "07:19"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:19"
+        ],
+        "saturday": [
+          "06:19"
+        ],
+        "sunday": [
+          "06:19"
+        ]
+      }
+    }
+  },
+  "DATO' KERAMAT": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:22"
+        ],
+        "saturday": [
+          "07:22"
+        ],
+        "sunday": [
+          "07:22"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      }
+    }
+  },
+  "JELATEK": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:23"
+        ],
+        "saturday": [
+          "07:23"
+        ],
+        "sunday": [
+          "07:23"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      }
+    }
+  },
+  "SETIAWANGSA": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:25"
+        ],
+        "saturday": [
+          "07:25"
+        ],
+        "sunday": [
+          "07:25"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      }
+    }
+  },
+  "SRI RAMPAI": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:30"
+        ],
+        "saturday": [
+          "07:30"
+        ],
+        "sunday": [
+          "07:30"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      }
+    }
+  },
+  "WANGSA MAJU": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:32"
+        ],
+        "saturday": [
+          "07:32"
+        ],
+        "sunday": [
+          "07:32"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      }
+    }
+  },
+  "TAMAN MELATI": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:35"
+        ],
+        "saturday": [
+          "07:35"
+        ],
+        "sunday": [
+          "07:35"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      }
+    }
+  },
+  "GOMBAK": {
+    "KJ": {
+      "From Putra Heights to Gombak": {
+        "weekday": [
+          "07:38"
+        ],
+        "saturday": [
+          "07:38"
+        ],
+        "sunday": [
+          "07:38"
+        ]
+      },
+      "From Gombak to Putra Heights": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    }
+  },
+  "KL SENTRAL": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      }
+    }
+  },
+  "TUN SAMBANTHAN": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      }
+    }
+  },
+  "MAHARAJALELA": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:19"
+        ],
+        "saturday": [
+          "06:19"
+        ],
+        "sunday": [
+          "06:19"
+        ]
+      }
+    }
+  },
+  "IMBI": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      }
+    }
+  },
+  "RAJA CHULAN": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      }
+    }
+  },
+  "BUKIT NANAS": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:18"
+        ],
+        "saturday": [
+          "06:18"
+        ],
+        "sunday": [
+          "06:18"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      }
+    }
+  },
+  "MEDAN TUANKU": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:20"
+        ],
+        "saturday": [
+          "06:20"
+        ],
+        "sunday": [
+          "06:20"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:05"
+        ],
+        "saturday": [
+          "06:05"
+        ],
+        "sunday": [
+          "06:05"
+        ]
+      }
+    }
+  },
+  "CHOW KIT": {
+    "MR": {
+      "From KL Sentral to Titiwangsa": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      },
+      "From Titiwangsa to KL Sentral": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      }
+    }
+  },
+  "KAMPUNG SELAMAT": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "07:05"
+        ],
+        "saturday": [
+          "07:05"
+        ],
+        "sunday": [
+          "07:05"
+        ]
+      }
+    }
+  },
+  "SUNGAI BULOH": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:05"
+        ],
+        "saturday": [
+          "06:05"
+        ],
+        "sunday": [
+          "06:05"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "07:03"
+        ],
+        "saturday": [
+          "07:03"
+        ],
+        "sunday": [
+          "07:03"
+        ]
+      }
+    }
+  },
+  "DAMANSARA DAMAI": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:07"
+        ],
+        "saturday": [
+          "06:07"
+        ],
+        "sunday": [
+          "06:07"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "07:01"
+        ],
+        "saturday": [
+          "07:01"
+        ],
+        "sunday": [
+          "07:01"
+        ]
+      }
+    }
+  },
+  "SRI DAMANSARA BARAT": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:09"
+        ],
+        "saturday": [
+          "06:09"
+        ],
+        "sunday": [
+          "06:09"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:59"
+        ],
+        "saturday": [
+          "06:59"
+        ],
+        "sunday": [
+          "06:59"
+        ]
+      }
+    }
+  },
+  "SRI DAMANSARA SENTRAL": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:57"
+        ],
+        "saturday": [
+          "06:57"
+        ],
+        "sunday": [
+          "06:57"
+        ]
+      }
+    }
+  },
+  "SRI DAMANSARA TIMUR": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:55"
+        ],
+        "saturday": [
+          "06:55"
+        ],
+        "sunday": [
+          "06:55"
+        ]
+      }
+    }
+  },
+  "METRO PRIMA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:54"
+        ],
+        "saturday": [
+          "06:54"
+        ],
+        "sunday": [
+          "06:54"
+        ]
+      }
+    }
+  },
+  "KEPONG BARU": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:15"
+        ],
+        "saturday": [
+          "06:15"
+        ],
+        "sunday": [
+          "06:15"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:52"
+        ],
+        "saturday": [
+          "06:52"
+        ],
+        "sunday": [
+          "06:52"
+        ]
+      }
+    }
+  },
+  "JINJANG": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:17"
+        ],
+        "saturday": [
+          "06:17"
+        ],
+        "sunday": [
+          "06:17"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:51"
+        ],
+        "saturday": [
+          "06:51"
+        ],
+        "sunday": [
+          "06:51"
+        ]
+      }
+    }
+  },
+  "SRI DELIMA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:18"
+        ],
+        "saturday": [
+          "06:18"
+        ],
+        "sunday": [
+          "06:18"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:50"
+        ],
+        "saturday": [
+          "06:50"
+        ],
+        "sunday": [
+          "06:50"
+        ]
+      }
+    }
+  },
+  "KAMPUNG BATU": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:19"
+        ],
+        "saturday": [
+          "06:19"
+        ],
+        "sunday": [
+          "06:19"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:48"
+        ],
+        "saturday": [
+          "06:48"
+        ],
+        "sunday": [
+          "06:48"
+        ]
+      }
+    }
+  },
+  "KENTOMEN": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      }
+    }
+  },
+  "JALAN IPOH": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:22"
+        ],
+        "saturday": [
+          "06:22"
+        ],
+        "sunday": [
+          "06:22"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:45"
+        ],
+        "saturday": [
+          "06:45"
+        ],
+        "sunday": [
+          "06:45"
+        ]
+      }
+    }
+  },
+  "SENTUL BARAT": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:43"
+        ],
+        "saturday": [
+          "06:43"
+        ],
+        "sunday": [
+          "06:43"
+        ]
+      }
+    }
+  },
+  "HOSPITAL KUALA LUMPUR": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:27"
+        ],
+        "saturday": [
+          "06:27"
+        ],
+        "sunday": [
+          "06:27"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:40"
+        ],
+        "saturday": [
+          "06:40"
+        ],
+        "sunday": [
+          "06:40"
+        ]
+      }
+    }
+  },
+  "RAJA UDA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:29"
+        ],
+        "saturday": [
+          "06:29"
+        ],
+        "sunday": [
+          "06:29"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:39"
+        ],
+        "saturday": [
+          "06:39"
+        ],
+        "sunday": [
+          "06:39"
+        ]
+      }
+    }
+  },
+  "PERSIARAN KLCC": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:32"
+        ],
+        "saturday": [
+          "06:32"
+        ],
+        "sunday": [
+          "06:32"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:36"
+        ],
+        "saturday": [
+          "06:36"
+        ],
+        "sunday": [
+          "06:36"
+        ]
+      }
+    }
+  },
+  "CONLAY": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:33"
+        ],
+        "saturday": [
+          "06:33"
+        ],
+        "sunday": [
+          "06:33"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:35"
+        ],
+        "saturday": [
+          "06:35"
+        ],
+        "sunday": [
+          "06:35"
+        ]
+      }
+    }
+  },
+  "KUCHAI": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:42"
+        ],
+        "saturday": [
+          "06:42"
+        ],
+        "sunday": [
+          "06:42"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:25"
+        ],
+        "saturday": [
+          "06:25"
+        ],
+        "sunday": [
+          "06:25"
+        ]
+      }
+    }
+  },
+  "TAMAN NAGA EMAS": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:44"
+        ],
+        "saturday": [
+          "06:44"
+        ],
+        "sunday": [
+          "06:44"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      }
+    }
+  },
+  "SUNGAI BESI": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      }
+    },
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:32"
+        ],
+        "saturday": [
+          "06:32"
+        ],
+        "sunday": [
+          "06:32"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:27"
+        ],
+        "saturday": [
+          "06:27"
+        ],
+        "sunday": [
+          "06:27"
+        ]
+      }
+    }
+  },
+  "SERDANG RAYA UTARA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:49"
+        ],
+        "saturday": [
+          "06:49"
+        ],
+        "sunday": [
+          "06:49"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:19"
+        ],
+        "saturday": [
+          "06:19"
+        ],
+        "sunday": [
+          "06:19"
+        ]
+      }
+    }
+  },
+  "SERDANG RAYA SELATAN": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:51"
+        ],
+        "saturday": [
+          "06:51"
+        ],
+        "sunday": [
+          "06:51"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:17"
+        ],
+        "saturday": [
+          "06:17"
+        ],
+        "sunday": [
+          "06:17"
+        ]
+      }
+    }
+  },
+  "SERDANG JAYA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:52"
+        ],
+        "saturday": [
+          "06:52"
+        ],
+        "sunday": [
+          "06:52"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      }
+    }
+  },
+  "UPM": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:54"
+        ],
+        "saturday": [
+          "06:54"
+        ],
+        "sunday": [
+          "06:54"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      }
+    }
+  },
+  "TAMAN EQUINE": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "06:58"
+        ],
+        "saturday": [
+          "06:58"
+        ],
+        "sunday": [
+          "06:58"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      }
+    }
+  },
+  "PUTRA PERMAI": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "07:00"
+        ],
+        "saturday": [
+          "07:00"
+        ],
+        "sunday": [
+          "07:00"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      }
+    }
+  },
+  "16 SIERRA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "07:02"
+        ],
+        "saturday": [
+          "07:02"
+        ],
+        "sunday": [
+          "07:02"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      }
+    }
+  },
+  "CYBERJAYA UTARA": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "07:04"
+        ],
+        "saturday": [
+          "07:04"
+        ],
+        "sunday": [
+          "07:04"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:03"
+        ],
+        "saturday": [
+          "06:03"
+        ],
+        "sunday": [
+          "06:03"
+        ]
+      }
+    }
+  },
+  "CYBERJAYA CITY CENTRE": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "07:07"
+        ],
+        "saturday": [
+          "07:07"
+        ],
+        "sunday": [
+          "07:07"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:01"
+        ],
+        "saturday": [
+          "06:01"
+        ],
+        "sunday": [
+          "06:01"
+        ]
+      }
+    }
+  },
+  "PUTRAJAYA SENTRAL": {
+    "PY": {
+      "From Kwasa Damansara to Putrajaya": {
+        "weekday": [
+          "07:08"
+        ],
+        "saturday": [
+          "07:08"
+        ],
+        "sunday": [
+          "07:08"
+        ]
+      },
+      "From Putrajaya to Kwasa Damansara": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    }
+  },
+  "PUCHONG PRIMA": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:04"
+        ],
+        "saturday": [
+          "06:04"
+        ],
+        "sunday": [
+          "06:04"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:56"
+        ],
+        "saturday": [
+          "06:56"
+        ],
+        "sunday": [
+          "06:56"
+        ]
+      }
+    }
+  },
+  "PUCHONG PERDANA": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:06"
+        ],
+        "saturday": [
+          "06:06"
+        ],
+        "sunday": [
+          "06:06"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:53"
+        ],
+        "saturday": [
+          "06:53"
+        ],
+        "sunday": [
+          "06:53"
+        ]
+      }
+    }
+  },
+  "BANDAR PUTERI": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:09"
+        ],
+        "saturday": [
+          "06:09"
+        ],
+        "sunday": [
+          "06:09"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:51"
+        ],
+        "saturday": [
+          "06:51"
+        ],
+        "sunday": [
+          "06:51"
+        ]
+      }
+    }
+  },
+  "TAMAN PERINDUSTRIAN PUCHONG": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:49"
+        ],
+        "saturday": [
+          "06:49"
+        ],
+        "sunday": [
+          "06:49"
+        ]
+      }
+    }
+  },
+  "PUSAT BANDAR PUCHONG": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:47"
+        ],
+        "saturday": [
+          "06:47"
+        ],
+        "sunday": [
+          "06:47"
+        ]
+      }
+    }
+  },
+  "IOI PUCHONG JAYA": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      }
+    }
+  },
+  "KINRARA": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:18"
+        ],
+        "saturday": [
+          "06:18"
+        ],
+        "sunday": [
+          "06:18"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:42"
+        ],
+        "saturday": [
+          "06:42"
+        ],
+        "sunday": [
+          "06:42"
+        ]
+      }
+    }
+  },
+  "ALAM SUTERA": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:39"
+        ],
+        "saturday": [
+          "06:39"
+        ],
+        "sunday": [
+          "06:39"
+        ]
+      }
+    }
+  },
+  "MUHIBBAH": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:36"
+        ],
+        "saturday": [
+          "06:36"
+        ],
+        "sunday": [
+          "06:36"
+        ]
+      }
+    }
+  },
+  "AWAN BESAR": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:26"
+        ],
+        "saturday": [
+          "06:26"
+        ],
+        "sunday": [
+          "06:26"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      }
+    }
+  },
+  "SRI PETALING": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:27"
+        ],
+        "saturday": [
+          "06:27"
+        ],
+        "sunday": [
+          "06:27"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:32"
+        ],
+        "saturday": [
+          "06:32"
+        ],
+        "sunday": [
+          "06:32"
+        ]
+      }
+    }
+  },
+  "BUKIT JALIL": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:29"
+        ],
+        "saturday": [
+          "06:29"
+        ],
+        "sunday": [
+          "06:29"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:30"
+        ],
+        "saturday": [
+          "06:30"
+        ],
+        "sunday": [
+          "06:30"
+        ]
+      }
+    }
+  },
+  "BANDAR TASIK SELATAN": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:25"
+        ],
+        "saturday": [
+          "06:25"
+        ],
+        "sunday": [
+          "06:25"
+        ]
+      }
+    }
+  },
+  "BANDAR TUN RAZAK": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:36"
+        ],
+        "saturday": [
+          "06:36"
+        ],
+        "sunday": [
+          "06:36"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      }
+    }
+  },
+  "SALAK SELATAN": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:39"
+        ],
+        "saturday": [
+          "06:39"
+        ],
+        "sunday": [
+          "06:39"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:20"
+        ],
+        "saturday": [
+          "06:20"
+        ],
+        "sunday": [
+          "06:20"
+        ]
+      }
+    }
+  },
+  "CHERAS": {
+    "SP": {
+      "From Putra Heights to Sentul Timur": {
+        "weekday": [
+          "06:41"
+        ],
+        "saturday": [
+          "06:41"
+        ],
+        "sunday": [
+          "06:41"
+        ]
+      },
+      "From Sentul Timur to Putra Heights": {
+        "weekday": [
+          "06:18"
+        ],
+        "saturday": [
+          "06:18"
+        ],
+        "sunday": [
+          "06:18"
+        ]
+      }
+    }
+  },
+  "KAYU ARA": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:02"
+        ],
+        "saturday": [
+          "06:02"
+        ],
+        "sunday": [
+          "06:02"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "07:03"
+        ],
+        "saturday": [
+          "07:03"
+        ],
+        "sunday": [
+          "07:03"
+        ]
+      }
+    }
+  },
+  "BANDAR UTAMA 11": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:05"
+        ],
+        "saturday": [
+          "06:05"
+        ],
+        "sunday": [
+          "06:05"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "07:01"
+        ],
+        "saturday": [
+          "07:01"
+        ],
+        "sunday": [
+          "07:01"
+        ]
+      }
+    }
+  },
+  "DAMANSARA IDAMAN": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:08"
+        ],
+        "saturday": [
+          "06:08"
+        ],
+        "sunday": [
+          "06:08"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:58"
+        ],
+        "saturday": [
+          "06:58"
+        ],
+        "sunday": [
+          "06:58"
+        ]
+      }
+    }
+  },
+  "SUBANG": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:11"
+        ],
+        "saturday": [
+          "06:11"
+        ],
+        "sunday": [
+          "06:11"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:54"
+        ],
+        "saturday": [
+          "06:54"
+        ],
+        "sunday": [
+          "06:54"
+        ]
+      }
+    }
+  },
+  "GLENMARIE 2": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:14"
+        ],
+        "saturday": [
+          "06:14"
+        ],
+        "sunday": [
+          "06:14"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:52"
+        ],
+        "saturday": [
+          "06:52"
+        ],
+        "sunday": [
+          "06:52"
+        ]
+      }
+    }
+  },
+  "KERJAYA": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:20"
+        ],
+        "saturday": [
+          "06:20"
+        ],
+        "sunday": [
+          "06:20"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:46"
+        ],
+        "saturday": [
+          "06:46"
+        ],
+        "sunday": [
+          "06:46"
+        ]
+      }
+    }
+  },
+  "STADIUM SHAH ALAM": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:23"
+        ],
+        "saturday": [
+          "06:23"
+        ],
+        "sunday": [
+          "06:23"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:43"
+        ],
+        "saturday": [
+          "06:43"
+        ],
+        "sunday": [
+          "06:43"
+        ]
+      }
+    }
+  },
+  "DATO' MENTERI - SA SENTRAL": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:29"
+        ],
+        "saturday": [
+          "06:29"
+        ],
+        "sunday": [
+          "06:29"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:36"
+        ],
+        "saturday": [
+          "06:36"
+        ],
+        "sunday": [
+          "06:36"
+        ]
+      }
+    }
+  },
+  "UITM SHAH ALAM": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:34"
+        ],
+        "saturday": [
+          "06:34"
+        ],
+        "sunday": [
+          "06:34"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:32"
+        ],
+        "saturday": [
+          "06:32"
+        ],
+        "sunday": [
+          "06:32"
+        ]
+      }
+    }
+  },
+  "SEKSYEN 7": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:37"
+        ],
+        "saturday": [
+          "06:37"
+        ],
+        "sunday": [
+          "06:37"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:29"
+        ],
+        "saturday": [
+          "06:29"
+        ],
+        "sunday": [
+          "06:29"
+        ]
+      }
+    }
+  },
+  "BANDAR BARU KLANG": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:41"
+        ],
+        "saturday": [
+          "06:41"
+        ],
+        "sunday": [
+          "06:41"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:24"
+        ],
+        "saturday": [
+          "06:24"
+        ],
+        "sunday": [
+          "06:24"
+        ]
+      }
+    }
+  },
+  "PASAR KLANG": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:45"
+        ],
+        "saturday": [
+          "06:45"
+        ],
+        "sunday": [
+          "06:45"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:21"
+        ],
+        "saturday": [
+          "06:21"
+        ],
+        "sunday": [
+          "06:21"
+        ]
+      }
+    }
+  },
+  "JALAN MERU": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:47"
+        ],
+        "saturday": [
+          "06:47"
+        ],
+        "sunday": [
+          "06:47"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:19"
+        ],
+        "saturday": [
+          "06:19"
+        ],
+        "sunday": [
+          "06:19"
+        ]
+      }
+    }
+  },
+  "JAMBATAN KOTA": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:49"
+        ],
+        "saturday": [
+          "06:49"
+        ],
+        "sunday": [
+          "06:49"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:16"
+        ],
+        "saturday": [
+          "06:16"
+        ],
+        "sunday": [
+          "06:16"
+        ]
+      }
+    }
+  },
+  "TAMAN SELATAN": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:54"
+        ],
+        "saturday": [
+          "06:54"
+        ],
+        "sunday": [
+          "06:54"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:12"
+        ],
+        "saturday": [
+          "06:12"
+        ],
+        "sunday": [
+          "06:12"
+        ]
+      }
+    }
+  },
+  "SERI ANDALAS": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:56"
+        ],
+        "saturday": [
+          "06:56"
+        ],
+        "sunday": [
+          "06:56"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:10"
+        ],
+        "saturday": [
+          "06:10"
+        ],
+        "sunday": [
+          "06:10"
+        ]
+      }
+    }
+  },
+  "KLANG JAYA": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "06:58"
+        ],
+        "saturday": [
+          "06:58"
+        ],
+        "sunday": [
+          "06:58"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:07"
+        ],
+        "saturday": [
+          "06:07"
+        ],
+        "sunday": [
+          "06:07"
+        ]
+      }
+    }
+  },
+  "BANDAR BUKIT TINGGI": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "07:01"
+        ],
+        "saturday": [
+          "07:01"
+        ],
+        "sunday": [
+          "07:01"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:05"
+        ],
+        "saturday": [
+          "06:05"
+        ],
+        "sunday": [
+          "06:05"
+        ]
+      }
+    }
+  },
+  "JOHAN SETIA": {
+    "SA": {
+      "From Bandar Utama to Johan Setia": {
+        "weekday": [
+          "07:06"
+        ],
+        "saturday": [
+          "07:06"
+        ],
+        "sunday": [
+          "07:06"
+        ]
+      },
+      "From Johan Setia to Bandar Utama": {
+        "weekday": [
+          "06:00"
+        ],
+        "saturday": [
+          "06:00"
+        ],
+        "sunday": [
+          "06:00"
+        ]
+      }
+    }
+  }
+}
