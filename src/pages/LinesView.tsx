@@ -79,14 +79,14 @@ export const LinesView: React.FC = () => {
               setShowSearch(!showSearch);
               if (showSearch) setSearchQuery("");
             }}
-            className={`p-2.5 rounded-xl border transition-all active:scale-90 shadow-md flex-shrink-0 ${
+            className={`p-2 rounded-xl border transition-all active:scale-90 shadow-md flex-shrink-0 ${
               showSearch || isSearching
                 ? "bg-blue-600/15 border-blue-500 text-blue-500"
                 : "border-border bg-card text-text-secondary hover:text-text-primary"
             }`}
             title="Search stations"
           >
-            {showSearch || isSearching ? <X className="h-4.5 w-4.5" /> : <Search className="h-4.5 w-4.5" />}
+            {showSearch || isSearching ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
         </div>
 
