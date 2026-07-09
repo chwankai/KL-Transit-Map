@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Map, Compass, Bus, Settings } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
 import { useSettings } from "../../context/SettingsContext";
+import { AnimatePresence } from "framer-motion";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -76,7 +77,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
 
       {/* Settings Modal */}
-      <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

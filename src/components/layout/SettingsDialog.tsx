@@ -1,25 +1,31 @@
 import React from "react";
 import { useSettings } from "../../context/SettingsContext";
 import { X, Sun, Moon, Laptop, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface SettingsDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
+export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
   const { theme, setTheme, farePref, setFarePref, hideBusButton, setHideBusButton } = useSettings();
 
-  if (!isOpen) return null;
-
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
     >
-      <div
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: "spring", duration: 0.25 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card text-text-primary shadow-2xl backdrop-blur-md animate-in zoom-in-95 duration-200"
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card text-text-primary shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
@@ -109,7 +115,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
             />
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

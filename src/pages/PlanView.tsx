@@ -585,7 +585,7 @@ export const PlanView: React.FC = () => {
                       </div>
 
                       {/* Fare breakdown */}
-                      <div className="flex gap-1 bg-button-secondary/30 p-1 rounded-xl border border-border">
+                      <div className="grid grid-flow-col auto-cols-fr gap-1 bg-button-secondary/30 p-1 rounded-xl border border-border min-w-[210px]">
                         {/* Cashless */}
                         {(farePref === "all" || farePref === "cashless") && (
                           <div className="px-3 py-1.5 text-center">
@@ -778,7 +778,7 @@ export const PlanView: React.FC = () => {
         </div>
 
         {/* Non-Sticky Footer (Appears at bottom of results area only) */}
-        <div className="mt-8 border-t border-border/20 pt-4 flex-shrink-0">
+        <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-4 flex-shrink-0">
           <Footer />
         </div>
       </div>

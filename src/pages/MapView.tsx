@@ -20,6 +20,26 @@ export const MapView: React.FC = () => {
 
   const [isResetting, setIsResetting] = useState(false);
 
+  // Clamp map panning offsets to ensure a portion of the map remains visible
+  const clampPosition = (x: number, y: number, currentScale: number) => {
+    if (!containerRef.current || !imageRef.current) return { x, y };
+    const rect = containerRef.current.getBoundingClientRect();
+    
+    const iw = imageRef.current.clientWidth || rect.width;
+    const ih = imageRef.current.clientHeight || rect.height;
+
+    // Minimum 100px of scaled image must remain visible on screen boundaries
+    const minX = -iw * currentScale + 100;
+    const maxX = rect.width - 100;
+    const minY = -ih * currentScale + 100;
+    const maxY = rect.height - 100;
+
+    return {
+      x: Math.max(minX, Math.min(x, maxX)),
+      y: Math.max(minY, Math.min(y, maxY)),
+    };
+  };
+
   // Reset zoom & pan
   const handleReset = () => {
     setIsResetting(true);
@@ -28,41 +48,53 @@ export const MapView: React.FC = () => {
     setTimeout(() => setIsResetting(false), 300);
   };
 
-
-
   // Mouse drag handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale === 1 && position.x === 0 && position.y === 0) {
-      // Allow drag to start anyway
-    }
     setIsDragging(true);
     dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
-    setPosition({
-      x: e.clientX - dragStart.current.x,
-      y: e.clientY - dragStart.current.y,
-    });
+    const rawX = e.clientX - dragStart.current.x;
+    const rawY = e.clientY - dragStart.current.y;
+    setPosition(clampPosition(rawX, rawY, scale));
   };
 
   const handleMouseUpOrLeave = () => {
     setIsDragging(false);
   };
 
-  // Wheel zoom handler
+  // Wheel zoom handler: scales relative to the cursor coordinates
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
-    const zoomFactor = 0.1;
+    if (!containerRef.current) return;
+
+    const zoomFactor = 0.15;
     const direction = e.deltaY < 0 ? 1 : -1;
-    setScale((prev) => {
-      const nextScale = prev + direction * zoomFactor;
-      return Math.max(1, Math.min(nextScale, 4));
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+
+    setScale((prevScale) => {
+      const nextScale = Math.max(1, Math.min(prevScale + direction * zoomFactor, 4));
+      if (nextScale === prevScale) return prevScale;
+
+      setPosition((prevPos) => {
+        const dx = cx - prevPos.x;
+        const dy = cy - prevPos.y;
+        const ratio = nextScale / prevScale;
+        const targetX = cx - dx * ratio;
+        const targetY = cy - dy * ratio;
+        return clampPosition(targetX, targetY, nextScale);
+      });
+
+      return nextScale;
     });
   };
 
-  // Mobile Touch handlers (includes pinch to zoom)
+  // Mobile Touch handlers (includes pinch to zoom relative to midpoint)
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 1) {
       setIsDragging(true);
@@ -81,20 +113,40 @@ export const MapView: React.FC = () => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!containerRef.current) return;
+
     if (isDragging && e.touches.length === 1) {
-      setPosition({
-        x: e.touches[0].clientX - dragStart.current.x,
-        y: e.touches[0].clientY - dragStart.current.y,
-      });
+      const rawX = e.touches[0].clientX - dragStart.current.x;
+      const rawY = e.touches[0].clientY - dragStart.current.y;
+      setPosition(clampPosition(rawX, rawY, scale));
     } else if (e.touches.length === 2 && lastTouchDistance.current !== null) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const cx = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+      const cy = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+
       const dist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
       );
       const delta = dist - lastTouchDistance.current;
-      setScale((prev) => {
-        const nextScale = prev + delta * 0.007;
-        return Math.max(1, Math.min(nextScale, 4));
+      const zoomFactor = delta * 0.007;
+
+      setScale((prevScale) => {
+        const nextScale = Math.max(1, Math.min(prevScale + zoomFactor, 4));
+        if (nextScale === prevScale) return prevScale;
+
+        setPosition((prevPos) => {
+          const dx = cx - prevPos.x;
+          const dy = cy - prevPos.y;
+          const ratio = nextScale / prevScale;
+          const targetX = cx - dx * ratio;
+          const targetY = cy - dy * ratio;
+          return clampPosition(targetX, targetY, nextScale);
+        });
+
+        return nextScale;
       });
       lastTouchDistance.current = dist;
     }
