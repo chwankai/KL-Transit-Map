@@ -16,10 +16,8 @@ export const MapView: React.FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
-  // Read interactive map state preference from localStorage so page redirects maintain view state
-  const [showRealScale, setShowRealScale] = useState(() => {
-    return localStorage.getItem("show_real_scale") === "true";
-  });
+  // By default, open web will show standard schematic map
+  const [showRealScale, setShowRealScale] = useState(false);
 
   const dragStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);

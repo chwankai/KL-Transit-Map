@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Train, Footprints, Search, X } from "lucide-react";
 import { lines, stations, lineStations } from "../lib/transit-data";
+import { Footer } from "../components/layout/Footer";
 
 export const LinesView: React.FC = () => {
   const navigate = useNavigate();
@@ -360,6 +361,10 @@ export const LinesView: React.FC = () => {
             })}
           </div>
         )}
+      </div>
+      
+      <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-4 pb-6 flex-shrink-0">
+        <Footer />
       </div>
     </div>
   );
