@@ -246,7 +246,7 @@ const SA_Line = [
   { code: "SA03", name: "BU 11" },
   { code: "SA05", name: "Damansara Idaman" },
   { code: "SA06", name: "Subang" },
-  { code: "SA07", name: "Glenmarie" },
+  { code: "SA07", name: "Glenmarie 2" },
   { code: "SA09", name: "Kerjaya" },
   { code: "SA10", name: "Stadium Shah Alam" },
   { code: "SA12", name: "Dato' Menteri" },
@@ -255,8 +255,8 @@ const SA_Line = [
   { code: "SA17", name: "Bandar Baru Klang" },
   { code: "SA18", name: "Pasar Klang" },
   { code: "SA19", name: "Jalan Meru" },
-  { code: "SA20", name: "Jambatan Kota" },
-  { code: "SA21", name: "Hospital Tengku Ampuan Rahimah" },
+  { code: "SA20", name: "Pasar Jawa" },
+  { code: "SA21", name: "Taman Selatan" },
   { code: "SA22", name: "Seri Andalas" },
   { code: "SA23", name: "Klang Jaya" },
   { code: "SA24", name: "Bandar Bukit Tinggi" },
@@ -267,7 +267,8 @@ const explicitTransfers = [
   { from: "Muzium Negara", to: "KL Sentral", line: "WALKWAY", distance: 1.0 },
   { from: "Bukit Nanas", to: "Dang Wangi", line: "WALKWAY", distance: 1.2 },
   { from: "Plaza Rakyat", to: "Merdeka", line: "WALKWAY", distance: 0.8 },
-  { from: "Medan Tuanku", to: "Sultan Ismail", line: "WALKWAY", distance: 0.6 }
+  { from: "Medan Tuanku", to: "Sultan Ismail", line: "WALKWAY", distance: 0.6 },
+  { from: "Glenmarie 2", to: "Glenmarie", line: "WALKWAY", distance: 0.5 }
 ];
 
 function buildGraph(): Record<string, StationObj> {
