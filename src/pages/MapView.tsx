@@ -292,12 +292,42 @@ export const MapView: React.FC = () => {
       });
     });
 
+    // Draw the 4 specific walkway transfers as gray dashed lines between platforms
+    const walkwayTransfers = [
+      { from: "KJ27", to: "SA07" }, // Glenmarie
+      { from: "KJ15", to: "MR1" },  // KL Sentral
+      { from: "KG09", to: "SA01" }, // Bandar Utama
+      { from: "KJ09", to: "PY20" }  // Ampang Park
+    ];
+
+    walkwayTransfers.forEach(transfer => {
+      const c1 = (stationCoords as any)[transfer.from];
+      const c2 = (stationCoords as any)[transfer.to];
+      if (c1 && c2) {
+        L.polyline([[c1.lat, c1.lng], [c2.lat, c2.lng]], {
+          color: "#94a3b8",
+          weight: 2.5,
+          dashArray: "5, 7",
+          opacity: 0.85,
+        }).addTo(map);
+      }
+    });
+
     // 3. Plot station dots (circle markers), splitting interchanges where platforms are distinct
+    const singleDotInterchanges = new Set([
+      "Maluri",
+      "Tun Razak Exchange",
+      "Kwasa Damansara",
+      "Sungai Besi",
+      "Putra Heights"
+    ]);
+
     Object.entries(stations).forEach(([name, node]) => {
       // Shared Ampang & Sri Petaling connection stations from Sentul Timur to Chan Sow Lin share the same physical platform
       const hasAG = node.codes.some(c => c.startsWith("AG"));
       const hasSP = node.codes.some(c => c.startsWith("SP"));
       const isSharedAmpangSriPetaling = hasAG && hasSP;
+      const isSingleDotInterchange = singleDotInterchanges.has(name);
 
       // Popup HTML template loaded on platform dot selection
       const popupHtml = `
@@ -315,22 +345,22 @@ export const MapView: React.FC = () => {
         </div>
       `;
 
-      if (isSharedAmpangSriPetaling) {
-        // Plot a single dot for parallel Ampang-Sri Petaling connection stations
+      if (isSharedAmpangSriPetaling || isSingleDotInterchange) {
+        // Plot a single dot for parallel Ampang-Sri Petaling connection stations and specific integrated interchanges
         const coord = (stationCoords as any)[name] || (stationCoords as any)[node.codes[0]];
         if (!coord) return;
 
         L.circleMarker([coord.lat, coord.lng], {
           radius: 6.5,
           fillColor: "#ffffff",
-          color: getLineColor("SP"),
+          color: isSingleDotInterchange ? "#0f172a" : getLineColor("SP"),
           weight: 3,
           fillOpacity: 1,
         })
           .addTo(map)
           .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
       } else {
-        // Plot separate platform dots for other interchanges and single stations
+        // Plot separate platform dots for other interchanges (like Bandar Utama KG and SA) and single stations
         node.codes.forEach(code => {
           const coord = (stationCoords as any)[code] || (stationCoords as any)[name];
           if (!coord) return;
