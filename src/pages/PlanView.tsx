@@ -603,9 +603,9 @@ export const PlanView: React.FC = () => {
                 className="h-[300px] flex flex-col items-center justify-center text-center text-text-secondary border border-dashed border-border rounded-2xl p-6 bg-card/10 backdrop-blur-sm"
               >
                 <RefreshCw className="h-8 w-8 text-blue-500 animate-spin mb-3" />
-                <h3 className="text-sm font-bold text-text-primary">Calculating Best Route...</h3>
+                <h3 className="text-sm font-bold text-text-primary">Loading...</h3>
                 <p className="text-xs max-w-xs mt-1 leading-relaxed text-text-secondary">
-                  Querying the real-time schedules and transit network pathfinder.
+                  Please hang on while we calculate the best route for you.
                 </p>
               </motion.div>
             )}

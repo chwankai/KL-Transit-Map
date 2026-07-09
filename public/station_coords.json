@@ -1,0 +1,642 @@
+{
+  "Gombak": {
+    "lat": 3.231793,
+    "lng": 101.724427
+  },
+  "Taman Melati": {
+    "lat": 3.219558,
+    "lng": 101.72197
+  },
+  "Wangsa Maju": {
+    "lat": 3.205751,
+    "lng": 101.731796
+  },
+  "Sri Rampai": {
+    "lat": 3.199176,
+    "lng": 101.73747
+  },
+  "Setiawangsa": {
+    "lat": 3.17576,
+    "lng": 101.73584
+  },
+  "Jelatek": {
+    "lat": 3.167204,
+    "lng": 101.735344
+  },
+  "Dato' Keramat": {
+    "lat": 3.1647,
+    "lng": 101.7314
+  },
+  "Damai": {
+    "lat": 3.164406,
+    "lng": 101.724489
+  },
+  "Ampang Park": {
+    "lat": 3.159894,
+    "lng": 101.719017
+  },
+  "KLCC": {
+    "lat": 3.158935,
+    "lng": 101.713287
+  },
+  "Kampung Baru": {
+    "lat": 3.161386,
+    "lng": 101.706608
+  },
+  "Dang Wangi": {
+    "lat": 3.156942,
+    "lng": 101.701975
+  },
+  "Masjid Jamek": {
+    "lat": 3.14927,
+    "lng": 101.696377
+  },
+  "Pasar Seni": {
+    "lat": 3.142439,
+    "lng": 101.69531
+  },
+  "KL Sentral": {
+    "lat": 3.13442,
+    "lng": 101.68625
+  },
+  "Bangsar": {
+    "lat": 3.127588,
+    "lng": 101.679062
+  },
+  "Abdullah Hukum": {
+    "lat": 3.118735,
+    "lng": 101.672897
+  },
+  "Kerinchi": {
+    "lat": 3.115506,
+    "lng": 101.668572
+  },
+  "Universiti": {
+    "lat": 3.114616,
+    "lng": 101.661639
+  },
+  "Taman Jaya": {
+    "lat": 3.104086,
+    "lng": 101.645248
+  },
+  "Asia Jaya": {
+    "lat": 3.104343,
+    "lng": 101.637695
+  },
+  "Taman Paramount": {
+    "lat": 3.104716,
+    "lng": 101.623192
+  },
+  "Taman Bahagia": {
+    "lat": 3.11079,
+    "lng": 101.612856
+  },
+  "Kelana Jaya": {
+    "lat": 3.112497,
+    "lng": 101.6043
+  },
+  "Lembah Subang": {
+    "lat": 3.112094,
+    "lng": 101.591034
+  },
+  "Ara Damansara": {
+    "lat": 3.108643,
+    "lng": 101.586372
+  },
+  "Glenmarie": {
+    "lat": 3.095278,
+    "lng": 101.588611
+  },
+  "Subang Jaya": {
+    "lat": 3.08466,
+    "lng": 101.588127
+  },
+  "Ss15": {
+    "lat": 3.076001,
+    "lng": 101.585977
+  },
+  "Ss18": {
+    "lat": 3.066983,
+    "lng": 101.580314
+  },
+  "USJ 7": {
+    "lat": 3.054956,
+    "lng": 101.592194
+  },
+  "Taipan": {
+    "lat": 3.04815,
+    "lng": 101.590233
+  },
+  "Wawasan": {
+    "lat": 3.035062,
+    "lng": 101.588348
+  },
+  "USJ 21": {
+    "lat": 3.029881,
+    "lng": 101.581711
+  },
+  "Alam Megah": {
+    "lat": 3.023151,
+    "lng": 101.572029
+  },
+  "Subang Alam": {
+    "lat": 3.009421,
+    "lng": 101.572281
+  },
+  "Putra Heights": {
+    "lat": 2.996227,
+    "lng": 101.575462
+  },
+  "Sentul Timur": {
+    "lat": 3.185897,
+    "lng": 101.695217
+  },
+  "Sentul": {
+    "lat": 3.178484,
+    "lng": 101.695542
+  },
+  "Titiwangsa": {
+    "lat": 3.173497,
+    "lng": 101.695367
+  },
+  "PWTC": {
+    "lat": 3.166333,
+    "lng": 101.693586
+  },
+  "Sultan Ismail": {
+    "lat": 3.161245,
+    "lng": 101.694109
+  },
+  "Bandaraya": {
+    "lat": 3.155567,
+    "lng": 101.694485
+  },
+  "Plaza Rakyat": {
+    "lat": 3.144049,
+    "lng": 101.702105
+  },
+  "Hang Tuah": {
+    "lat": 3.140012,
+    "lng": 101.705984
+  },
+  "Pudu": {
+    "lat": 3.134879,
+    "lng": 101.711957
+  },
+  "Chan Sow Lin": {
+    "lat": 3.128105,
+    "lng": 101.715637
+  },
+  "Miharja": {
+    "lat": 3.120973,
+    "lng": 101.717922
+  },
+  "Maluri": {
+    "lat": 3.12329,
+    "lng": 101.727283
+  },
+  "Pandan Jaya": {
+    "lat": 3.130141,
+    "lng": 101.739122
+  },
+  "Pandan Indah": {
+    "lat": 3.134581,
+    "lng": 101.746509
+  },
+  "Cempaka": {
+    "lat": 3.138324,
+    "lng": 101.752979
+  },
+  "Cahaya": {
+    "lat": 3.140575,
+    "lng": 101.756677
+  },
+  "Ampang": {
+    "lat": 3.150318,
+    "lng": 101.760049
+  },
+  "Cheras": {
+    "lat": 3.041339,
+    "lng": 101.773383
+  },
+  "Salak Selatan": {
+    "lat": 3.102201,
+    "lng": 101.706179
+  },
+  "Bandar Tun Razak": {
+    "lat": 3.089576,
+    "lng": 101.712466
+  },
+  "Bandar Tasik Selatan": {
+    "lat": 3.076058,
+    "lng": 101.711107
+  },
+  "Sungai Besi": {
+    "lat": 3.063737,
+    "lng": 101.7084
+  },
+  "Bukit Jalil": {
+    "lat": 3.058196,
+    "lng": 101.692125
+  },
+  "Sri Petaling": {
+    "lat": 3.061445,
+    "lng": 101.687074
+  },
+  "Awan Besar": {
+    "lat": 3.062131,
+    "lng": 101.670555
+  },
+  "Muhibbah": {
+    "lat": 3.062229,
+    "lng": 101.662552
+  },
+  "Alam Sutera": {
+    "lat": 3.0547,
+    "lng": 101.656468
+  },
+  "Kinrara Bk5": {
+    "lat": 3.0471213,
+    "lng": 101.6459441
+  },
+  "IOI Puchong Jaya": {
+    "lat": 3.048101,
+    "lng": 101.62095
+  },
+  "Pusat Bandar Puchong": {
+    "lat": 3.033194,
+    "lng": 101.616057
+  },
+  "Taman Perindustrian Puchong": {
+    "lat": 3.022814,
+    "lng": 101.613514
+  },
+  "Bandar Puteri": {
+    "lat": 3.017111,
+    "lng": 101.612855
+  },
+  "Puchong Perdana": {
+    "lat": 3.007913,
+    "lng": 101.605021
+  },
+  "Puchong Prima": {
+    "lat": 2.999808,
+    "lng": 101.596692
+  },
+  "Kwasa Damansara": {
+    "lat": 3.176146,
+    "lng": 101.572052
+  },
+  "Kwasa Sentral": {
+    "lat": 3.170112,
+    "lng": 101.564651
+  },
+  "Kota Damansara": {
+    "lat": 3.150134,
+    "lng": 101.57869
+  },
+  "Surian": {
+    "lat": 3.14948,
+    "lng": 101.593925
+  },
+  "Mutiara Damansara": {
+    "lat": 3.155301,
+    "lng": 101.609077
+  },
+  "Bandar Utama": {
+    "lat": 3.144722,
+    "lng": 101.618611
+  },
+  "TTDI": {
+    "lat": 3.13613,
+    "lng": 101.630539
+  },
+  "Phileo Damansara": {
+    "lat": 3.129864,
+    "lng": 101.642471
+  },
+  "Pusat Bandar Damansara": {
+    "lat": 3.143444,
+    "lng": 101.662857
+  },
+  "Semantan": {
+    "lat": 3.150977,
+    "lng": 101.665497
+  },
+  "Muzium Negara": {
+    "lat": 3.137317,
+    "lng": 101.687336
+  },
+  "Merdeka": {
+    "lat": 3.141969,
+    "lng": 101.70205
+  },
+  "Bukit Bintang": {
+    "lat": 3.146022,
+    "lng": 101.7115
+  },
+  "Tun Razak Exchange": {
+    "lat": 3.142403,
+    "lng": 101.720156
+  },
+  "Cochrane": {
+    "lat": 3.132829,
+    "lng": 101.722962
+  },
+  "Taman Pertama": {
+    "lat": 3.112547,
+    "lng": 101.729371
+  },
+  "Taman Midah": {
+    "lat": 3.104505,
+    "lng": 101.732186
+  },
+  "Taman Mutiara": {
+    "lat": 3.090989,
+    "lng": 101.740453
+  },
+  "Taman Connaught": {
+    "lat": 3.079172,
+    "lng": 101.74522
+  },
+  "Taman Suntex": {
+    "lat": 3.071578,
+    "lng": 101.763552
+  },
+  "Sri Raya": {
+    "lat": 3.062273,
+    "lng": 101.772899
+  },
+  "Bandar Tun Hussein Onn": {
+    "lat": 3.048223,
+    "lng": 101.775109
+  },
+  "Batu 11 Cheras": {
+    "lat": 3.041339,
+    "lng": 101.773383
+  },
+  "Bukit Dukung": {
+    "lat": 3.026413,
+    "lng": 101.771072
+  },
+  "Sungai Jernih": {
+    "lat": 3.000948,
+    "lng": 101.783857
+  },
+  "Stadium Kajang": {
+    "lat": 2.994514,
+    "lng": 101.786338
+  },
+  "Kajang": {
+    "lat": 2.982778,
+    "lng": 101.790278
+  },
+  "Kampung Selamat": {
+    "lat": 3.197266,
+    "lng": 101.578499
+  },
+  "Sungai Buloh": {
+    "lat": 3.206429,
+    "lng": 101.581779
+  },
+  "Damansara Damai": {
+    "lat": 3.199892,
+    "lng": 101.592623
+  },
+  "Sri Damansara Barat": {
+    "lat": 3.198197,
+    "lng": 101.608302
+  },
+  "Sri Damansara Sentral": {
+    "lat": 3.198815,
+    "lng": 101.621396
+  },
+  "Sri Damansara Timur": {
+    "lat": 3.207832,
+    "lng": 101.628716
+  },
+  "Metro Prima": {
+    "lat": 3.214438,
+    "lng": 101.639402
+  },
+  "Kepong Baru": {
+    "lat": 3.211663,
+    "lng": 101.648193
+  },
+  "Jinjang": {
+    "lat": 3.209544,
+    "lng": 101.655829
+  },
+  "Sri Delima": {
+    "lat": 3.207108,
+    "lng": 101.665749
+  },
+  "Kampung Batu": {
+    "lat": 3.205521,
+    "lng": 101.675473
+  },
+  "Kentonmen": {
+    "lat": 3.198485,
+    "lng": 101.681138
+  },
+  "Jalan Ipoh": {
+    "lat": 3.189319,
+    "lng": 101.681145
+  },
+  "Sentul Barat": {
+    "lat": 3.179369,
+    "lng": 101.684742
+  },
+  "Hospital Kuala Lumpur": {
+    "lat": 3.17405,
+    "lng": 101.70239
+  },
+  "Raja Uda": {
+    "lat": 3.16794,
+    "lng": 101.71017
+  },
+  "Persiaran KLCC": {
+    "lat": 3.15712,
+    "lng": 101.71834
+  },
+  "Conlay": {
+    "lat": 3.15145,
+    "lng": 101.71801
+  },
+  "Kuchai": {
+    "lat": 3.089546,
+    "lng": 101.694124
+  },
+  "Taman Naga Emas": {
+    "lat": 3.077688,
+    "lng": 101.699867
+  },
+  "Serdang Raya Utara": {
+    "lat": 3.041674,
+    "lng": 101.704928
+  },
+  "Serdang Raya Selatan": {
+    "lat": 3.028463,
+    "lng": 101.707514
+  },
+  "Serdang Jaya": {
+    "lat": 3.0216,
+    "lng": 101.709
+  },
+  "UPM": {
+    "lat": 3.008489,
+    "lng": 101.705396
+  },
+  "Taman Equine": {
+    "lat": 2.98942,
+    "lng": 101.67244
+  },
+  "Putra Permai": {
+    "lat": 2.98339,
+    "lng": 101.66099
+  },
+  "16 Sierra": {
+    "lat": 2.964974,
+    "lng": 101.654812
+  },
+  "Cyberjaya Utara": {
+    "lat": 2.95,
+    "lng": 101.6573
+  },
+  "Cyberjaya City Centre": {
+    "lat": 2.9384,
+    "lng": 101.6659
+  },
+  "Putrajaya Sentral": {
+    "lat": 2.9313,
+    "lng": 101.6715
+  },
+  "Tun Sambanthan": {
+    "lat": 3.13132,
+    "lng": 101.69085
+  },
+  "Maharajalela": {
+    "lat": 3.138743,
+    "lng": 101.699268
+  },
+  "Imbi": {
+    "lat": 3.14283,
+    "lng": 101.70945
+  },
+  "Raja Chulan": {
+    "lat": 3.150878,
+    "lng": 101.710432
+  },
+  "Bukit Nanas": {
+    "lat": 3.156214,
+    "lng": 101.704809
+  },
+  "Medan Tuanku": {
+    "lat": 3.15935,
+    "lng": 101.69888
+  },
+  "Chow Kit": {
+    "lat": 3.167358,
+    "lng": 101.698379
+  },
+  "Sunway-Setia Jaya": {
+    "lat": 3.0828,
+    "lng": 101.6123
+  },
+  "Mentari": {
+    "lat": 3.0761,
+    "lng": 101.6101
+  },
+  "Sunway Lagoon": {
+    "lat": 3.0706,
+    "lng": 101.6107
+  },
+  "SunMed": {
+    "lat": 3.0656,
+    "lng": 101.6087
+  },
+  "SunU-Monash": {
+    "lat": 3.0654,
+    "lng": 101.6016
+  },
+  "South Quay-USJ 1": {
+    "lat": 3.0617,
+    "lng": 101.5969
+  },
+  "Kayu Ara": {
+    "lat": 3.134722,
+    "lng": 101.616667
+  },
+  "BU 11": {
+    "lat": 3.133474,
+    "lng": 101.604528
+  },
+  "Damansara Idaman": {
+    "lat": 3.122778,
+    "lng": 101.594167
+  },
+  "Subang": {
+    "lat": 3.106111,
+    "lng": 101.591111
+  },
+  "Glenmarie 2": {
+    "lat": 3.095278,
+    "lng": 101.588611
+  },
+  "Kerjaya": {
+    "lat": 3.082222,
+    "lng": 101.561944
+  },
+  "Stadium Shah Alam": {
+    "lat": 3.079722,
+    "lng": 101.548889
+  },
+  "Dato' Menteri": {
+    "lat": 3.0731,
+    "lng": 101.5204
+  },
+  "UiTM Shah Alam": {
+    "lat": 3.0625,
+    "lng": 101.501111
+  },
+  "Seksyen 7 Shah Alam": {
+    "lat": 3.0693043,
+    "lng": 101.4897649
+  },
+  "Bandar Baru Klang": {
+    "lat": 3.0625,
+    "lng": 101.465556
+  },
+  "Pasar Klang": {
+    "lat": 3.067778,
+    "lng": 101.450833
+  },
+  "Jalan Meru": {
+    "lat": 3.058889,
+    "lng": 101.451944
+  },
+  "Pasar Jawa": {
+    "lat": 3.0469738,
+    "lng": 101.4471635
+  },
+  "Taman Selatan": {
+    "lat": 3.026667,
+    "lng": 101.442222
+  },
+  "Seri Andalas": {
+    "lat": 3.015833,
+    "lng": 101.440556
+  },
+  "Klang Jaya": {
+    "lat": 3.005278,
+    "lng": 101.441667
+  },
+  "Bandar Bukit Tinggi": {
+    "lat": 2.993056,
+    "lng": 101.445833
+  },
+  "Johan Setia": {
+    "lat": 2.976111,
+    "lng": 101.459167
+  }
+}
