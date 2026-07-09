@@ -58,6 +58,8 @@ export const translations: Record<Language, Record<string, string>> = {
     backToMap: "Back to Map",
     noSchedule: "No schedule data for this day.",
     loadingSchedule: "Loading timetable…",
+    loading: "Loading...",
+    calculatingRouteDesc: "Please hang on while we calculate the best route for you.",
 
     // Plan View page
     routePlanner: "Route Planner",
@@ -155,8 +157,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Settings dialog
     appTheme: "主题样式",
     system: "跟随系统",
-    light: "明亮模式",
-    dark: "暗黑模式",
+    light: "浅色模式",
+    dark: "深色模式",
     farePreference: "车费显示偏好",
     all: "全部",
     cashless: "无现金 (卡)",
@@ -200,6 +202,8 @@ export const translations: Record<Language, Record<string, string>> = {
     backToMap: "返回地图",
     noSchedule: "该日无时刻表数据。",
     loadingSchedule: "正在加载时刻表…",
+    loading: "载入中...",
+    calculatingRouteDesc: "请稍候，系统正在为您计算最佳乘车方案。",
 
     // Plan View page
     routePlanner: "路线路径规划",
@@ -258,9 +262,9 @@ export const translations: Record<Language, Record<string, string>> = {
     stationsCount: "站",
     searchPlaceholder: "输入车站名称或代码搜索...",
     searchAllPlaceholder: "在全巴生谷网络中搜索车站名称或代码...",
-    globalSearchResults: "全局搜索结果",
+    globalSearchResults: "搜索结果",
     noSearchMatches: "未找到匹配的车站。",
-    noGlobalSearchMatches: "在全网络中未搜索到此车站。",
+    noGlobalSearchMatches: "未搜索到此车站。",
     transferToWalkway: "步行通道至",
 
     // Bus view
