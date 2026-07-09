@@ -20,6 +20,10 @@ export const PlanView: React.FC = () => {
   const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
   const [destSuggestions, setDestSuggestions] = useState<string[]>([]);
 
+  // State to filter suggestions list. Reset to empty on focus so the full list displays.
+  const [originFilter, setOriginFilter] = useState("");
+  const [destFilter, setDestFilter] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
@@ -51,28 +55,28 @@ export const PlanView: React.FC = () => {
     setTimeInput(`${hh}:${min}`);
   }, []);
 
-  // Update origin/dest autocompletes to show full list on empty input
+  // Update origin/dest autocompletes based on filter values (empty shows full list)
   useEffect(() => {
-    if (!origin) {
+    if (!originFilter) {
       setOriginSuggestions(sortedStationNames);
     } else {
       const match = sortedStationNames.filter((name) =>
-        name.toLowerCase().includes(origin.toLowerCase())
+        name.toLowerCase().includes(originFilter.toLowerCase())
       );
       setOriginSuggestions(match);
     }
-  }, [origin]);
+  }, [originFilter]);
 
   useEffect(() => {
-    if (!dest) {
+    if (!destFilter) {
       setDestSuggestions(sortedStationNames);
     } else {
       const match = sortedStationNames.filter((name) =>
-        name.toLowerCase().includes(dest.toLowerCase())
+        name.toLowerCase().includes(destFilter.toLowerCase())
       );
       setDestSuggestions(match);
     }
-  }, [dest]);
+  }, [destFilter]);
 
   // Click outside to close dropdowns
   useEffect(() => {
@@ -92,11 +96,15 @@ export const PlanView: React.FC = () => {
     const tmp = origin;
     setOrigin(dest);
     setDest(tmp);
+    setOriginFilter("");
+    setDestFilter("");
   };
 
   const handleSearchAgain = () => {
     setOrigin("");
     setDest("");
+    setOriginFilter("");
+    setDestFilter("");
     setRoutes([]);
     setSearchedOrigin("");
     setSearchedDest("");
@@ -177,6 +185,18 @@ export const PlanView: React.FC = () => {
         const stopCount = localRoute.path.length;
         localRoute.totalDurationSec = stopCount * 120;
         localRoute._routeLabel = "Best";
+        
+        // Generate mock schedule times
+        const formatTime = (d: Date) => {
+          const hh = String(d.getHours()).padStart(2, "0");
+          const mm = String(d.getMinutes()).padStart(2, "0");
+          return `${hh}:${mm}`;
+        };
+        const dt = new Date(targetTime.replace(/-/g, "/"));
+        localRoute.etaDepart = formatTime(dt);
+        const arrDt = new Date(dt.getTime() + localRoute.totalDurationSec * 1000);
+        localRoute.etaArrive = formatTime(arrDt);
+
         setRoutes([localRoute]);
         setSelectedRouteIndex(0);
         setSearchedOrigin(origin);
@@ -230,7 +250,7 @@ export const PlanView: React.FC = () => {
     const h = Math.floor(seconds / 3600);
     const m = Math.round((seconds % 3600) / 60);
     if (h > 0) return `${h}h ${m}m`;
-    return `${m} min`;
+    return `${m} mins`;
   };
 
   const activeRoute = routes[selectedRouteIndex];
@@ -262,7 +282,7 @@ export const PlanView: React.FC = () => {
   const segments = activeRoute ? getRouteSegments(activeRoute) : [];
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative">
+    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative animate-fade-in">
       {/* Sidebar Selector Form */}
       <div
         className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between ${
@@ -300,8 +320,14 @@ export const PlanView: React.FC = () => {
                 <input
                   type="text"
                   value={origin}
-                  onChange={(e) => setOrigin(e.target.value)}
-                  onFocus={() => setOriginInputFocused(true)}
+                  onChange={(e) => {
+                    setOrigin(e.target.value);
+                    setOriginFilter(e.target.value);
+                  }}
+                  onFocus={() => {
+                    setOriginInputFocused(true);
+                    setOriginFilter(""); // Empty search string to render full directory instantly
+                  }}
                   placeholder="Type station name..."
                   className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
@@ -314,6 +340,7 @@ export const PlanView: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setOrigin(name);
+                        setOriginFilter("");
                         setOriginInputFocused(false);
                       }}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
@@ -346,8 +373,14 @@ export const PlanView: React.FC = () => {
                 <input
                   type="text"
                   value={dest}
-                  onChange={(e) => setDest(e.target.value)}
-                  onFocus={() => setDestInputFocused(true)}
+                  onChange={(e) => {
+                    setDest(e.target.value);
+                    setDestFilter(e.target.value);
+                  }}
+                  onFocus={() => {
+                    setDestInputFocused(true);
+                    setDestFilter(""); // Empty search string to render full directory instantly
+                  }}
                   placeholder="Type station name..."
                   className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
@@ -360,6 +393,7 @@ export const PlanView: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setDest(name);
+                        setDestFilter("");
                         setDestInputFocused(false);
                       }}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
@@ -533,18 +567,20 @@ export const PlanView: React.FC = () => {
 
                 {/* Route Details Card */}
                 {activeRoute && (
-                  <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl">
+                  <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-5">
                     {/* Journey Stats Bar */}
-                    <div className="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-border mb-4">
+                    <div className="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-border">
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 bg-button-secondary/50 border border-border rounded-lg px-2.5 py-1.5">
+                        <div className="flex items-center gap-1.5 bg-button-secondary/50 border border-border rounded-lg px-2.5 py-1.5">
                           <Clock className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
                           <span className="text-xs font-bold text-text-primary">
-                            {formatDuration(activeRoute.totalDurationSec)}
+                            {activeRoute.etaDepart && activeRoute.etaArrive
+                              ? `${activeRoute.etaDepart} - ${activeRoute.etaArrive}`
+                              : "ETA Range"}
                           </span>
                         </div>
-                        <span className="text-xs text-text-secondary font-medium">
-                          {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? "Direct" : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? "Transfer" : "Transfers"}`}
+                        <span className="text-xs text-text-secondary font-semibold">
+                          {formatDuration(activeRoute.totalDurationSec)} · {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? "Direct" : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? "Transfer" : "Transfers"}`}
                         </span>
                       </div>
 
@@ -578,16 +614,22 @@ export const PlanView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Route Timeline */}
+                    {/* Route Timeline with Line Color Matching */}
                     <div className="space-y-4">
                       <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
                         Journey Directions
                       </h3>
 
-                      <div className="relative pl-6 border-l-2 border-border ml-2 space-y-5">
+                      <div className="relative space-y-0 pl-2">
                         {/* Start Node */}
-                        <div className="relative">
-                          <span className="absolute -left-[33px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
+                        <div className="relative pl-8 pb-4">
+                          {/* Vertical colored line down to first board point */}
+                          <span
+                            style={{ backgroundColor: getLineColor(segments[0]?.line) }}
+                            className="absolute left-[9px] top-3 bottom-0 w-[2px]"
+                          />
+                          <span className="absolute left-[2px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10 animate-pulse-soft" />
+                          
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-bold text-text-primary">{activeRoute.path[0]}</span>
                             {getStationBadges(activeRoute.path[0])}
@@ -607,92 +649,118 @@ export const PlanView: React.FC = () => {
                           const meta = activeRoute.legMeta?.[idx] || null;
 
                           return (
-                            <div key={idx} className="relative space-y-2">
-                              {/* Segment Line indicator */}
-                              <span
-                                style={{ backgroundColor: color }}
-                                className="absolute -left-[33px] top-1.5 h-4 w-4 rounded-full border-2 border-border"
-                              />
+                            <React.Fragment key={idx}>
+                              {/* Board segment row */}
+                              <div className="relative pl-8 pb-4">
+                                {/* Vertical colored line to next step */}
+                                <span
+                                  style={{ backgroundColor: color }}
+                                  className="absolute left-[9px] top-3 bottom-0 w-[2px]"
+                                />
+                                <span
+                                  style={{ borderColor: color, backgroundColor: color }}
+                                  className="absolute left-[2px] top-1.5 h-4 w-4 rounded-full border-2 z-10"
+                                />
 
-                              <div className="flex flex-wrap items-center justify-between">
-                                <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
-                                  {isWalk ? "Pedestrian Walkway" : `Board ${getLineName(seg.line)}`}
-                                  {meta?.direction && (
-                                    <span className="text-[10px] text-text-secondary font-normal ml-1.5">
-                                      toward {meta.direction}
+                                <div className="space-y-2">
+                                  <div className="flex flex-wrap items-center justify-between">
+                                    <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
+                                      {isWalk ? "Pedestrian Walkway" : `Board ${getLineName(seg.line)}`}
+                                      {meta?.direction && (
+                                        <span className="text-[10px] text-text-secondary font-normal ml-1.5">
+                                          toward {meta.direction}
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
+
+                                  {/* Ride Toggles */}
+                                  {intermediateStops.length > 0 ? (
+                                    <div className="pl-2">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setExpandedStops((prev) => ({ ...prev, [idx]: !isExpanded }))
+                                        }
+                                        className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors"
+                                      >
+                                        Ride {seg.stations.length} stop{seg.stations.length > 1 ? "s" : ""}
+                                        {isExpanded ? (
+                                          <ChevronUp className="h-3 w-3" />
+                                        ) : (
+                                          <ChevronDown className="h-3 w-3" />
+                                        )}
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <span className="text-[10px] text-text-secondary pl-2">
+                                      {isWalk ? "Walk to interchange station" : "Ride 1 stop"}
                                     </span>
                                   )}
-                                </span>
+                                </div>
                               </div>
 
-                              {/* Ride Toggle */}
-                              {intermediateStops.length > 0 ? (
-                                <div className="pl-2">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setExpandedStops((prev) => ({ ...prev, [idx]: !isExpanded }))
-                                    }
-                                    className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors"
-                                  >
-                                    Ride {seg.stations.length} stop{seg.stations.length > 1 ? "s" : ""}
-                                    {isExpanded ? (
-                                      <ChevronUp className="h-3 w-3" />
-                                    ) : (
-                                      <ChevronDown className="h-3 w-3" />
-                                    )}
-                                  </button>
-
-                                  {/* Stops List */}
-                                  <AnimatePresence>
-                                    {isExpanded && (
-                                      <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        className="overflow-hidden mt-1.5 space-y-1.5 pl-2 border-l border-border"
-                                      >
-                                        {intermediateStops.map((stop) => (
-                                          <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary">
-                                            <div className="flex items-center gap-2">
-                                              <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
-                                              <span>{stop}</span>
-                                            </div>
-                                            {getStationBadges(stop)}
-                                          </div>
-                                        ))}
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
-                                </div>
-                              ) : (
-                                <span className="text-[10px] text-text-secondary pl-2">
-                                  {isWalk ? "Walk to interchange station" : "Ride 1 stop"}
-                                </span>
-                              )}
-
-                              {/* Transfer/Arrival Node */}
-                              {idx < segments.length && (
-                                <div className="relative pt-3 pl-0">
-                                  <span className="absolute -left-[33px] top-[14px] flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500" />
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
-                                    {getStationBadges(seg.stations[seg.stations.length - 1])}
-                                    {meta?.arriveTime && (
-                                      <span className="text-[10px] text-text-secondary font-semibold ml-auto">{meta.arriveTime}</span>
-                                    )}
+                              {/* Ride Stops List Expansion (if open) */}
+                              {isExpanded && intermediateStops.length > 0 && (
+                                <div className="relative pl-8 pb-4">
+                                  {/* Continued vertical segment line */}
+                                  <span
+                                    style={{ backgroundColor: color }}
+                                    className="absolute left-[9px] top-0 bottom-0 w-[2px]"
+                                  />
+                                  <div className="overflow-hidden space-y-2.5 pl-2 border-l border-border/80">
+                                    {intermediateStops.map((stop) => (
+                                      <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary animate-fade-in">
+                                        <div className="flex items-center gap-2">
+                                          <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
+                                          <span>{stop}</span>
+                                        </div>
+                                        {getStationBadges(stop)}
+                                      </div>
+                                    ))}
                                   </div>
-                                  <p className="text-[10px] text-text-secondary font-medium mt-0.5">
-                                    {idx === segments.length - 1
-                                      ? "Arrive at destination"
-                                      : `Transfer to ${getLineName(segments[idx + 1].line)}`}
-                                  </p>
                                 </div>
                               )}
-                            </div>
+
+                              {/* Arrival / Transfer Node */}
+                              <div className="relative pl-8 pb-4">
+                                {/* Vertical colored line to next step, using NEXT segment line color if available */}
+                                {idx < segments.length - 1 && (
+                                  <span
+                                    style={{ backgroundColor: getLineColor(segments[idx + 1].line) }}
+                                    className="absolute left-[9px] top-3 bottom-0 w-[2px]"
+                                  />
+                                )}
+                                <span className="absolute left-[2px] top-2 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10" />
+                                
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
+                                  {getStationBadges(seg.stations[seg.stations.length - 1])}
+                                  {meta?.arriveTime && (
+                                    <span className="text-[10px] text-text-secondary font-semibold ml-auto">{meta.arriveTime}</span>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-text-secondary font-medium mt-0.5">
+                                  {idx === segments.length - 1
+                                    ? "Arrive at destination"
+                                    : `Transfer to ${getLineName(segments[idx + 1].line)}`}
+                                </p>
+                              </div>
+                            </React.Fragment>
                           );
                         })}
                       </div>
+                    </div>
+
+                    {/* Mobile View: Search again button inside breakdown card bottom */}
+                    <div className="md:hidden pt-2">
+                      <button
+                        onClick={handleSearchAgain}
+                        className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-xs tracking-wider uppercase text-white hover:scale-95 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
+                      >
+                        <Search className="h-4 w-4" />
+                        Search Again
+                      </button>
                     </div>
                   </div>
                 )}
@@ -706,19 +774,6 @@ export const PlanView: React.FC = () => {
           <Footer />
         </div>
       </div>
-
-      {/* Mobile Floating Return Button */}
-      {routes.length > 0 && !isMobileFormOpen && (
-        <div className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-          <button
-            onClick={handleSearchAgain}
-            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-5 py-3 text-xs font-bold shadow-2xl active:scale-95 transition-all whitespace-nowrap"
-          >
-            <Search className="h-4 w-4" />
-            Search Again
-          </button>
-        </div>
-      )}
     </div>
   );
 };

@@ -152,7 +152,7 @@ const KG_Line = [
   { code: "KG07", name: "Surian", distance: 1.69 },
   { code: "KG08", name: "Mutiara Damansara", distance: 1.8 },
   { code: "KG09", name: "Bandar Utama", distance: 1.42 },
-  { code: "KG10", name: "Ttdi", distance: 1.77 },
+  { code: "KG10", name: "TTDI", distance: 1.77 },
   { code: "KG12", name: "Phileo Damansara", distance: 1.5 },
   { code: "KG13", name: "Pusat Bandar Damansara", distance: 2.72 },
   { code: "KG14", name: "Semantan", distance: 0.89 },
@@ -246,7 +246,7 @@ const SA_Line = [
   { code: "SA03", name: "BU 11" },
   { code: "SA05", name: "Damansara Idaman" },
   { code: "SA06", name: "Subang" },
-  { code: "SA07", name: "Glenmarie 2" },
+  { code: "SA07", name: "Glenmarie" },
   { code: "SA09", name: "Kerjaya" },
   { code: "SA10", name: "Stadium Shah Alam" },
   { code: "SA12", name: "Dato' Menteri" },
@@ -267,8 +267,7 @@ const explicitTransfers = [
   { from: "Muzium Negara", to: "KL Sentral", line: "WALKWAY", distance: 1.0 },
   { from: "Bukit Nanas", to: "Dang Wangi", line: "WALKWAY", distance: 1.2 },
   { from: "Plaza Rakyat", to: "Merdeka", line: "WALKWAY", distance: 0.8 },
-  { from: "Medan Tuanku", to: "Sultan Ismail", line: "WALKWAY", distance: 0.6 },
-  { from: "Glenmarie 2", to: "Glenmarie", line: "WALKWAY", distance: 0.5 }
+  { from: "Medan Tuanku", to: "Sultan Ismail", line: "WALKWAY", distance: 0.6 }
 ];
 
 function buildGraph(): Record<string, StationObj> {
