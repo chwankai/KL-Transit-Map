@@ -56,9 +56,9 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
                 <button
                   key={id}
                   onClick={() => setTheme(id)}
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-1 rounded-lg text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${
                     theme === id
-                      ? "bg-blue-600 text-white shadow-md font-bold"
+                      ? "bg-blue-600 text-white shadow-md"
                       : "text-text-secondary hover:text-text-primary hover:bg-button-secondary/50"
                   }`}
                 >

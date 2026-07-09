@@ -26,11 +26,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 h-[calc(64px+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] border-b border-border bg-card backdrop-blur-md z-40">
         <Link to="/" className="flex items-center gap-2 sm:gap-3 select-none">
           <div className="text-xl sm:text-2xl flex items-center justify-center">🚇</div>
-          <div className="flex flex-col md:gap-0.5">
-            <h1 className="text-xs sm:text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent leading-tight md:leading-snug">
+          <div className="flex flex-col items-center md:items-start md:gap-0.5">
+            <h1 className="text-xs sm:text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent leading-tight md:leading-snug text-center md:text-left">
               KL Transit Map
             </h1>
-            <span className="hidden md:inline text-[9px] font-semibold uppercase tracking-wider text-text-secondary select-none leading-tight mt-0.5">
+            <span className="hidden md:inline text-[9px] font-semibold uppercase tracking-wider text-text-secondary select-none leading-tight mt-0.5 text-center md:text-left">
               Integrated Route Planner
             </span>
           </div>
@@ -38,7 +38,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Right side controls */}
         <div className="flex items-center gap-1 sm:gap-2">
-          <nav className="flex items-center gap-0.5 sm:gap-1.5">
+          <nav className="flex items-center gap-2 sm:gap-3">
             {navItems.map(({ path, label, icon: Icon }) => {
               const isActive = location.pathname === path;
               return (

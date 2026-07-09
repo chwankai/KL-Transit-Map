@@ -4,7 +4,7 @@ import type { Route } from "../lib/transit-data";
 import { fetchMyRapidRoute, getCurrentDateTime, subtractSecondsFromDatetime, geocodeStation, fetchSingleRoute } from "../lib/routing";
 import { useSettings } from "../context/SettingsContext";
 import { Footer } from "../components/layout/Footer";
-import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp, AlertCircle, X } from "lucide-react";
+import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp, AlertCircle, X, Heart, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const PlanView: React.FC = () => {
@@ -36,6 +36,13 @@ export const PlanView: React.FC = () => {
 
   // Mobile layout overlay pull down controls
   const [isMobileFormOpen, setIsMobileFormOpen] = useState(true);
+
+  // Local storage saved routes
+  const [savedRoutes, setSavedRoutes] = useState<{ origin: string; dest: string }[]>(() => {
+    const saved = localStorage.getItem("saved_routes");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [isJustSaved, setIsJustSaved] = useState(false);
 
   const originRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
@@ -109,6 +116,37 @@ export const PlanView: React.FC = () => {
     setSearchedOrigin("");
     setSearchedDest("");
     setErrorMsg(null);
+    setIsMobileFormOpen(true);
+  };
+
+  const handleSaveRoute = () => {
+    if (!searchedOrigin || !searchedDest) return;
+    const exists = savedRoutes.some(
+      (r) =>
+        r.origin.toLowerCase() === searchedOrigin.toLowerCase() &&
+        r.dest.toLowerCase() === searchedDest.toLowerCase()
+    );
+    if (!exists) {
+      const updated = [...savedRoutes, { origin: searchedOrigin, dest: searchedDest }];
+      setSavedRoutes(updated);
+      localStorage.setItem("saved_routes", JSON.stringify(updated));
+    }
+    setIsJustSaved(true);
+    setTimeout(() => setIsJustSaved(false), 2000);
+  };
+
+  const handleDeleteSavedRoute = (e: React.MouseEvent, index: number) => {
+    e.stopPropagation();
+    const updated = savedRoutes.filter((_, idx) => idx !== index);
+    setSavedRoutes(updated);
+    localStorage.setItem("saved_routes", JSON.stringify(updated));
+  };
+
+  const handleSelectSavedRoute = (saved: { origin: string; dest: string }) => {
+    setOrigin(saved.origin);
+    setDest(saved.dest);
+    setOriginFilter("");
+    setDestFilter("");
     setIsMobileFormOpen(true);
   };
 
@@ -224,7 +262,6 @@ export const PlanView: React.FC = () => {
     return (
       <div className="flex gap-1 flex-wrap">
         {node.codes.map((code) => {
-          // Extract alphabetical line prefix correctly (e.g. KG18A -> KG, SB3 -> SB)
           const match = code.match(/^[a-zA-Z]+/);
           let lineId = match ? match[0] : "";
           if (lineId === "SB") {
@@ -254,6 +291,7 @@ export const PlanView: React.FC = () => {
   };
 
   const activeRoute = routes[selectedRouteIndex];
+  const isWalkOnly = activeRoute && activeRoute.edges.length > 0 && activeRoute.edges.every(e => e.line === "WALKWAY");
 
   // Helper to compile steps for rendering timeline
   const getRouteSegments = (route: Route) => {
@@ -285,192 +323,230 @@ export const PlanView: React.FC = () => {
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative animate-fade-in">
       {/* Sidebar Selector Form */}
       <div
-        className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between ${
+        className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${
           routes.length > 0
             ? isMobileFormOpen
-              ? "absolute inset-x-0 top-0 max-h-[90%] shadow-2xl border-b border-border md:relative md:inset-auto md:max-h-none md:shadow-none md:border-r"
+              ? "absolute inset-x-0 top-0 max-h-[90%] shadow-2xl border-b border-border md:relative md:inset-auto md:max-h-none md:shadow-none md:border-r animate-in slide-in-from-top duration-200"
               : "hidden md:flex"
             : "flex"
         }`}
       >
-        <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
-              Find Route
-            </h2>
-            {routes.length > 0 && (
+        <div className="space-y-4">
+          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
+                Find Route
+              </h2>
+              {routes.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFormOpen(false)}
+                  className="md:hidden text-text-secondary hover:text-text-primary p-1.5 rounded-lg hover:bg-button-secondary transition-all"
+                  title="Close Form"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            <form onSubmit={handleSearch} className="space-y-4">
+              {/* Origin */}
+              <div ref={originRef} className="relative">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                  Origin Station
+                </label>
+                <div className="relative mt-1">
+                  <input
+                    type="text"
+                    value={origin}
+                    onChange={(e) => {
+                      setOrigin(e.target.value);
+                      setOriginFilter(e.target.value);
+                    }}
+                    onFocus={() => {
+                      setOriginInputFocused(true);
+                      setOriginFilter("");
+                    }}
+                    placeholder="Type station name..."
+                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                {originInputFocused && originSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
+                    {originSuggestions.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setOrigin(name);
+                          setOriginFilter("");
+                          setOriginInputFocused(false);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
+                      >
+                        {name}
+                        {getStationBadges(name)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Swap Button */}
+              <div className="flex justify-center -my-2.5">
+                <button
+                  type="button"
+                  onClick={handleSwap}
+                  className="rounded-full border border-border bg-card p-2 text-text-secondary hover:border-blue-500 hover:text-blue-500 transition-all hover:scale-110 active:scale-95 shadow-sm"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Destination */}
+              <div ref={destRef} className="relative">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                  Destination Station
+                </label>
+                <div className="relative mt-1">
+                  <input
+                    type="text"
+                    value={dest}
+                    onChange={(e) => {
+                      setDest(e.target.value);
+                      setDestFilter(e.target.value);
+                    }}
+                    onFocus={() => {
+                      setDestInputFocused(true);
+                      setDestFilter("");
+                    }}
+                    placeholder="Type station name..."
+                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                {destInputFocused && destSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
+                    {destSuggestions.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setDest(name);
+                          setDestFilter("");
+                          setDestInputFocused(false);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
+                      >
+                        {name}
+                        {getStationBadges(name)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Time mode selector */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                  Time
+                </label>
+                <div className="grid grid-cols-3 gap-1 rounded-xl bg-button-secondary p-0.5 border border-border">
+                  {(["now", "depart", "arrive"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setTimeMode(mode)}
+                      className={`py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold capitalize transition-all ${
+                        timeMode === mode
+                          ? "bg-blue-600 text-white shadow-md font-bold"
+                          : "text-text-secondary hover:text-text-primary"
+                      }`}
+                    >
+                      {mode === "now" ? "Now" : mode === "depart" ? "Depart" : "Arrive"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Date/Time pickers */}
+              {timeMode !== "now" && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  <input
+                    type="date"
+                    value={dateInput}
+                    onChange={(e) => setDateInput(e.target.value)}
+                    className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
+                  />
+                  <input
+                    type="time"
+                    value={timeInput}
+                    onChange={(e) => setTimeInput(e.target.value)}
+                    className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
+                  />
+                </motion.div>
+              )}
+
+              {/* Form actions row */}
               <button
-                type="button"
-                onClick={() => setIsMobileFormOpen(false)}
-                className="md:hidden text-text-secondary hover:text-text-primary p-1.5 rounded-lg hover:bg-button-secondary transition-all"
-                title="Close Form"
+                type="submit"
+                disabled={isLoading || !origin || !dest}
+                className="w-full py-3 rounded-xl bg-blue-600 font-bold text-xs tracking-wider uppercase text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:scale-100"
               >
-                <X className="h-4 w-4" />
+                {isLoading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Calculating...
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-4 w-4" />
+                    Search Journey
+                  </>
+                )}
               </button>
-            )}
+            </form>
           </div>
 
-          <form onSubmit={handleSearch} className="space-y-4">
-            {/* Origin */}
-            <div ref={originRef} className="relative">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                Origin Station
-              </label>
-              <div className="relative mt-1">
-                <input
-                  type="text"
-                  value={origin}
-                  onChange={(e) => {
-                    setOrigin(e.target.value);
-                    setOriginFilter(e.target.value);
-                  }}
-                  onFocus={() => {
-                    setOriginInputFocused(true);
-                    setOriginFilter(""); // Empty search string to render full directory instantly
-                  }}
-                  placeholder="Type station name..."
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              {originInputFocused && originSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
-                  {originSuggestions.map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => {
-                        setOrigin(name);
-                        setOriginFilter("");
-                        setOriginInputFocused(false);
-                      }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
-                    >
-                      {name}
-                      {getStationBadges(name)}
-                    </button>
-                  ))}
+          {/* Saved Routes Card */}
+          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl flex flex-col overflow-hidden max-h-[300px]">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-3 flex items-center gap-1.5 select-none">
+              <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" />
+              Saved Journeys
+            </h3>
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {savedRoutes.length === 0 ? (
+                <div className="text-[10px] text-text-secondary italic text-center py-4">
+                  No saved journeys yet. Search and save your favorite routes!
                 </div>
-              )}
-            </div>
-
-            {/* Swap Button */}
-            <div className="flex justify-center -my-2.5">
-              <button
-                type="button"
-                onClick={handleSwap}
-                className="rounded-full border border-border bg-card p-2 text-text-secondary hover:border-blue-500 hover:text-blue-500 transition-all hover:scale-110 active:scale-95 shadow-sm"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Destination */}
-            <div ref={destRef} className="relative">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                Destination Station
-              </label>
-              <div className="relative mt-1">
-                <input
-                  type="text"
-                  value={dest}
-                  onChange={(e) => {
-                    setDest(e.target.value);
-                    setDestFilter(e.target.value);
-                  }}
-                  onFocus={() => {
-                    setDestInputFocused(true);
-                    setDestFilter(""); // Empty search string to render full directory instantly
-                  }}
-                  placeholder="Type station name..."
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              {destInputFocused && destSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
-                  {destSuggestions.map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => {
-                        setDest(name);
-                        setDestFilter("");
-                        setDestInputFocused(false);
-                      }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
-                    >
-                      {name}
-                      {getStationBadges(name)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Time mode selector */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                Time
-              </label>
-              <div className="grid grid-cols-3 gap-1 rounded-xl bg-button-secondary p-0.5 border border-border">
-                {(["now", "depart", "arrive"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => setTimeMode(mode)}
-                    className={`py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold capitalize transition-all ${
-                      timeMode === mode
-                        ? "bg-blue-600 text-white shadow-md font-bold"
-                        : "text-text-secondary hover:text-text-primary"
-                    }`}
-                  >
-                    {mode === "now" ? "Now" : mode === "depart" ? "Depart" : "Arrive"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Custom Date/Time pickers */}
-            {timeMode !== "now" && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="grid grid-cols-2 gap-2"
-              >
-                <input
-                  type="date"
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
-                />
-                <input
-                  type="time"
-                  value={timeInput}
-                  onChange={(e) => setTimeInput(e.target.value)}
-                  className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
-                />
-              </motion.div>
-            )}
-
-            {/* Form actions row */}
-            <button
-              type="submit"
-              disabled={isLoading || !origin || !dest}
-              className="w-full py-3 rounded-xl bg-blue-600 font-bold text-xs tracking-wider uppercase text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-40 disabled:scale-100"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  Calculating...
-                </>
               ) : (
-                <>
-                  <Search className="h-4 w-4" />
-                  Search Journey
-                </>
+                savedRoutes.map((route, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handleSelectSavedRoute(route)}
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl border border-border bg-input hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] active:scale-98"
+                  >
+                    <div className="flex flex-col text-left max-w-[80%]">
+                      <span className="text-[10px] font-bold text-text-primary truncate">{route.origin}</span>
+                      <span className="text-[9px] text-text-secondary truncate">to {route.dest}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteSavedRoute(e, idx)}
+                      className="p-1 rounded-lg text-text-secondary hover:bg-red-500/15 hover:text-red-500 transition-colors"
+                      title="Delete Saved Route"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))
               )}
-            </button>
-          </form>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -495,7 +571,7 @@ export const PlanView: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="h-[300px] flex flex-col items-center justify-center text-center text-text-secondary border border-dashed border-border rounded-2xl p-6"
+                className="hidden md:flex h-[300px] flex-col items-center justify-center text-center text-text-secondary border border-dashed border-border rounded-2xl p-6"
               >
                 <Compass className="h-12 w-12 text-slate-500 mb-3 animate-pulse" />
                 <h3 className="text-sm font-bold text-text-primary">Plan a Journey</h3>
@@ -574,13 +650,15 @@ export const PlanView: React.FC = () => {
                         <div className="flex items-center gap-1.5 bg-button-secondary/50 border border-border rounded-lg px-2.5 py-1.5">
                           <Clock className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
                           <span className="text-xs font-bold text-text-primary">
-                            {activeRoute.etaDepart && activeRoute.etaArrive
-                              ? `${activeRoute.etaDepart} - ${activeRoute.etaArrive}`
-                              : "ETA Range"}
+                            {(isWalkOnly || activeRoute.isSameStation)
+                              ? "N/A"
+                              : (activeRoute.etaDepart && activeRoute.etaArrive
+                                ? `${activeRoute.etaDepart} - ${activeRoute.etaArrive}`
+                                : "ETA Range")}
                           </span>
                         </div>
                         <span className="text-xs text-text-secondary font-semibold">
-                          {formatDuration(activeRoute.totalDurationSec)} · {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? "Direct" : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? "Transfer" : "Transfers"}`}
+                          {formatDuration(activeRoute.totalDurationSec) || "0 mins"} · {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? "Direct" : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? "Transfer" : "Transfers"}`}
                         </span>
                       </div>
 
@@ -590,7 +668,9 @@ export const PlanView: React.FC = () => {
                         {(farePref === "all" || farePref === "cashless") && (
                           <div className="px-3 py-1.5 text-center">
                             <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">Cashless</div>
-                            <div className="text-xs font-extrabold text-text-primary">RM {activeRoute.totalFare.toFixed(2)}</div>
+                            <div className="text-xs font-extrabold text-text-primary">
+                              RM {(isWalkOnly || activeRoute.isSameStation) ? "0.00" : activeRoute.totalFare.toFixed(2)}
+                            </div>
                           </div>
                         )}
                         {/* Cash */}
@@ -598,7 +678,7 @@ export const PlanView: React.FC = () => {
                           <div className="px-3 py-1.5 text-center border-l border-border">
                             <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">Cash</div>
                             <div className="text-xs font-extrabold text-text-primary">
-                              {activeRoute.cashFare ? `RM ${activeRoute.cashFare.toFixed(2)}` : "--"}
+                              {(isWalkOnly || activeRoute.isSameStation) ? "RM 0.00" : (activeRoute.cashFare ? `RM ${activeRoute.cashFare.toFixed(2)}` : "--")}
                             </div>
                           </div>
                         )}
@@ -607,7 +687,7 @@ export const PlanView: React.FC = () => {
                           <div className="px-3 py-1.5 text-center border-l border-border">
                             <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">Concession</div>
                             <div className="text-xs font-extrabold text-text-primary">
-                              {activeRoute.concessionFare ? `RM ${activeRoute.concessionFare.toFixed(2)}` : "--"}
+                              {(isWalkOnly || activeRoute.isSameStation) ? "RM 0.00" : (activeRoute.concessionFare ? `RM ${activeRoute.concessionFare.toFixed(2)}` : "--")}
                             </div>
                           </div>
                         )}
@@ -620,144 +700,158 @@ export const PlanView: React.FC = () => {
                         Journey Directions
                       </h3>
 
-                      <div className="relative space-y-0 pl-2">
-                        {/* Start Node */}
-                        <div className="relative pl-8 pb-4">
-                          {/* Vertical colored line down to first board point */}
-                          <span
-                            style={{ backgroundColor: getLineColor(segments[0]?.line) }}
-                            className="absolute left-[9px] top-3 bottom-0 w-[2px]"
-                          />
-                          <span className="absolute left-[2px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10 animate-pulse-soft" />
-                          
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-bold text-text-primary">{activeRoute.path[0]}</span>
-                            {getStationBadges(activeRoute.path[0])}
-                            {activeRoute.etaDepart && (
-                              <span className="text-[10px] text-text-secondary font-semibold ml-auto">{activeRoute.etaDepart}</span>
-                            )}
+                      {activeRoute.isSameStation ? (
+                        <div className="relative pl-8 py-2">
+                          <span className="absolute left-[2px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600/20 border-2 border-blue-500 z-10" />
+                          <div className="text-xs font-bold text-text-primary">
+                            You are already at {activeRoute.path[0]}
                           </div>
-                          <p className="text-[10px] text-text-secondary font-medium mt-0.5">Departing Station</p>
+                          <p className="text-[10px] text-text-secondary font-medium mt-1 leading-relaxed">
+                            No travel is needed because origin and destination are the same station.
+                          </p>
                         </div>
+                      ) : (
+                        <div className="relative space-y-0 pl-2">
+                          {/* Start Node */}
+                          <div className="relative pl-8 pb-4">
+                            {/* Vertical colored line down to first board point */}
+                            <span
+                              style={{ backgroundColor: getLineColor(segments[0]?.line) }}
+                              className="absolute left-[9px] top-3 bottom-0 w-[2px]"
+                            />
+                            <span className="absolute left-[2px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10 animate-pulse-soft" />
+                            
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-bold text-text-primary">{activeRoute.path[0]}</span>
+                              {getStationBadges(activeRoute.path[0])}
+                              {activeRoute.etaDepart && (
+                                <span className="text-[10px] text-text-secondary font-semibold ml-auto">{activeRoute.etaDepart}</span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-text-secondary font-medium mt-0.5">Departing Station</p>
+                          </div>
 
-                        {/* Segments & Stops */}
-                        {segments.map((seg, idx) => {
-                          const isWalk = seg.line === "WALKWAY";
-                          const color = getLineColor(seg.line);
-                          const isExpanded = expandedStops[idx] || false;
-                          const intermediateStops = seg.stations.slice(0, -1);
-                          const meta = activeRoute.legMeta?.[idx] || null;
+                          {/* Segments & Stops */}
+                          {segments.map((seg, idx) => {
+                            const isWalk = seg.line === "WALKWAY";
+                            const color = getLineColor(seg.line);
+                            const isExpanded = expandedStops[idx] || false;
+                            const intermediateStops = seg.stations.slice(0, -1);
+                            const meta = activeRoute.legMeta?.[idx] || null;
 
-                          return (
-                            <React.Fragment key={idx}>
-                              {/* Board segment row */}
-                              <div className="relative pl-8 pb-4">
-                                {/* Vertical colored line to next step */}
-                                <span
-                                  style={{ backgroundColor: color }}
-                                  className="absolute left-[9px] top-3 bottom-0 w-[2px]"
-                                />
-                                <span
-                                  style={{ borderColor: color, backgroundColor: color }}
-                                  className="absolute left-[2px] top-1.5 h-4 w-4 rounded-full border-2 z-10"
-                                />
-
-                                <div className="space-y-2">
-                                  <div className="flex flex-wrap items-center justify-between">
-                                    <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
-                                      {isWalk ? "Pedestrian Walkway" : `Board ${getLineName(seg.line)}`}
-                                      {meta?.direction && (
-                                        <span className="text-[10px] text-text-secondary font-normal ml-1.5">
-                                          toward {meta.direction}
-                                        </span>
-                                      )}
-                                    </span>
-                                  </div>
-
-                                  {/* Ride Toggles */}
-                                  {intermediateStops.length > 0 ? (
-                                    <div className="pl-2">
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          setExpandedStops((prev) => ({ ...prev, [idx]: !isExpanded }))
-                                        }
-                                        className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors"
-                                      >
-                                        Ride {seg.stations.length} stop{seg.stations.length > 1 ? "s" : ""}
-                                        {isExpanded ? (
-                                          <ChevronUp className="h-3 w-3" />
-                                        ) : (
-                                          <ChevronDown className="h-3 w-3" />
-                                        )}
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <span className="text-[10px] text-text-secondary pl-2">
-                                      {isWalk ? "Walk to interchange station" : "Ride 1 stop"}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Ride Stops List Expansion (if open) */}
-                              <AnimatePresence initial={false}>
-                                {isExpanded && intermediateStops.length > 0 && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                                    className="relative pl-8 pb-4 overflow-hidden"
-                                  >
-                                    {/* Continued vertical segment line */}
-                                    <span
-                                      style={{ backgroundColor: color }}
-                                      className="absolute left-[9px] top-0 bottom-0 w-[2px]"
-                                    />
-                                    <div className="space-y-2.5 pl-2 border-l border-border/80">
-                                      {intermediateStops.map((stop) => (
-                                        <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary">
-                                          <div className="flex items-center gap-2">
-                                            <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
-                                            <span>{stop}</span>
-                                          </div>
-                                          {getStationBadges(stop)}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-
-                              {/* Arrival / Transfer Node */}
-                              <div className="relative pl-8 pb-4">
-                                {/* Vertical colored line to next step, using NEXT segment line color if available */}
-                                {idx < segments.length - 1 && (
+                            return (
+                              <React.Fragment key={idx}>
+                                {/* Board segment row */}
+                                <div className="relative pl-8 pb-4">
+                                  {/* Vertical colored line to next step */}
                                   <span
-                                    style={{ backgroundColor: getLineColor(segments[idx + 1].line) }}
+                                    style={{ backgroundColor: color }}
                                     className="absolute left-[9px] top-3 bottom-0 w-[2px]"
                                   />
-                                )}
-                                <span className="absolute left-[2px] top-2 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10" />
-                                
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
-                                  {getStationBadges(seg.stations[seg.stations.length - 1])}
-                                  {meta?.arriveTime && (
-                                    <span className="text-[10px] text-text-secondary font-semibold ml-auto">{meta.arriveTime}</span>
-                                  )}
+                                  <span
+                                    style={{ borderColor: color, backgroundColor: color }}
+                                    className="absolute left-[2px] top-1.5 h-4 w-4 rounded-full border-2 z-10"
+                                  />
+
+                                  <div className="space-y-2">
+                                    <div className="flex flex-wrap items-center justify-between">
+                                      <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
+                                        {isWalk
+                                          ? `Walk to ${seg.stations[seg.stations.length - 1]}`
+                                          : `Board ${getLineName(seg.line)}`}
+                                        {meta?.direction && (
+                                          <span className="text-[10px] text-text-secondary font-normal ml-1.5">
+                                            toward {meta.direction}
+                                          </span>
+                                        )}
+                                      </span>
+                                    </div>
+
+                                    {/* Ride Toggles */}
+                                    {!isWalk && intermediateStops.length > 0 ? (
+                                      <div className="pl-2">
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setExpandedStops((prev) => ({ ...prev, [idx]: !isExpanded }))
+                                          }
+                                          className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors"
+                                        >
+                                          Ride {seg.stations.length} stop{seg.stations.length > 1 ? "s" : ""}
+                                          {isExpanded ? (
+                                            <ChevronUp className="h-3 w-3" />
+                                          ) : (
+                                            <ChevronDown className="h-3 w-3" />
+                                          )}
+                                        </button>
+                                      </div>
+                                    ) : !isWalk ? (
+                                      <span className="text-[10px] text-text-secondary pl-2">
+                                        Ride 1 stop
+                                      </span>
+                                    ) : null}
+                                  </div>
                                 </div>
-                                <p className="text-[10px] text-text-secondary font-medium mt-0.5">
-                                  {idx === segments.length - 1
-                                    ? "Arrive at destination"
-                                    : `Transfer to ${getLineName(segments[idx + 1].line)}`}
-                                </p>
-                              </div>
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
+
+                                {/* Ride Stops List Expansion (if open) */}
+                                <AnimatePresence initial={false}>
+                                  {isExpanded && intermediateStops.length > 0 && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                                      className="relative pl-8 pb-4 overflow-hidden"
+                                    >
+                                      {/* Continued vertical segment line */}
+                                      <span
+                                        style={{ backgroundColor: color }}
+                                        className="absolute left-[9px] top-0 bottom-0 w-[2px]"
+                                      />
+                                      <div className="space-y-2.5 pl-2 border-l border-border/80">
+                                        {intermediateStops.map((stop) => (
+                                          <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary">
+                                            <div className="flex items-center gap-2">
+                                              <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
+                                              <span>{stop}</span>
+                                            </div>
+                                            {getStationBadges(stop)}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+
+                                {/* Arrival / Transfer Node */}
+                                <div className="relative pl-8 pb-4">
+                                  {/* Vertical colored line to next step, using NEXT segment line color if available */}
+                                  {idx < segments.length - 1 && (
+                                    <span
+                                      style={{ backgroundColor: getLineColor(segments[idx + 1].line) }}
+                                      className="absolute left-[9px] top-3 bottom-0 w-[2px]"
+                                    />
+                                  )}
+                                  <span className="absolute left-[2px] top-2 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10" />
+                                  
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
+                                    {getStationBadges(seg.stations[seg.stations.length - 1])}
+                                    {meta?.arriveTime && (
+                                      <span className="text-[10px] text-text-secondary font-semibold ml-auto">{meta.arriveTime}</span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] text-text-secondary font-medium mt-0.5">
+                                    {idx === segments.length - 1
+                                      ? "Arrive at destination"
+                                      : `Transfer to ${getLineName(segments[idx + 1].line)}`}
+                                  </p>
+                                </div>
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
 
                     {/* Mobile View: Search again button inside breakdown card bottom */}
@@ -770,6 +864,24 @@ export const PlanView: React.FC = () => {
                         Search Again
                       </button>
                     </div>
+                  </div>
+                )}
+
+                {/* Save This Route Button below the detailed result card */}
+                {activeRoute && !activeRoute.isSameStation && (
+                  <div className="flex justify-end pt-1">
+                    <button
+                      onClick={handleSaveRoute}
+                      disabled={isJustSaved}
+                      className={`flex items-center gap-2 px-5 py-3 rounded-xl border font-bold text-xs tracking-wider uppercase shadow-lg transition-all active:scale-95 ${
+                        isJustSaved
+                          ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/50 dark:text-emerald-400"
+                          : "border-border bg-card text-text-primary hover:border-red-500/40 hover:text-red-500"
+                      }`}
+                    >
+                      <Heart className={`h-4 w-4 text-red-500 ${isJustSaved ? "fill-red-500 animate-pulse" : "hover:fill-red-500"}`} />
+                      {isJustSaved ? "Saved!" : "Save this route"}
+                    </button>
                   </div>
                 )}
               </motion.div>
