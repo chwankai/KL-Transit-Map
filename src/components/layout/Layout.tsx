@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Map, Compass, Bus, Settings } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
+import { useSettings } from "../../context/SettingsContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,12 +10,13 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  const { hideBusButton } = useSettings();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const navItems = [
     { path: "/", label: "Map", icon: Map },
     { path: "/plan", label: "Plan", icon: Compass },
-    { path: "/bus", label: "Bus", icon: Bus },
+    ...(!hideBusButton ? [{ path: "/bus", label: "Bus", icon: Bus }] : []),
   ];
 
   return (

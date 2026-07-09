@@ -1,6 +1,6 @@
 import React from "react";
 import { useSettings } from "../../context/SettingsContext";
-import { X, Sun, Moon, Laptop, Key } from "lucide-react";
+import { X, Sun, Moon, Laptop, EyeOff } from "lucide-react";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -8,7 +8,7 @@ interface SettingsDialogProps {
 }
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
-  const { theme, setTheme, farePref, setFarePref, gmapsApiKey, setGmapsApiKey } = useSettings();
+  const { theme, setTheme, farePref, setFarePref, hideBusButton, setHideBusButton } = useSettings();
 
   if (!isOpen) return null;
 
@@ -92,24 +92,21 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
             </div>
           </div>
 
-          {/* Google Maps API Key */}
-          <div className="space-y-2">
+          {/* Hide Bus Tracker Button Toggle */}
+          <div className="flex items-center justify-between py-2 border-t border-border pt-4">
             <div className="flex items-center gap-2">
-              <Key className="h-4 w-4 text-text-secondary" />
-              <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                Google Maps API Key
-              </label>
+              <EyeOff className="h-4 w-4 text-text-secondary" />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-text-primary">Hide Bus Tracker link</span>
+                <span className="text-[10px] text-text-secondary">Hides the live bus page button from navigation.</span>
+              </div>
             </div>
             <input
-              type="password"
-              value={gmapsApiKey}
-              onChange={(e) => setGmapsApiKey(e.target.value)}
-              placeholder="Enter API key..."
-              className="w-full px-4 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary placeholder-text-secondary/50 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+              type="checkbox"
+              checked={hideBusButton}
+              onChange={(e) => setHideBusButton(e.target.checked)}
+              className="rounded bg-input border-border text-blue-600 focus:ring-0 cursor-pointer h-4 w-4"
             />
-            <p className="text-[10px] text-text-secondary leading-normal">
-              Used for fallback geocoding services. Leave blank for default keyless configuration.
-            </p>
           </div>
         </div>
       </div>

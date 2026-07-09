@@ -701,26 +701,34 @@ export const PlanView: React.FC = () => {
                               </div>
 
                               {/* Ride Stops List Expansion (if open) */}
-                              {isExpanded && intermediateStops.length > 0 && (
-                                <div className="relative pl-8 pb-4">
-                                  {/* Continued vertical segment line */}
-                                  <span
-                                    style={{ backgroundColor: color }}
-                                    className="absolute left-[9px] top-0 bottom-0 w-[2px]"
-                                  />
-                                  <div className="overflow-hidden space-y-2.5 pl-2 border-l border-border/80">
-                                    {intermediateStops.map((stop) => (
-                                      <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary animate-fade-in">
-                                        <div className="flex items-center gap-2">
-                                          <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
-                                          <span>{stop}</span>
+                              <AnimatePresence initial={false}>
+                                {isExpanded && intermediateStops.length > 0 && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                                    className="relative pl-8 pb-4 overflow-hidden"
+                                  >
+                                    {/* Continued vertical segment line */}
+                                    <span
+                                      style={{ backgroundColor: color }}
+                                      className="absolute left-[9px] top-0 bottom-0 w-[2px]"
+                                    />
+                                    <div className="space-y-2.5 pl-2 border-l border-border/80">
+                                      {intermediateStops.map((stop) => (
+                                        <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary">
+                                          <div className="flex items-center gap-2">
+                                            <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
+                                            <span>{stop}</span>
+                                          </div>
+                                          {getStationBadges(stop)}
                                         </div>
-                                        {getStationBadges(stop)}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
 
                               {/* Arrival / Transfer Node */}
                               <div className="relative pl-8 pb-4">

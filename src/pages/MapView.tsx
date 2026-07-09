@@ -18,10 +18,14 @@ export const MapView: React.FC = () => {
       ? "maps/Klang Valley Rail Map.jpg"
       : "maps/Circle Line.jpg";
 
+  const [isResetting, setIsResetting] = useState(false);
+
   // Reset zoom & pan
   const handleReset = () => {
+    setIsResetting(true);
     setScale(1);
     setPosition({ x: 0, y: 0 });
+    setTimeout(() => setIsResetting(false), 300);
   };
 
 
@@ -158,7 +162,7 @@ export const MapView: React.FC = () => {
             scale: scale,
           }}
           className="relative w-full md:w-auto max-w-full max-h-full flex items-center justify-center"
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          transition={isResetting ? { type: "spring", damping: 25, stiffness: 200 } : { duration: 0 }}
         >
           <img
             ref={imageRef}

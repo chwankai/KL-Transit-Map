@@ -6,10 +6,10 @@ export type FarePreference = "all" | "cashless" | "cash" | "concession";
 interface SettingsContextType {
   theme: Theme;
   farePref: FarePreference;
-  gmapsApiKey: string;
+  hideBusButton: boolean;
   setTheme: (theme: Theme) => void;
   setFarePref: (pref: FarePreference) => void;
-  setGmapsApiKey: (key: string) => void;
+  setHideBusButton: (hide: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -21,8 +21,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [farePref, setFarePrefState] = useState<FarePreference>(() => {
     return (localStorage.getItem("fare_display_preference") as FarePreference) || "all";
   });
-  const [gmapsApiKey, setGmapsApiKeyState] = useState<string>(() => {
-    return localStorage.getItem("gmaps_api_key") || "";
+  const [hideBusButton, setHideBusButtonState] = useState<boolean>(() => {
+    const saved = localStorage.getItem("hide_bus_button");
+    return saved === null ? true : saved === "true";
   });
 
   const setTheme = (newTheme: Theme) => {
@@ -35,9 +36,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem("fare_display_preference", pref);
   };
 
-  const setGmapsApiKey = (key: string) => {
-    setGmapsApiKeyState(key);
-    localStorage.setItem("gmaps_api_key", key);
+  const setHideBusButton = (hide: boolean) => {
+    setHideBusButtonState(hide);
+    localStorage.setItem("hide_bus_button", hide ? "true" : "false");
   };
 
   // Apply theme class to document
@@ -82,10 +83,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         theme,
         farePref,
-        gmapsApiKey,
+        hideBusButton,
         setTheme,
         setFarePref,
-        setGmapsApiKey,
+        setHideBusButton,
       }}
     >
       {children}
