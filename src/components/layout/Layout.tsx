@@ -30,7 +30,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <h1 className="text-xs sm:text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent leading-tight md:leading-snug text-center md:text-left">
               KL Transit Map
             </h1>
-            <span className="hidden md:inline text-[9px] font-semibold uppercase tracking-wider text-text-secondary select-none leading-tight mt-0.5 text-center md:text-left">
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-text-secondary select-none leading-tight mt-0.5 text-center md:text-left">
               Integrated Route Planner
             </span>
           </div>
