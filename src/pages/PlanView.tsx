@@ -332,11 +332,13 @@ export const PlanView: React.FC = () => {
         }`}
       >
         <div className="space-y-4">
-          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
+          {/* Find Route Card */}
+          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl overflow-visible relative z-20">
+            <div className="flex justify-between items-center mb-3 select-none">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
+                <Compass className="h-3.5 w-3.5 text-blue-500" />
                 Find Route
-              </h2>
+              </h3>
               {routes.length > 0 && (
                 <button
                   type="button"
@@ -368,8 +370,20 @@ export const PlanView: React.FC = () => {
                       setOriginFilter("");
                     }}
                     placeholder="Type station name..."
-                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full pl-3 pr-9 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
+                  {origin && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOrigin("");
+                        setOriginFilter("");
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary p-0.5 rounded-full hover:bg-button-secondary transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
                 {originInputFocused && originSuggestions.length > 0 && (
                   <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
@@ -421,8 +435,20 @@ export const PlanView: React.FC = () => {
                       setDestFilter("");
                     }}
                     placeholder="Type station name..."
-                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full pl-3 pr-9 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
+                  {dest && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDest("");
+                        setDestFilter("");
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary p-0.5 rounded-full hover:bg-button-secondary transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
                 {destInputFocused && destSuggestions.length > 0 && (
                   <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
@@ -513,7 +539,7 @@ export const PlanView: React.FC = () => {
           </div>
 
           {/* Saved Routes Card */}
-          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl flex flex-col overflow-hidden max-h-[300px]">
+          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl flex flex-col overflow-hidden max-h-[300px] relative z-10">
             <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-3 flex items-center gap-1.5 select-none">
               <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" />
               Saved Journeys
@@ -710,6 +736,16 @@ export const PlanView: React.FC = () => {
                             No travel is needed because origin and destination are the same station.
                           </p>
                         </div>
+                      ) : isWalkOnly ? (
+                        <div className="relative pl-8 py-2">
+                          <span className="absolute left-[2px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600/20 border-2 border-blue-500 z-10" />
+                          <div className="text-xs font-bold text-text-primary">
+                            Walkable Interchange Connection
+                          </div>
+                          <p className="text-[10px] text-text-secondary font-medium mt-1 leading-relaxed">
+                            Both stations are within walkable interchange distance. - You may walk to the {searchedDest} by referring to the signage.
+                          </p>
+                        </div>
                       ) : (
                         <div className="relative space-y-0 pl-2">
                           {/* Start Node */}
@@ -868,7 +904,7 @@ export const PlanView: React.FC = () => {
                 )}
 
                 {/* Save This Route Button below the detailed result card */}
-                {activeRoute && !activeRoute.isSameStation && (
+                {activeRoute && !activeRoute.isSameStation && !isWalkOnly && (
                   <div className="flex justify-end pt-1">
                     <button
                       onClick={handleSaveRoute}
