@@ -219,7 +219,11 @@ export const MapView: React.FC = () => {
 
     // 1. Draw OSM realistic train paths from public/rail_tracks.json
     if (railTracks && railTracks.length > 0) {
+      const drawnLineIds = new Set<string>();
       railTracks.forEach((track: any) => {
+        if (drawnLineIds.has(track.lineId)) return;
+        drawnLineIds.add(track.lineId);
+
         L.polyline(track.coords, {
           color: getLineColor(track.lineId),
           weight: 4.5,
