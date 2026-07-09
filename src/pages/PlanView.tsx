@@ -9,7 +9,7 @@ import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp,
 import { motion, AnimatePresence } from "framer-motion";
 
 export const PlanView: React.FC = () => {
-  const { farePref } = useSettings();
+  const { farePref, t, tStation, tLine } = useSettings();
   const location = useLocation();
 
   const [origin, setOrigin] = useState("");
@@ -91,7 +91,8 @@ export const PlanView: React.FC = () => {
       setOriginSuggestions(sortedStationNames);
     } else {
       const match = sortedStationNames.filter((name) =>
-        name.toLowerCase().includes(originFilter.toLowerCase())
+        name.toLowerCase().includes(originFilter.toLowerCase()) ||
+        tStation(name).toLowerCase().includes(originFilter.toLowerCase())
       );
       setOriginSuggestions(match);
     }
@@ -102,7 +103,8 @@ export const PlanView: React.FC = () => {
       setDestSuggestions(sortedStationNames);
     } else {
       const match = sortedStationNames.filter((name) =>
-        name.toLowerCase().includes(destFilter.toLowerCase())
+        name.toLowerCase().includes(destFilter.toLowerCase()) ||
+        tStation(name).toLowerCase().includes(destFilter.toLowerCase())
       );
       setDestSuggestions(match);
     }
@@ -360,7 +362,7 @@ export const PlanView: React.FC = () => {
             <div className="flex justify-between items-center mb-3 select-none">
               <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
                 <Compass className="h-3.5 w-3.5 text-blue-500" />
-                Find Route
+                {t("routePlanner")}
               </h3>
               {routes.length > 0 && (
                 <button
@@ -378,7 +380,7 @@ export const PlanView: React.FC = () => {
               {/* Origin */}
               <div ref={originRef} className="relative">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                  Origin Station
+                  {t("origin")}
                 </label>
                 <div className="relative mt-1">
                   <input
@@ -392,7 +394,7 @@ export const PlanView: React.FC = () => {
                       setOriginInputFocused(true);
                       setOriginFilter("");
                     }}
-                    placeholder="Type station name..."
+                    placeholder={t("searchPlaceholder")}
                     className="w-full pl-3 pr-9 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                   {origin && (
@@ -421,7 +423,7 @@ export const PlanView: React.FC = () => {
                         }}
                         className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
                       >
-                        {name}
+                        {tStation(name)}
                         {getStationBadges(name)}
                       </button>
                     ))}
@@ -443,7 +445,7 @@ export const PlanView: React.FC = () => {
               {/* Destination */}
               <div ref={destRef} className="relative">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                  Destination Station
+                  {t("destination")}
                 </label>
                 <div className="relative mt-1">
                   <input
@@ -457,7 +459,7 @@ export const PlanView: React.FC = () => {
                       setDestInputFocused(true);
                       setDestFilter("");
                     }}
-                    placeholder="Type station name..."
+                    placeholder={t("searchPlaceholder")}
                     className="w-full pl-3 pr-9 py-2.5 rounded-xl border border-border bg-input text-sm text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                   {dest && (
@@ -486,7 +488,7 @@ export const PlanView: React.FC = () => {
                         }}
                         className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
                       >
-                        {name}
+                        {tStation(name)}
                         {getStationBadges(name)}
                       </button>
                     ))}
@@ -497,7 +499,7 @@ export const PlanView: React.FC = () => {
               {/* Time mode selector */}
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                  Time
+                  {t("time")}
                 </label>
                 <div className="grid grid-cols-3 gap-1 rounded-xl bg-button-secondary p-0.5 border border-border">
                   {(["now", "depart", "arrive"] as const).map((mode) => (
@@ -511,7 +513,7 @@ export const PlanView: React.FC = () => {
                           : "text-text-secondary hover:text-text-primary"
                       }`}
                     >
-                      {mode === "now" ? "Now" : mode === "depart" ? "Depart" : "Arrive"}
+                      {t(mode)}
                     </button>
                   ))}
                 </div>
@@ -552,12 +554,12 @@ export const PlanView: React.FC = () => {
                 {isLoading ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    Calculating...
+                    {t("loadingSchedule")}
                   </>
                 ) : (
                   <>
                     <Search className="h-4 w-4" />
-                    Search Journey
+                    {t("calculateRoute")}
                   </>
                 )}
               </button>
@@ -568,12 +570,12 @@ export const PlanView: React.FC = () => {
           <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl flex flex-col overflow-hidden max-h-[300px] relative z-10">
             <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-3 flex items-center gap-1.5 select-none">
               <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" />
-              Saved Journeys
+              {t("savedJourneys")}
             </h3>
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {savedRoutes.length === 0 ? (
                 <div className="text-[10px] text-text-secondary italic text-center py-4">
-                  No saved journeys yet. Search and save your favorite routes!
+                  {t("noSavedJourneys")}
                 </div>
               ) : (
                 savedRoutes.map((route, idx) => (
@@ -593,7 +595,7 @@ export const PlanView: React.FC = () => {
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       {/* Origin Row */}
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold text-text-primary truncate">{route.origin}</span>
+                        <span className="text-[10px] font-bold text-text-primary truncate">{tStation(route.origin)}</span>
                         <div className="flex-shrink-0">{getStationBadges(route.origin)}</div>
                       </div>
                       {/* Down Arrow Row */}
@@ -602,7 +604,7 @@ export const PlanView: React.FC = () => {
                       </div>
                       {/* Destination Row */}
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold text-text-primary truncate">{route.dest}</span>
+                        <span className="text-[10px] font-bold text-text-primary truncate">{tStation(route.dest)}</span>
                         <div className="flex-shrink-0">{getStationBadges(route.dest)}</div>
                       </div>
                     </div>
@@ -626,9 +628,9 @@ export const PlanView: React.FC = () => {
                 className="h-[300px] flex flex-col items-center justify-center text-center text-text-secondary border border-dashed border-border rounded-2xl p-6 bg-card/10 backdrop-blur-sm"
               >
                 <RefreshCw className="h-8 w-8 text-blue-500 animate-spin mb-3" />
-                <h3 className="text-sm font-bold text-text-primary">Loading...</h3>
+                <h3 className="text-sm font-bold text-text-primary">{t("loading")}</h3>
                 <p className="text-xs max-w-xs mt-1 leading-relaxed text-text-secondary">
-                  Please hang on while we calculate the best route for you.
+                  {t("calculatingRouteDesc")}
                 </p>
               </motion.div>
             )}
@@ -653,9 +655,9 @@ export const PlanView: React.FC = () => {
                 className="hidden md:flex h-[300px] flex-col items-center justify-center text-center text-text-secondary border border-dashed border-border rounded-2xl p-6"
               >
                 <Compass className="h-12 w-12 text-slate-500 mb-3 animate-pulse" />
-                <h3 className="text-sm font-bold text-text-primary">Plan a Journey</h3>
+                <h3 className="text-sm font-bold text-text-primary">{t("planJourney")}</h3>
                 <p className="text-xs max-w-xs mt-1 leading-relaxed text-text-secondary">
-                  Select your origin and destination stations on the left panel, and find your fastest route.
+                  {t("planJourneyDesc")}
                 </p>
               </motion.div>
             )}
@@ -671,7 +673,7 @@ export const PlanView: React.FC = () => {
                 {/* Route Recommendation Cards */}
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-                    Recommended Routes
+                    {t("recommendedRoutes")}
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {routes.map((route, idx) => {
@@ -691,7 +693,7 @@ export const PlanView: React.FC = () => {
                           }`}
                         >
                           <span className="text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wide">
-                            {route._routeLabel || `Option ${idx + 1}`}
+                             {route._routeLabel === "Best" ? t("bestOption") : `${t("optionLabel")} ${idx + 1}`}
                           </span>
                           <div className="flex flex-wrap items-center gap-1.5 my-2">
                             {activeLines.map((lineId, i) => (
@@ -708,7 +710,7 @@ export const PlanView: React.FC = () => {
                           </div>
                           <div className="mt-auto flex justify-between items-end w-full">
                             <span className="text-xs font-semibold text-text-secondary">
-                              {route.transfers === 0 ? "Direct" : `${route.transfers} ${route.transfers === 1 ? "Transfer" : "Transfers"}`}
+                              {route.transfers === 0 ? t("direct") : `${route.transfers} ${route.transfers === 1 ? t("transfer") : t("transfersLabel")}`}
                             </span>
                             <span className="text-sm font-bold text-text-primary">
                               {formatDuration(route.totalDurationSec) || `${route.totalDistance.toFixed(1)} km`}
@@ -737,7 +739,7 @@ export const PlanView: React.FC = () => {
                           </span>
                         </div>
                         <span className="text-xs text-text-secondary font-semibold">
-                          {formatDuration(activeRoute.totalDurationSec) || "0 mins"} · {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? "Direct" : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? "Transfer" : "Transfers"}`}
+                          {formatDuration(activeRoute.totalDurationSec) || "0 mins"} · {activeRoute.totalDistance.toFixed(2)} km · {activeRoute.transfers === 0 ? t("direct") : `${activeRoute.transfers} ${activeRoute.transfers === 1 ? t("transfer") : t("transfersLabel")}`}
                         </span>
                       </div>
 
@@ -746,7 +748,7 @@ export const PlanView: React.FC = () => {
                         {/* Cashless */}
                         {(farePref === "all" || farePref === "cashless") && (
                           <div className="px-3 py-1.5 text-center">
-                            <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">Cashless</div>
+                            <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">{t("cashless")}</div>
                             <div className="text-xs font-extrabold text-text-primary">
                               RM {(isWalkOnly || activeRoute.isSameStation) ? "0.00" : activeRoute.totalFare.toFixed(2)}
                             </div>
@@ -755,7 +757,7 @@ export const PlanView: React.FC = () => {
                         {/* Cash */}
                         {(farePref === "all" || farePref === "cash") && (
                           <div className="px-3 py-1.5 text-center border-l border-border">
-                            <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">Cash</div>
+                            <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">{t("cash")}</div>
                             <div className="text-xs font-extrabold text-text-primary">
                               {(isWalkOnly || activeRoute.isSameStation) ? "RM 0.00" : (activeRoute.cashFare ? `RM ${activeRoute.cashFare.toFixed(2)}` : "--")}
                             </div>
@@ -764,7 +766,7 @@ export const PlanView: React.FC = () => {
                         {/* Concession */}
                         {(farePref === "all" || farePref === "concession") && (
                           <div className="px-3 py-1.5 text-center border-l border-border">
-                            <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">Concession</div>
+                            <div className="text-[9px] font-bold text-text-secondary uppercase tracking-wide">{t("concession")}</div>
                             <div className="text-xs font-extrabold text-text-primary">
                               {(isWalkOnly || activeRoute.isSameStation) ? "RM 0.00" : (activeRoute.concessionFare ? `RM ${activeRoute.concessionFare.toFixed(2)}` : "--")}
                             </div>
@@ -776,27 +778,27 @@ export const PlanView: React.FC = () => {
                     {/* Route Timeline with Line Color Matching */}
                     <div className="space-y-4">
                       <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-                        Journey Directions
+                        {t("journeyDirections")}
                       </h3>
 
                       {activeRoute.isSameStation ? (
                         <div className="relative pl-8 py-2">
                           <span className="absolute left-[2px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600/20 border-2 border-blue-500 z-10" />
                           <div className="text-xs font-bold text-text-primary">
-                            You are already at {activeRoute.path[0]}
+                            {t("alreadyAt")} {tStation(activeRoute.path[0])}
                           </div>
                           <p className="text-[10px] text-text-secondary font-medium mt-1 leading-relaxed">
-                            No travel is needed because origin and destination are the same station.
+                            {t("noTravelNeeded")}
                           </p>
                         </div>
                       ) : isWalkOnly ? (
                         <div className="relative pl-8 py-2">
                           <span className="absolute left-[2px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600/20 border-2 border-blue-500 z-10" />
                           <div className="text-xs font-bold text-text-primary">
-                            Walkable Interchange Connection
+                            {t("walkableInterchange")}
                           </div>
                           <p className="text-[10px] text-text-secondary font-medium mt-1 leading-relaxed">
-                            Both stations are within walkable interchange distance. - You may walk to the {searchedDest} by referring to the signage.
+                            {t("walkableInterchangeDesc")}
                           </p>
                         </div>
                       ) : (
@@ -816,14 +818,14 @@ export const PlanView: React.FC = () => {
                                 className="text-xs font-bold text-text-primary cursor-pointer"
                                 style={{ textDecoration: 'none' }}
                               >
-                                {activeRoute.path[0]}
+                                {tStation(activeRoute.path[0])}
                               </a>
                               {getStationBadges(activeRoute.path[0])}
                               {activeRoute.etaDepart && (
                                 <span className="text-[10px] text-text-secondary font-semibold ml-auto">{activeRoute.etaDepart}</span>
                               )}
                             </div>
-                            <p className="text-[10px] text-text-secondary font-medium mt-0.5">Departing Station</p>
+                            <p className="text-[10px] text-text-secondary font-medium mt-0.5">{t("departingStation")}</p>
                           </div>
 
                           {/* Segments & Stops */}
@@ -852,11 +854,11 @@ export const PlanView: React.FC = () => {
                                     <div className="flex flex-wrap items-center justify-between">
                                       <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
                                         {isWalk
-                                          ? `Walk to ${seg.stations[seg.stations.length - 1]}`
-                                          : `Board ${getLineName(seg.line)}`}
+                                          ? `${t("walkTo")} ${tStation(seg.stations[seg.stations.length - 1])}`
+                                          : `${t("board")} ${tLine(getLineName(seg.line))}`}
                                         {meta?.direction && (
                                           <span className="text-[10px] text-text-secondary font-normal ml-1.5">
-                                            toward {meta.direction}
+                                            {t("towardLabel")} {tStation(meta.direction)}
                                           </span>
                                         )}
                                       </span>
@@ -872,7 +874,7 @@ export const PlanView: React.FC = () => {
                                           }
                                           className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors"
                                         >
-                                          Ride {seg.stations.length} stop{seg.stations.length > 1 ? "s" : ""}
+                                          {t("ride")} {seg.stations.length} {seg.stations.length > 1 ? t("stopsLabel") : t("stopLabel")}
                                           {isExpanded ? (
                                             <ChevronUp className="h-3 w-3" />
                                           ) : (
@@ -882,7 +884,7 @@ export const PlanView: React.FC = () => {
                                       </div>
                                     ) : !isWalk ? (
                                       <span className="text-[10px] text-text-secondary pl-2">
-                                        Ride 1 stop
+                                        {t("ride")} 1 {t("stopLabel")}
                                       </span>
                                     ) : null}
                                   </div>
@@ -913,7 +915,7 @@ export const PlanView: React.FC = () => {
                                                 className="cursor-pointer"
                                                 style={{ textDecoration: 'none', color: 'inherit' }}
                                               >
-                                                {stop}
+                                                {tStation(stop)}
                                               </a>
                                             </div>
                                             {getStationBadges(stop)}
@@ -941,7 +943,7 @@ export const PlanView: React.FC = () => {
                                       className="text-xs font-bold text-text-primary cursor-pointer"
                                       style={{ textDecoration: 'none' }}
                                     >
-                                      {seg.stations[seg.stations.length - 1]}
+                                      {tStation(seg.stations[seg.stations.length - 1])}
                                     </a>
                                     {getStationBadges(seg.stations[seg.stations.length - 1])}
                                     {meta?.arriveTime && (
@@ -950,8 +952,8 @@ export const PlanView: React.FC = () => {
                                   </div>
                                   <p className="text-[10px] text-text-secondary font-medium mt-0.5">
                                     {idx === segments.length - 1
-                                      ? "Arrive at destination"
-                                      : `Transfer to ${getLineName(segments[idx + 1].line)}`}
+                                      ? t("arriveDest")
+                                      : `${t("transferTo")} ${tLine(getLineName(segments[idx + 1].line))}`}
                                   </p>
                                 </div>
                               </React.Fragment>
@@ -968,7 +970,7 @@ export const PlanView: React.FC = () => {
                         className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-xs tracking-wider uppercase text-white hover:scale-95 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
                       >
                         <Search className="h-4 w-4" />
-                        Search Again
+                        {t("searchAgain")}
                       </button>
                     </div>
                   </div>
@@ -987,7 +989,7 @@ export const PlanView: React.FC = () => {
                       }`}
                     >
                       <Heart className={`h-4 w-4 text-red-500 ${isJustSaved ? "fill-red-500 animate-pulse" : "hover:fill-red-500"}`} />
-                      {isJustSaved ? "Saved!" : "Save this route"}
+                      {isJustSaved ? t("savedText") : t("saveRoute")}
                     </button>
                   </div>
                 )}

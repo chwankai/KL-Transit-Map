@@ -10,7 +10,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export const MapView: React.FC = () => {
-  const { theme } = useSettings();
+  const { theme, t, tStation, tLine } = useSettings();
   const [mapType, setMapType] = useState<"standard" | "upcoming">("standard");
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -251,14 +251,14 @@ export const MapView: React.FC = () => {
           // Alternating two-color dashed segment from Sentul Timur to Chan Sow Lin
           const colorSP = getLineColor("SP");
           const colorAG = getLineColor("AG");
-          const lineNameSP = lines["SP"]?.name || "LRT Sri Petaling Line";
-          const lineNameAG = lines["AG"]?.name || "LRT Ampang Line";
+          const lineNameSP = tLine(lines["SP"]?.name || "LRT Sri Petaling Line");
+          const lineNameAG = tLine(lines["AG"]?.name || "LRT Ampang Line");
 
           const popupHtmlSP = `
             <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
               <div class="text-xs font-bold text-slate-900">${lineNameSP}</div>
               <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
-                <a href="#/lines?line=SP" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Line</a>
+                <a href="#/lines?line=SP" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewLine")}</a>
               </div>
             </div>
           `;
@@ -267,7 +267,7 @@ export const MapView: React.FC = () => {
             <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
               <div class="text-xs font-bold text-slate-900">${lineNameAG}</div>
               <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
-                <a href="#/lines?line=AG" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Line</a>
+                <a href="#/lines?line=AG" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewLine")}</a>
               </div>
             </div>
           `;
@@ -292,12 +292,12 @@ export const MapView: React.FC = () => {
             .bindPopup(popupHtmlAG, { closeButton: false, minWidth: 150 });
         } else {
           // Standard solid color line
-          const lineName = lines[track.lineId]?.name || track.lineId;
+          const lineName = tLine(lines[track.lineId]?.name || track.lineId);
           const popupHtml = `
             <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
               <div class="text-xs font-bold text-slate-900">${lineName}</div>
               <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
-                <a href="#/lines?line=${track.lineId}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Line</a>
+                <a href="#/lines?line=${track.lineId}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewLine")}</a>
               </div>
             </div>
           `;
@@ -387,7 +387,7 @@ export const MapView: React.FC = () => {
       // Popup HTML template loaded on platform dot selection
       const popupHtml = `
         <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
-          <div class="text-xs font-bold text-slate-900">${name}</div>
+          <div class="text-xs font-bold text-slate-900">${tStation(name)}</div>
           <div class="flex gap-1 flex-wrap justify-center">
             ${node.codes.map(code => {
               const lineId = getLineOfCode(code);
@@ -395,7 +395,7 @@ export const MapView: React.FC = () => {
             }).join("")}
           </div>
           <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
-            <a href="#/station/${encodeURIComponent(name)}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Arrival</a>
+            <a href="#/station/${encodeURIComponent(name)}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewArrivals")}</a>
           </div>
         </div>
       `;
@@ -452,7 +452,7 @@ export const MapView: React.FC = () => {
           <button
             onClick={handleReset}
             className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
-            title="Reset View"
+            title={t("resetView")}
           >
             <RotateCcw className="h-5 w-5" />
           </button>
@@ -460,7 +460,7 @@ export const MapView: React.FC = () => {
       )}
 
       {/* Floating Toggle Controls Panel top-right */}
-      <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
+      <div className="absolute top-4 right-4 z-30 flex flex-col items-end gap-2">
         {/* Toggle Map Type (Standard schematic map view only) */}
         {!showRealScale && (
           <button
@@ -470,7 +470,7 @@ export const MapView: React.FC = () => {
             className="flex items-center gap-2 rounded-2xl border border-border bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xl hover:bg-blue-700 transition-all active:scale-95 select-none"
           >
             <MapIcon className="h-4 w-4" />
-            {mapType === "standard" ? "Show Upcoming Circle Line" : "Show Standard Map"}
+            {mapType === "standard" ? t("circleLineMap") : t("standardMap")}
           </button>
         )}
 
@@ -480,7 +480,7 @@ export const MapView: React.FC = () => {
           className="flex items-center gap-2 rounded-2xl border border-border bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xl hover:bg-emerald-700 transition-all active:scale-95 select-none"
         >
           <MapIcon className="h-4 w-4" />
-          {showRealScale ? "Show Schematic Map" : "Show Real Scale Map"}
+          {showRealScale ? t("schematicMap") : t("realScaleMap")}
         </button>
       </div>
 

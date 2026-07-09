@@ -4,6 +4,7 @@ import type { DecodedVehicle } from "../lib/bus-decoder";
 import { SvgBusMap } from "../components/bus/SvgBusMap";
 import { Footer } from "../components/layout/Footer";
 import { RefreshCw, CheckSquare, Square, EyeOff, LayoutList, Check, Map } from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface StaticRoute {
@@ -72,10 +73,12 @@ const REGION_CONFIGS = {
 };
 
 export const BusView: React.FC = () => {
+  const { t } = useSettings();
   const [region, setRegion] = useState<"johor" | "melaka">("johor");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [statusText, setStatusText] = useState("Initializing tracker...");
+  const [statusKey, setStatusKey] = useState<"initializing" | "refreshing" | "success" | "failed">("initializing");
+  const [activeBusesCountVal, setActiveBusesCountVal] = useState({ count: 0, routes: 0 });
   const [buses, setBuses] = useState<DecodedVehicle[]>([]);
   const [hideInactive, setHideInactive] = useState(true);
   const [selectedRouteIds, setSelectedRouteIds] = useState<Set<string>>(new Set());
@@ -109,7 +112,7 @@ export const BusView: React.FC = () => {
   const fetchPositions = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);
-    setStatusText("Refreshing live locations...");
+    setStatusKey("refreshing");
 
     try {
       const res = await fetch(REGION_CONFIGS[region].url);
@@ -129,10 +132,11 @@ export const BusView: React.FC = () => {
         return prev;
       });
 
-      setStatusText(`Found ${list.length} active buses across ${STATIC_ROUTES[region].length} routes.`);
+      setActiveBusesCountVal({ count: list.length, routes: STATIC_ROUTES[region].length });
+      setStatusKey("success");
     } catch (err: any) {
       console.error(err);
-      setStatusText("Failed to refresh live positions. Retrying shortly...");
+      setStatusKey("failed");
     } finally {
       setIsRefreshing(false);
     }
@@ -178,6 +182,15 @@ export const BusView: React.FC = () => {
     return list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
   }, [region, hideInactive, activeBusCounts]);
 
+  const statusText = (() => {
+    if (statusKey === "initializing") return "Initializing tracker...";
+    if (statusKey === "refreshing") return t("refreshingFeed");
+    if (statusKey === "failed") return t("refreshFailed");
+    return t("activeBusesCount")
+      .replace("{count}", String(activeBusesCountVal.count))
+      .replace("{routes}", String(activeBusesCountVal.routes));
+  })();
+
   return (
     <div className="flex h-full w-full overflow-hidden bg-background text-text-primary relative">
       {/* Search Bus / Show Tracker Floating Button - Mobile only */}
@@ -187,7 +200,7 @@ export const BusView: React.FC = () => {
           className="md:hidden absolute top-4 left-4 z-30 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-2.5 text-xs font-bold shadow-2xl flex items-center gap-1.5 active:scale-95 transition-all"
         >
           <LayoutList className="h-4 w-4" />
-          Show Tracker
+          {t("showTracker")}
         </button>
       )}
 
@@ -205,7 +218,7 @@ export const BusView: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
-                  myBAS Live Tracker
+                  {t("busTracker")}
                 </h2>
                 <span className="bg-red-500/20 text-red-500 border border-red-500/30 text-[8px] font-extrabold px-1.5 py-0.5 rounded select-none animate-pulse-soft">
                   LIVE
@@ -215,7 +228,7 @@ export const BusView: React.FC = () => {
                 onClick={() => setIsSidebarOpen(false)}
                 className="md:hidden text-[10px] font-bold text-text-secondary hover:text-text-primary"
               >
-                Hide
+                {t("hide")}
               </button>
             </div>
 
@@ -231,7 +244,7 @@ export const BusView: React.FC = () => {
                       : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  {reg}
+                  {reg === "johor" ? (t("johor") || "Johor") : (t("melaka") || "Melaka")}
                 </button>
               ))}
             </div>
@@ -243,7 +256,7 @@ export const BusView: React.FC = () => {
                 onClick={fetchPositions}
                 disabled={isRefreshing}
                 className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
-                title="Refresh Feed"
+                title={t("refreshHint")}
               >
                 <RefreshCw className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} />
               </button>
@@ -254,11 +267,11 @@ export const BusView: React.FC = () => {
               <div className="flex justify-between items-center text-[10px] font-semibold text-text-secondary">
                 <button onClick={selectAll} className="hover:text-text-primary flex items-center gap-1">
                   <CheckSquare className="h-3.5 w-3.5" />
-                  Select All
+                  {t("selectAll")}
                 </button>
                 <button onClick={deselectAll} className="hover:text-text-primary flex items-center gap-1">
                   <Square className="h-3.5 w-3.5" />
-                  Deselect All
+                  {t("deselectAll")}
                 </button>
               </div>
 
@@ -270,7 +283,7 @@ export const BusView: React.FC = () => {
                   onChange={(e) => setHideInactive(e.target.checked)}
                   className="rounded bg-input border-border text-blue-600 focus:ring-0"
                 />
-                Hide Inactive Routes
+                {t("hideInactive")}
               </label>
             </div>
 
@@ -313,7 +326,7 @@ export const BusView: React.FC = () => {
                     </div>
                     {count > 0 && (
                       <span className="text-[9px] font-bold bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/25 px-1.5 py-0.5 rounded-full select-none flex-shrink-0 whitespace-nowrap text-center min-w-[48px]">
-                        {count} live
+                        {count} {t("live")}
                       </span>
                     )}
                   </button>
@@ -323,7 +336,7 @@ export const BusView: React.FC = () => {
               {visibleRoutes.length === 0 && (
                 <div className="h-[120px] flex flex-col items-center justify-center text-center text-text-secondary">
                   <EyeOff className="h-8 w-8 mb-2 animate-pulse" />
-                  <p className="text-xs">No active routes matching filters.</p>
+                  <p className="text-xs">{t("noRoutesMatched")}</p>
                 </div>
               )}
             </div>
@@ -335,7 +348,7 @@ export const BusView: React.FC = () => {
                 className="w-full py-2.5 rounded-xl border border-border bg-button-secondary text-text-secondary font-semibold text-xs hover:text-text-primary active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <Map className="h-4 w-4" />
-                Hide Sidebar
+                {t("hideSidebar")}
               </button>
               
               <Footer />
@@ -353,7 +366,7 @@ export const BusView: React.FC = () => {
             className="hidden md:flex absolute top-4 left-4 z-30 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-2.5 text-xs font-bold shadow-2xl items-center gap-1.5 active:scale-95 transition-all"
           >
             <LayoutList className="h-4 w-4" />
-            Show Tracker Sidebar
+            {t("showTrackerSidebar")}
           </button>
         )}
 

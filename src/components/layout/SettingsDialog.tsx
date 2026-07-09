@@ -1,6 +1,6 @@
 import React from "react";
 import { useSettings } from "../../context/SettingsContext";
-import { X, Sun, Moon, Laptop, EyeOff } from "lucide-react";
+import { X, Sun, Moon, Laptop, EyeOff, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface SettingsDialogProps {
@@ -9,7 +9,17 @@ interface SettingsDialogProps {
 }
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
-  const { theme, setTheme, farePref, setFarePref, hideBusButton, setHideBusButton } = useSettings();
+  const {
+    theme,
+    setTheme,
+    farePref,
+    setFarePref,
+    hideBusButton,
+    setHideBusButton,
+    language,
+    setLanguage,
+    t,
+  } = useSettings();
 
   return (
     <motion.div
@@ -29,7 +39,9 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold tracking-wide text-text-primary">Settings</h2>
+          <h2 className="text-lg font-semibold tracking-wide text-text-primary">
+            {t("settings")}
+          </h2>
           <button
             onClick={onClose}
             className="rounded-full p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
@@ -40,19 +52,47 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
 
         {/* Body */}
         <div className="p-6 space-y-6">
+          {/* Language Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5" />
+              {t("languageLabel")}
+            </label>
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-button-secondary p-1 border border-border">
+              {(
+                [
+                  { id: "en", label: "English" },
+                  { id: "zh", label: "中文" },
+                ] as const
+              ).map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => setLanguage(id)}
+                  className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                    language === id
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "text-text-secondary hover:text-text-primary hover:bg-button-secondary/50"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Theme Preference */}
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              App Theme
+              {t("appTheme")}
             </label>
             <div className="grid grid-cols-3 gap-2 rounded-xl bg-button-secondary p-1 border border-border">
               {(
                 [
-                  { id: "system", label: "System", icon: Laptop },
-                  { id: "light", label: "Light", icon: Sun },
-                  { id: "dark", label: "Dark", icon: Moon },
+                  { id: "system", labelKey: "system", icon: Laptop },
+                  { id: "light", labelKey: "light", icon: Sun },
+                  { id: "dark", labelKey: "dark", icon: Moon },
                 ] as const
-              ).map(({ id, label, icon: Icon }) => (
+              ).map(({ id, labelKey, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setTheme(id)}
@@ -63,7 +103,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
                   }`}
                 >
                   <Icon className="h-4 w-4" />
-                  {label}
+                  {t(labelKey)}
                 </button>
               ))}
             </div>
@@ -72,17 +112,17 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
           {/* Fare Preference */}
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Fare Display Preference
+              {t("farePreference")}
             </label>
             <div className="grid grid-cols-4 gap-1.5 rounded-xl bg-button-secondary p-1 border border-border">
               {(
                 [
-                  { id: "all", label: "All" },
-                  { id: "cashless", label: "Cashless" },
-                  { id: "cash", label: "Cash" },
-                  { id: "concession", label: "Concession" },
+                  { id: "all", labelKey: "all" },
+                  { id: "cashless", labelKey: "cashless" },
+                  { id: "cash", labelKey: "cash" },
+                  { id: "concession", labelKey: "concession" },
                 ] as const
-              ).map(({ id, label }) => (
+              ).map(({ id, labelKey }) => (
                 <button
                   key={id}
                   onClick={() => setFarePref(id)}
@@ -92,7 +132,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
                       : "text-text-secondary hover:text-text-primary hover:bg-button-secondary/50"
                   }`}
                 >
-                  {label}
+                  {t(labelKey)}
                 </button>
               ))}
             </div>
@@ -103,8 +143,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
             <div className="flex items-center gap-2">
               <EyeOff className="h-4 w-4 text-text-secondary" />
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-text-primary">Hide Bus Tracker link</span>
-                <span className="text-[10px] text-text-secondary">Hides the live bus page button from navigation.</span>
+                <span className="text-xs font-semibold text-text-primary">
+                  {t("hideBus")}
+                </span>
+                <span className="text-[10px] text-text-secondary">
+                  {t("hideBusDesc")}
+                </span>
               </div>
             </div>
             <input

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { type Language, translations, translateStation, translateLine } from "../lib/translations";
 
 export type Theme = "light" | "dark" | "system";
 export type FarePreference = "all" | "cashless" | "cash" | "concession";
@@ -7,9 +8,14 @@ interface SettingsContextType {
   theme: Theme;
   farePref: FarePreference;
   hideBusButton: boolean;
+  language: Language;
   setTheme: (theme: Theme) => void;
   setFarePref: (pref: FarePreference) => void;
   setHideBusButton: (hide: boolean) => void;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+  tStation: (name: string) => string;
+  tLine: (lineName: string) => string;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -25,6 +31,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const saved = localStorage.getItem("hide_bus_button");
     return saved === null ? true : saved === "true";
   });
+  const [language, setLanguageState] = useState<Language>(() => {
+    return (localStorage.getItem("language_preference") as Language) || "en";
+  });
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -39,6 +48,23 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setHideBusButton = (hide: boolean) => {
     setHideBusButtonState(hide);
     localStorage.setItem("hide_bus_button", hide ? "true" : "false");
+  };
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem("language_preference", lang);
+  };
+
+  const t = (key: string): string => {
+    return translations[language][key] || key;
+  };
+
+  const tStation = (name: string): string => {
+    return translateStation(name, language);
+  };
+
+  const tLine = (lineName: string): string => {
+    return translateLine(lineName, language);
   };
 
   // Apply theme class to document
@@ -84,9 +110,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         theme,
         farePref,
         hideBusButton,
+        language,
         setTheme,
         setFarePref,
         setHideBusButton,
+        setLanguage,
+        t,
+        tStation,
+        tLine,
       }}
     >
       {children}

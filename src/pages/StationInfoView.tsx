@@ -7,6 +7,7 @@ import {
   Navigation, Heart, RefreshCw
 } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
+import { useSettings } from "../context/SettingsContext";
 import {
   getNextDepartures,
   getFullTimetable,
@@ -63,6 +64,7 @@ interface TimetableData {
 export const StationInfoView: React.FC = () => {
   const { stationName } = useParams<{ stationName: string }>();
   const navigate = useNavigate();
+  const { t, tStation, tLine } = useSettings();
 
   const decodedName = stationName ? decodeURIComponent(stationName) : "";
   const station: StationObj | undefined = stations[decodedName];
@@ -297,16 +299,16 @@ export const StationInfoView: React.FC = () => {
             <button
               onClick={() => navigate(-1)}
               className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary transition-all active:scale-90 shadow-md flex-shrink-0"
-              title="Go back"
+              title={t("backToMap")}
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Station Information</div>
-              <h1 className="text-xl font-bold tracking-tight text-text-primary">{decodedName}</h1>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{t("stationInfo")}</div>
+              <h1 className="text-xl font-bold tracking-tight text-text-primary">{tStation(decodedName)}</h1>
               {groupedStationNames.length > 1 && (
                 <div className="text-[10px] text-text-secondary font-medium mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span>Connected to:</span>
+                  <span>{t("connectedTo")}</span>
                   {groupedStationNames
                     .filter(n => n !== decodedName)
                     .map((name, idx, arr) => (
@@ -315,7 +317,7 @@ export const StationInfoView: React.FC = () => {
                           href={`#/station/${encodeURIComponent(name)}`}
                           className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer font-semibold"
                         >
-                          {name}
+                          {tStation(name)}
                         </a>
                         {idx < arr.length - 1 && <span className="text-text-secondary">,</span>}
                       </React.Fragment>
@@ -393,7 +395,7 @@ export const StationInfoView: React.FC = () => {
                 <div className="pt-3 border-t border-border/80 space-y-2">
                   <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                     <Clock className="h-3.5 w-3.5 text-emerald-500" />
-                    Operational Hours
+                    {t("hoursOfOperation")}
                   </div>
                   <div className="space-y-1.5">
                     {opHours.map(({ lineId, code, first, last }) => (
@@ -418,13 +420,13 @@ export const StationInfoView: React.FC = () => {
           {/* ── Right panel: Next departures ── */}
           <div className="flex-1 min-w-0 space-y-4">
             <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary select-none">
-              Next Departures
+              {t("nextDepartures")}
             </h2>
 
             {isLoadingDeps && dirDeps.length === 0 ? (
               <div className="flex items-center justify-center py-12 text-text-secondary">
                 <RefreshCw className="h-5 w-5 animate-spin mr-2" />
-                <span className="text-sm">Loading schedule…</span>
+                <span className="text-sm">{t("loadingSchedule")}</span>
               </div>
             ) : (
               depsByLine.map(({ lineId, directions }) => {
@@ -443,7 +445,7 @@ export const StationInfoView: React.FC = () => {
                         {/* Line title */}
                         <div className="p-4 bg-button-secondary/15 flex items-center gap-2">
                           <Train style={{ color: lineColor }} className="h-5 w-5" />
-                          <span className="text-sm font-bold text-text-primary">{getLineName(lineId)}</span>
+                          <span className="text-sm font-bold text-text-primary">{tLine(getLineName(lineId))}</span>
                         </div>
 
                         <div className="p-5 divide-y divide-border/60">
@@ -462,11 +464,11 @@ export const StationInfoView: React.FC = () => {
                                 <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
                                   {/* Direction label + status chip */}
                                   <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">Towards</span>
+                                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">{t("towards")}</span>
                                     <div className="flex items-center gap-2 mt-1">
                                       <span className="text-sm font-bold text-text-primary flex items-center gap-1.5">
                                         <ArrowRight className="h-4 w-4 text-text-secondary" />
-                                        {dir.displayDest}
+                                        {tStation(dir.displayDest)}
                                       </span>
                                       {/* Approaching/Arriving chip for nearest train */}
                                       {(() => {
@@ -478,7 +480,7 @@ export const StationInfoView: React.FC = () => {
                                         if (!chip) return null;
                                         return (
                                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${chipColor}`}>
-                                            {chip}
+                                            {t(chip.toLowerCase())}
                                           </span>
                                         );
                                       })()}
@@ -489,7 +491,7 @@ export const StationInfoView: React.FC = () => {
                                   <div className="flex gap-2 flex-wrap">
                                     {dir.departures.length === 0 ? (
                                       <div className="flex items-center justify-center px-4 py-2 bg-button-secondary/35 border border-border/40 text-text-secondary/60 text-xs font-bold rounded-xl select-none uppercase tracking-wider">
-                                        Service End
+                                        {t("serviceEnd")}
                                       </div>
                                     ) : (
                                       dir.departures.map((dep, dIdx) => {
@@ -524,9 +526,9 @@ export const StationInfoView: React.FC = () => {
                                     className="flex items-center gap-1 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-wider"
                                   >
                                     {isExpanded ? (
-                                      <><ChevronUp className="h-3 w-3" />Hide Full Timetable</>
+                                      <><ChevronUp className="h-3 w-3" />{t("hide") || "Hide"} {t("fullTimetable")}</>
                                     ) : (
-                                      <><ChevronDown className="h-3 w-3" />View Full Timetable</>
+                                      <><ChevronDown className="h-3 w-3" />{t("view") || "View"} {t("fullTimetable")}</>
                                     )}
                                   </button>
 
@@ -544,7 +546,7 @@ export const StationInfoView: React.FC = () => {
                                                 : "text-text-secondary hover:text-text-primary"
                                             }`}
                                           >
-                                            {tab === "weekday" ? "Weekday" : tab === "saturday" ? "Saturday" : "Sunday"}
+                                            {t(tab)}
                                           </button>
                                         ))}
                                       </div>
@@ -553,10 +555,10 @@ export const StationInfoView: React.FC = () => {
                                       <div className="p-4 max-h-64 overflow-y-auto space-y-3">
                                         {!ttData ? (
                                           <div className="flex items-center justify-center py-4 text-text-secondary text-xs gap-2">
-                                            <RefreshCw className="h-3.5 w-3.5 animate-spin" />Loading timetable…
+                                            <RefreshCw className="h-3.5 w-3.5 animate-spin" />{t("loadingSchedule")}
                                           </div>
                                         ) : Object.keys(hourGroups).length === 0 ? (
-                                          <p className="text-xs text-text-secondary text-center py-4">No schedule data for this day.</p>
+                                          <p className="text-xs text-text-secondary text-center py-4">{t("noSchedule")}</p>
                                         ) : (
                                           Object.entries(hourGroups)
                                             .sort(([a], [b]) => {
