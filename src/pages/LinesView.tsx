@@ -1,17 +1,38 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Train, ArrowRight } from "lucide-react";
+import React from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Train, Footprints } from "lucide-react";
 import { lines, stations, lineStations } from "../lib/transit-data";
 
 export const LinesView: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedLineId, setSelectedLineId] = useState<string>("KJ");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Read query parameter "?line=KJ"
+  const queryLine = searchParams.get("line");
+  const selectedLineId = queryLine && lines[queryLine.toUpperCase()] ? queryLine.toUpperCase() : "KJ";
+
+  const setSelectedLineId = (id: string) => {
+    setSearchParams({ line: id });
+  };
 
   const selectedLine = lines[selectedLineId];
   const selectedStations = lineStations[selectedLineId] || [];
 
   const getLineColor = (id: string) => lines[id]?.color || "#6b7280";
   const getLineName = (id: string) => lines[id]?.name || id;
+
+  // Sort: MRT (KG, PY) > LRT (KJ, AG, SP, SA) > Monorail (MR) > BRT (BRT)
+  const sortedLineIds = ["KG", "PY", "KJ", "AG", "SP", "SA", "MR", "BRT"];
+  const sortedLines = sortedLineIds.map(id => lines[id]).filter(Boolean);
+
+  const getInterchangeCode = (node: any, lineId: string) => {
+    return node.codes.find((c: string) => {
+      const match = c.match(/^[a-zA-Z]+/);
+      let id = match ? match[0] : "";
+      if (id === "SB") id = "BRT";
+      return id === lineId;
+    }) || lineId;
+  };
 
   return (
     <div className="flex flex-col h-full w-full bg-background text-text-primary overflow-y-auto animate-fade-in select-none">
@@ -32,9 +53,9 @@ export const LinesView: React.FC = () => {
           </div>
         </div>
 
-        {/* Lines Selector - Rich Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {Object.values(lines).map((line) => {
+        {/* Lines Selector - Wrapped Tabs */}
+        <div className="flex flex-wrap gap-2 pb-2">
+          {sortedLines.map((line) => {
             const isSelected = selectedLineId === line.id;
             return (
               <button
@@ -128,47 +149,59 @@ export const LinesView: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Right: Connecting Station and Interchanges */}
-                <div className="flex items-center gap-3">
+                {/* Right: Interchange Codes and Walkway Icons */}
+                <div className="flex items-center gap-2 flex-wrap justify-end">
                   {/* Standard Interchanges */}
                   {interchanges.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      {interchanges.map((lineId) => (
-                        <span
-                          key={lineId}
-                          style={{ backgroundColor: getLineColor(lineId) }}
-                          className="text-[8px] font-black text-white px-1.5 py-0.5 rounded shadow-sm leading-none"
-                          title={getLineName(lineId)}
-                        >
-                          {lineId}
-                        </span>
-                      ))}
+                    <div className="flex items-center gap-1.5">
+                      {interchanges.map((lineId) => {
+                        const code = getInterchangeCode(node, lineId);
+                        return (
+                          <span
+                            key={lineId}
+                            style={{ backgroundColor: getLineColor(lineId) }}
+                            className="text-[9px] font-black text-white px-2 py-0.5 rounded shadow-sm leading-none"
+                            title={getLineName(lineId)}
+                          >
+                            {code}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
 
                   {/* Walkway Transfers */}
                   {walkwayTransfers.map((conn) => {
                     const targetNode = stations[conn.to];
-                    const targetLines = targetNode?.lines.filter((l) => l !== "WALKWAY") ?? [];
                     return (
                       <div
                         key={conn.to}
-                        className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2.5 py-1 rounded-xl"
+                        className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
+                        title={`Walkway to ${conn.to}`}
                       >
-                        <span>Transfer to {conn.to}</span>
-                        {targetLines.map((lineId) => (
-                          <span
-                            key={lineId}
-                            style={{ backgroundColor: getLineColor(lineId) }}
-                            className="w-1.5 h-1.5 rounded-full"
-                            title={getLineName(lineId)}
-                          />
-                        ))}
+                        <Footprints className="h-3.5 w-3.5 text-text-secondary animate-pulse" />
+                        <span>{conn.to}</span>
+                        {targetNode && (
+                          <div className="flex gap-1">
+                            {targetNode.codes.map((code) => {
+                              const match = code.match(/^[a-zA-Z]+/);
+                              let lineId = match ? match[0] : "";
+                              if (lineId === "SB") lineId = "BRT";
+                              return (
+                                <span
+                                  key={code}
+                                  style={{ backgroundColor: getLineColor(lineId) }}
+                                  className="text-[8px] font-extrabold text-white px-1 py-0.5 rounded leading-none"
+                                >
+                                  {code}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
-
-                  <ArrowRight className="h-4 w-4 text-text-secondary opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1" />
                 </div>
               </div>
             );

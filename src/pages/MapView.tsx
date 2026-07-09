@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { RotateCcw, Map as MapIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { stations, lines } from "../lib/transit-data";
@@ -10,6 +11,7 @@ import "leaflet/dist/leaflet.css";
 
 export const MapView: React.FC = () => {
   const { theme } = useSettings();
+  const navigate = useNavigate();
   const [mapType, setMapType] = useState<"standard" | "upcoming">("standard");
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -254,22 +256,37 @@ export const MapView: React.FC = () => {
           const colorAG = getLineColor("AG");
           L.polyline(track.coords, {
             color: colorSP,
-            weight: 4.5,
+            weight: 5.5,
             opacity: 0.85,
-          }).addTo(map);
+            className: "cursor-pointer",
+          })
+            .addTo(map)
+            .on("click", () => {
+              navigate("/lines?line=SP");
+            });
           L.polyline(track.coords, {
             color: colorAG,
-            weight: 4.5,
+            weight: 5.5,
             opacity: 0.85,
             dashArray: "10, 12",
-          }).addTo(map);
+            className: "cursor-pointer",
+          })
+            .addTo(map)
+            .on("click", () => {
+              navigate("/lines?line=AG");
+            });
         } else {
           // Standard solid color line
           L.polyline(track.coords, {
             color: getLineColor(track.lineId),
-            weight: 4.5,
+            weight: 5.5,
             opacity: 0.85,
-          }).addTo(map);
+            className: "cursor-pointer",
+          })
+            .addTo(map)
+            .on("click", () => {
+              navigate(`/lines?line=${track.lineId}`);
+            });
         }
       });
     }

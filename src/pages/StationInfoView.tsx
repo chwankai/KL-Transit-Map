@@ -459,7 +459,7 @@ export const StationInfoView: React.FC = () => {
 
                             return (
                               <div key={dir.headsign} className="py-4 first:pt-0 last:pb-0 space-y-4">
-                                <div className="flex items-center justify-between gap-4 flex-wrap">
+                                <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
                                   {/* Direction label + status chip */}
                                   <div className="flex flex-col">
                                     <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">Towards</span>
