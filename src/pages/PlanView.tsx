@@ -323,7 +323,7 @@ export const PlanView: React.FC = () => {
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative animate-fade-in">
       {/* Sidebar Selector Form */}
       <div
-        className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${
+        className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto md:overflow-y-visible bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${
           routes.length > 0
             ? isMobileFormOpen
               ? "absolute inset-x-0 top-0 max-h-[90%] shadow-2xl border-b border-border md:relative md:inset-auto md:max-h-none md:shadow-none md:border-r animate-in slide-in-from-top duration-200"
@@ -407,13 +407,13 @@ export const PlanView: React.FC = () => {
               </div>
 
               {/* Swap Button */}
-              <div className="flex justify-center -my-2.5">
+              <div className="flex justify-center -my-4 relative z-10">
                 <button
                   type="button"
                   onClick={handleSwap}
-                  className="rounded-full border border-border bg-card p-2 text-text-secondary hover:border-blue-500 hover:text-blue-500 transition-all hover:scale-110 active:scale-95 shadow-sm"
+                  className="rounded-full border border-border bg-card p-1.5 text-text-secondary hover:border-blue-500 hover:text-blue-500 transition-all hover:scale-110 active:scale-95 shadow-sm"
                 >
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-3.5 w-3.5" />
                 </button>
               </div>
 
@@ -495,27 +495,30 @@ export const PlanView: React.FC = () => {
               </div>
 
               {/* Custom Date/Time pickers */}
-              {timeMode !== "now" && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="grid grid-cols-2 gap-2"
-                >
-                  <input
-                    type="date"
-                    value={dateInput}
-                    onChange={(e) => setDateInput(e.target.value)}
-                    className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
-                  />
-                  <input
-                    type="time"
-                    value={timeInput}
-                    onChange={(e) => setTimeInput(e.target.value)}
-                    className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
-                  />
-                </motion.div>
-              )}
+              <AnimatePresence>
+                {timeMode !== "now" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, y: -10 }}
+                    animate={{ opacity: 1, height: "auto", y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid grid-cols-2 gap-2 overflow-hidden"
+                  >
+                    <input
+                      type="date"
+                      value={dateInput}
+                      onChange={(e) => setDateInput(e.target.value)}
+                      className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
+                    />
+                    <input
+                      type="time"
+                      value={timeInput}
+                      onChange={(e) => setTimeInput(e.target.value)}
+                      className="px-3 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Form actions row */}
               <button
@@ -554,12 +557,12 @@ export const PlanView: React.FC = () => {
                   <div
                     key={idx}
                     onClick={() => handleSelectSavedRoute(route)}
-                    className="w-full flex items-start gap-2 p-2.5 rounded-xl border border-border bg-input hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] active:scale-98"
+                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-input hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] active:scale-98"
                   >
                     <button
                       type="button"
                       onClick={(e) => handleDeleteSavedRoute(e, idx)}
-                      className="p-1 rounded-lg text-text-secondary hover:bg-red-500/15 hover:text-red-500 transition-colors flex-shrink-0 mt-0.5"
+                      className="p-1.5 rounded-lg text-text-secondary hover:bg-red-500/15 hover:text-red-500 transition-colors flex-shrink-0"
                       title="Delete Saved Route"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -592,7 +595,22 @@ export const PlanView: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full bg-results">
         <div className="space-y-5">
           <AnimatePresence mode="wait">
-            {errorMsg && (
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-[300px] flex flex-col items-center justify-center text-center text-text-secondary border border-dashed border-border rounded-2xl p-6 bg-card/10 backdrop-blur-sm"
+              >
+                <RefreshCw className="h-8 w-8 text-blue-500 animate-spin mb-3" />
+                <h3 className="text-sm font-bold text-text-primary">Calculating Best Route...</h3>
+                <p className="text-xs max-w-xs mt-1 leading-relaxed text-text-secondary">
+                  Querying the real-time schedules and transit network pathfinder.
+                </p>
+              </motion.div>
+            )}
+
+            {!isLoading && errorMsg && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -619,7 +637,7 @@ export const PlanView: React.FC = () => {
               </motion.div>
             )}
 
-            {routes.length > 0 && (
+            {routes.length > 0 && !isLoading && (
               <motion.div
                 key={searchedOrigin + searchedDest}
                 initial={{ opacity: 0 }}
