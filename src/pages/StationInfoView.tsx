@@ -238,7 +238,7 @@ export const StationInfoView: React.FC = () => {
         {/* Departures lists per Line */}
         <div className="space-y-4">
           <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary select-none">
-            Upcoming Next Departures
+            Next Departures
           </h2>
 
           {stationLines.map((lineId) => {
@@ -252,7 +252,6 @@ export const StationInfoView: React.FC = () => {
                     <Train style={{ color: lineColor }} className="h-5 w-5" />
                     <span className="text-sm font-bold text-text-primary">{getLineName(lineId)}</span>
                   </div>
-                  <span className="text-[10px] text-text-secondary font-bold uppercase tracking-wider">Line: {lineId}</span>
                 </div>
 
                 <div className="p-5 divide-y divide-border/60">
@@ -269,7 +268,7 @@ export const StationInfoView: React.FC = () => {
                         <div key={dir.destination} className="py-4 first:pt-0 last:pb-0 space-y-4">
                           <div className="flex items-center justify-between gap-4">
                             <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">Bound For</span>
+                              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">Towards</span>
                               <span className="text-sm font-bold text-text-primary flex items-center gap-1.5 mt-1">
                                 <ArrowRight className="h-4 w-4 text-text-secondary" />
                                 {dir.destination}
