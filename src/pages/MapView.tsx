@@ -37,6 +37,15 @@ export const MapView: React.FC = () => {
     return lines[lineId]?.color || "#6b7280";
   };
 
+  const getLineOfCode = (code: string): string => {
+    const match = code.match(/^[a-zA-Z]+/);
+    let lineId = match ? match[0] : "";
+    if (lineId === "SB") {
+      lineId = "BRT";
+    }
+    return lineId;
+  };
+
   // Sync scale mode preference
   useEffect(() => {
     localStorage.setItem("show_real_scale", String(showRealScale));
@@ -217,38 +226,56 @@ export const MapView: React.FC = () => {
       maxZoom: 18,
     }).addTo(map);
 
-    // 1. Draw OSM realistic train paths from public/rail_tracks.json
+    // 1. Draw OSM/GTFS realistic train paths from public/rail_tracks.json
     if (railTracks && railTracks.length > 0) {
       const drawnLineIds = new Set<string>();
       railTracks.forEach((track: any) => {
         if (drawnLineIds.has(track.lineId)) return;
         drawnLineIds.add(track.lineId);
 
-        L.polyline(track.coords, {
-          color: getLineColor(track.lineId),
-          weight: 4.5,
-          opacity: 0.85,
-        }).addTo(map);
+        if (track.lineId === "AG_SP") {
+          // Alternating two-color dashed segment from Sentul Timur to Chan Sow Lin
+          const colorSP = getLineColor("SP");
+          const colorAG = getLineColor("AG");
+          L.polyline(track.coords, {
+            color: colorSP,
+            weight: 4.5,
+            opacity: 0.85,
+          }).addTo(map);
+          L.polyline(track.coords, {
+            color: colorAG,
+            weight: 4.5,
+            opacity: 0.85,
+            dashArray: "10, 12",
+          }).addTo(map);
+        } else {
+          // Standard solid color line
+          L.polyline(track.coords, {
+            color: getLineColor(track.lineId),
+            weight: 4.5,
+            opacity: 0.85,
+          }).addTo(map);
+        }
       });
     }
 
-    // 2. Draw fallback straight polylines for lines not covered by OSM (e.g. Monorail MR, BRT, WALKWAY)
-    const osmDrawnLines = new Set(["KJ", "SP", "AG", "KG", "SA", "PY"]);
+    // 2. Draw fallback straight polylines only for walkways
+    const gtfsDrawnLines = new Set(["KJ", "SP", "AG", "KG", "SA", "PY", "MR", "BRT"]);
     const drawnTracks = new Set<string>();
 
     Object.entries(stations).forEach(([name, node]) => {
-      const s1 = (stationCoords as any)[name];
+      const s1 = (stationCoords as any)[node.codes[0]] || (stationCoords as any)[name];
       if (!s1) return;
 
       node.connections.forEach((conn) => {
-        const s2 = (stationCoords as any)[conn.to];
+        const destNode = Object.values(stations).find(st => st.name === conn.to);
+        const s2 = destNode ? ((stationCoords as any)[destNode.codes[0]] || (stationCoords as any)[conn.to]) : null;
         if (!s2) return;
 
         const isWalk = conn.line === "WALKWAY";
-        const isOsmLine = osmDrawnLines.has(conn.line);
+        const isGtfsLine = gtfsDrawnLines.has(conn.line);
 
-        // Only draw straight fallback if it is a walkway or not in the OSM track dataset
-        if (isWalk || !isOsmLine) {
+        if (isWalk || !isGtfsLine) {
           const trackKey = [name, conn.to].sort().join("_") + "_" + conn.line;
 
           if (!drawnTracks.has(trackKey)) {
@@ -265,31 +292,20 @@ export const MapView: React.FC = () => {
       });
     });
 
-    // 3. Plot station dots (circle markers)
+    // 3. Plot station dots (circle markers), splitting interchanges where platforms are distinct
     Object.entries(stations).forEach(([name, node]) => {
-      const coord = (stationCoords as any)[name];
-      if (!coord) return;
+      // Shared Ampang & Sri Petaling connection stations from Sentul Timur to Chan Sow Lin share the same physical platform
+      const hasAG = node.codes.some(c => c.startsWith("AG"));
+      const hasSP = node.codes.some(c => c.startsWith("SP"));
+      const isSharedAmpangSriPetaling = hasAG && hasSP;
 
-      const mainLine = node.lines.filter(l => l !== "WALKWAY")[0] || "KJ";
-      const isInterchange = node.lines.filter(l => l !== "WALKWAY").length > 1;
-
-      const marker = L.circleMarker([coord.lat, coord.lng], {
-        radius: isInterchange ? 6.5 : 4.5,
-        fillColor: "#ffffff",
-        color: isInterchange ? "#0f172a" : getLineColor(mainLine),
-        weight: isInterchange ? 3 : 2,
-        fillOpacity: 1,
-      }).addTo(map);
-
-      // Popup template center-aligned with view arrival using explicit white link styling
+      // Popup HTML template loaded on platform dot selection
       const popupHtml = `
         <div style="text-align: center !important;" class="p-2 space-y-1.5 font-sans leading-snug">
           <div class="text-xs font-bold text-slate-900">${name}</div>
           <div class="flex gap-1 flex-wrap justify-center">
             ${node.codes.map(code => {
-              const match = code.match(/^[a-zA-Z]+/);
-              let lineId = match ? match[0] : "";
-              if (lineId === "SB") lineId = "BRT";
+              const lineId = getLineOfCode(code);
               return `<span style="background-color: ${getLineColor(lineId)}; color: white; padding: 2.5px 5.5px; font-size: 8px; font-weight: 800; border-radius: 4px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">${code}</span>`;
             }).join("")}
           </div>
@@ -299,10 +315,40 @@ export const MapView: React.FC = () => {
         </div>
       `;
 
-      marker.bindPopup(popupHtml, {
-        closeButton: false,
-        minWidth: 150,
-      });
+      if (isSharedAmpangSriPetaling) {
+        // Plot a single dot for parallel Ampang-Sri Petaling connection stations
+        const coord = (stationCoords as any)[name] || (stationCoords as any)[node.codes[0]];
+        if (!coord) return;
+
+        L.circleMarker([coord.lat, coord.lng], {
+          radius: 6.5,
+          fillColor: "#ffffff",
+          color: getLineColor("SP"),
+          weight: 3,
+          fillOpacity: 1,
+        })
+          .addTo(map)
+          .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
+      } else {
+        // Plot separate platform dots for other interchanges and single stations
+        node.codes.forEach(code => {
+          const coord = (stationCoords as any)[code] || (stationCoords as any)[name];
+          if (!coord) return;
+
+          const lineId = getLineOfCode(code);
+          const isInterchange = node.lines.filter(l => l !== "WALKWAY").length > 1;
+
+          L.circleMarker([coord.lat, coord.lng], {
+            radius: isInterchange ? 6.5 : 4.5,
+            fillColor: "#ffffff",
+            color: getLineColor(lineId),
+            weight: isInterchange ? 3 : 2,
+            fillOpacity: 1,
+          })
+            .addTo(map)
+            .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
+        });
+      }
     });
 
     return () => {
