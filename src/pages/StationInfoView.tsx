@@ -487,27 +487,33 @@ export const StationInfoView: React.FC = () => {
 
                                   {/* Countdown badges */}
                                   <div className="flex gap-2 flex-wrap">
-                                    {dir.departures.map((dep, dIdx) => {
-                                      let secsAway = dep.targetSecs - currentTotalSecs;
-                                      if (secsAway < -60) secsAway += 86400;
-                                      const { label, isPast } = depLabel(secsAway, dIdx === 0);
-                                      const isFirst = dIdx === 0;
-                                      return (
-                                        <div
-                                          key={dIdx}
-                                          className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl border text-center w-[76px] sm:w-[84px] flex-shrink-0 ${
-                                            isPast
-                                              ? "bg-button-secondary/30 border-border/40 text-text-secondary/40"
-                                              : isFirst
-                                              ? "bg-blue-600/10 border-blue-500/35 text-blue-500"
-                                              : "bg-card border-border/80 text-text-primary"
-                                          }`}
-                                        >
-                                          <span className="text-xs font-extrabold">{label}</span>
-                                          <span className="text-[8px] font-bold uppercase tracking-wider text-text-secondary/70 mt-0.5">{dep.timeStr}</span>
-                                        </div>
-                                      );
-                                    })}
+                                    {dir.departures.length === 0 ? (
+                                      <div className="flex items-center justify-center px-4 py-2 bg-button-secondary/35 border border-border/40 text-text-secondary/60 text-xs font-bold rounded-xl select-none uppercase tracking-wider">
+                                        Service End
+                                      </div>
+                                    ) : (
+                                      dir.departures.map((dep, dIdx) => {
+                                        let secsAway = dep.targetSecs - currentTotalSecs;
+                                        if (secsAway < -60) secsAway += 86400;
+                                        const { label, isPast } = depLabel(secsAway, dIdx === 0);
+                                        const isFirst = dIdx === 0;
+                                        return (
+                                          <div
+                                            key={dIdx}
+                                            className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl border text-center w-[76px] sm:w-[84px] flex-shrink-0 ${
+                                              isPast
+                                                ? "bg-button-secondary/30 border-border/40 text-text-secondary/40"
+                                                : isFirst
+                                                ? "bg-blue-600/10 border-blue-500/35 text-blue-500"
+                                                : "bg-card border-border/80 text-text-primary"
+                                            }`}
+                                          >
+                                            <span className="text-xs font-extrabold">{label}</span>
+                                            <span className="text-[8px] font-bold uppercase tracking-wider text-text-secondary/70 mt-0.5">{dep.timeStr}</span>
+                                          </div>
+                                        );
+                                      })
+                                    )}
                                   </div>
                                 </div>
 

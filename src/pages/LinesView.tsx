@@ -7,9 +7,9 @@ export const LinesView: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Read query parameter "?line=KJ"
+  // Read query parameter "?line=KG"
   const queryLine = searchParams.get("line");
-  const selectedLineId = queryLine && lines[queryLine.toUpperCase()] ? queryLine.toUpperCase() : "KJ";
+  const selectedLineId = queryLine && lines[queryLine.toUpperCase()] ? queryLine.toUpperCase() : "KG";
 
   const setSelectedLineId = (id: string) => {
     setSearchParams({ line: id });
@@ -179,7 +179,7 @@ export const LinesView: React.FC = () => {
                         className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
                         title={`Walkway to ${conn.to}`}
                       >
-                        <Footprints className="h-3.5 w-3.5 text-text-secondary animate-pulse" />
+                        <Footprints className="h-3.5 w-3.5 text-text-secondary" />
                         <span>{conn.to}</span>
                         {targetNode && (
                           <div className="flex gap-1">

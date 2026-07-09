@@ -22,7 +22,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-text-primary">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-background text-text-primary">
       {/* Top Header - Unified Mobile & Desktop */}
       <header className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 h-[calc(64px+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] border-b border-border bg-card backdrop-blur-md z-40">
         <Link to="/" className="flex items-center gap-2 sm:gap-3 select-none">

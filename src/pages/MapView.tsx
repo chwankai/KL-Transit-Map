@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { RotateCcw, Map as MapIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { stations, lines } from "../lib/transit-data";
@@ -11,7 +11,6 @@ import "leaflet/dist/leaflet.css";
 
 export const MapView: React.FC = () => {
   const { theme } = useSettings();
-  const navigate = useNavigate();
   const [mapType, setMapType] = useState<"standard" | "upcoming">("standard");
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -254,6 +253,27 @@ export const MapView: React.FC = () => {
           // Alternating two-color dashed segment from Sentul Timur to Chan Sow Lin
           const colorSP = getLineColor("SP");
           const colorAG = getLineColor("AG");
+          const lineNameSP = lines["SP"]?.name || "LRT Sri Petaling Line";
+          const lineNameAG = lines["AG"]?.name || "LRT Ampang Line";
+
+          const popupHtmlSP = `
+            <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
+              <div class="text-xs font-bold text-slate-900">${lineNameSP}</div>
+              <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
+                <a href="#/lines?line=SP" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Line</a>
+              </div>
+            </div>
+          `;
+
+          const popupHtmlAG = `
+            <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
+              <div class="text-xs font-bold text-slate-900">${lineNameAG}</div>
+              <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
+                <a href="#/lines?line=AG" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Line</a>
+              </div>
+            </div>
+          `;
+
           L.polyline(track.coords, {
             color: colorSP,
             weight: 5.5,
@@ -261,9 +281,8 @@ export const MapView: React.FC = () => {
             className: "cursor-pointer",
           })
             .addTo(map)
-            .on("click", () => {
-              navigate("/lines?line=SP");
-            });
+            .bindPopup(popupHtmlSP, { closeButton: false, minWidth: 150 });
+
           L.polyline(track.coords, {
             color: colorAG,
             weight: 5.5,
@@ -272,11 +291,19 @@ export const MapView: React.FC = () => {
             className: "cursor-pointer",
           })
             .addTo(map)
-            .on("click", () => {
-              navigate("/lines?line=AG");
-            });
+            .bindPopup(popupHtmlAG, { closeButton: false, minWidth: 150 });
         } else {
           // Standard solid color line
+          const lineName = lines[track.lineId]?.name || track.lineId;
+          const popupHtml = `
+            <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
+              <div class="text-xs font-bold text-slate-900">${lineName}</div>
+              <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
+                <a href="#/lines?line=${track.lineId}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">View Line</a>
+              </div>
+            </div>
+          `;
+
           L.polyline(track.coords, {
             color: getLineColor(track.lineId),
             weight: 5.5,
@@ -284,9 +311,7 @@ export const MapView: React.FC = () => {
             className: "cursor-pointer",
           })
             .addTo(map)
-            .on("click", () => {
-              navigate(`/lines?line=${track.lineId}`);
-            });
+            .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
         }
       });
     }
