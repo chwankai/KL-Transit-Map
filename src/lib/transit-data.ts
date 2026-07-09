@@ -466,3 +466,14 @@ export function findRoute(originName: string, destinationName: string, excludedL
   }
   return null;
 }
+
+export const lineStations: Record<string, { code: string; name: string; distance?: number }[]> = {
+  "KJ": KJ_Line,
+  "AG": AG_Line,
+  "SP": SP_Line,
+  "KG": KG_Line,
+  "PY": PY_Line,
+  "MR": MR_Line,
+  "BRT": BRT_Line,
+  "SA": SA_Line,
+};

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Map, Compass, Bus, Settings } from "lucide-react";
+import { Map, Compass, Bus, Settings, Train } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
 import { useSettings } from "../../context/SettingsContext";
 import { AnimatePresence } from "framer-motion";
@@ -16,6 +16,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navItems = [
     { path: "/", label: "Map", icon: Map },
+    { path: "/lines", label: "Line", icon: Train },
     { path: "/plan", label: "Plan", icon: Compass },
     ...(!hideBusButton ? [{ path: "/bus", label: "Bus", icon: Bus }] : []),
   ];

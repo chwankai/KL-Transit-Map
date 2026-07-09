@@ -1,25 +1,273 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { stations, lines } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
-import { ArrowLeft, Clock, Calendar, ArrowRight, Train, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowLeft, Clock, ArrowRight, Train, ChevronDown, ChevronUp,
+  Navigation, Heart, RefreshCw
+} from "lucide-react";
 import { Footer } from "../components/layout/Footer";
-import stationSchedules from "../../public/station_schedules.json";
+import {
+  getNextDepartures,
+  getFullTimetable,
+  getOperationalHours,
+  getGtfsDirections,
+  type DepartureResult,
+} from "../lib/gtfs-schedule";
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function pad2(n: number) { return String(n).padStart(2, "0"); }
+
+function fmtTime12(date: Date) {
+  let h = date.getHours();
+  const m = pad2(date.getMinutes());
+  const s = pad2(date.getSeconds());
+  const ampm = h >= 12 ? "pm" : "am";
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return `${pad2(h)}:${m}:${s} ${ampm}`;
+}
+
+function timeStrToTotalMins(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function groupByHour(times: string[]): Record<number, string[]> {
+  const map: Record<number, string[]> = {};
+  for (const t of times) {
+    const [h] = t.split(":").map(Number);
+    if (!map[h]) map[h] = [];
+    map[h].push(t);
+  }
+  return map;
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+type DayTab = "weekday" | "saturday" | "sunday";
+
+interface DirectionDeps {
+  lineId: string;
+  headsign: string;       // GTFS headsign
+  displayDest: string;    // human-readable
+  departures: DepartureResult[];
+}
+
+interface TimetableData {
+  weekday: string[];
+  saturday: string[];
+  sunday: string[];
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export const StationInfoView: React.FC = () => {
   const { stationName } = useParams<{ stationName: string }>();
   const navigate = useNavigate();
-  const [isTimetableExpanded, setIsTimetableExpanded] = useState<Record<string, boolean>>({});
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Tick current time for countdowns
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 15000);
-    return () => clearInterval(timer);
-  }, []);
 
   const decodedName = stationName ? decodeURIComponent(stationName) : "";
   const station: StationObj | undefined = stations[decodedName];
+
+  // ── Grouped / walkway connected stations helper ──
+  const getGroupedStations = useCallback((baseName: string): string[] => {
+    const group = [baseName];
+    const baseStation = stations[baseName];
+    if (baseStation) {
+      baseStation.connections.forEach(conn => {
+        if (conn.line === "WALKWAY") {
+          group.push(conn.to);
+        }
+      });
+    }
+    return [...new Set(group)];
+  }, []);
+
+  const groupedStationNames = getGroupedStations(decodedName);
+  
+  // Collect all codes from the grouped stations
+  const groupedCodes = groupedStationNames.flatMap(name => stations[name]?.codes ?? []);
+
+  // ── Time state ──
+  const [now, setNow] = useState(new Date());
+  const [updatedAt, setUpdatedAt] = useState(new Date());
+
+  // ── Departure data (async from GTFS) ──
+  const [dirDeps, setDirDeps] = useState<DirectionDeps[]>([]);
+  const [opHours, setOpHours] = useState<{ lineId: string; code: string; first: string; last: string }[]>([]);
+  const [isLoadingDeps, setIsLoadingDeps] = useState(true);
+
+  // ── Timetable per direction ──
+  const [isTimetableExpanded, setIsTimetableExpanded] = useState<Record<string, boolean>>({});
+  const [timetableTab, setTimetableTab] = useState<Record<string, DayTab>>({});
+  const [timetableData, setTimetableData] = useState<Record<string, TimetableData>>({});
+
+  // ── Favourites ──
+  const [isFavourite, setIsFavourite] = useState(false);
+
+  // ── Line metadata ──
+  const stationLines = groupedCodes.map((code) => {
+    const match = code.match(/^[a-zA-Z]+/);
+    let lineId = match ? match[0] : "";
+    if (lineId === "SB") lineId = "BRT";
+    return lineId;
+  }).filter((v, i, s) => s.indexOf(v) === i);
+
+  const getLineColor = (lineId: string) => lines[lineId]?.color || "#6b7280";
+  const getLineName = (lineId: string) => lines[lineId]?.name || lineId;
+
+  // ── Favourites ──
+  useEffect(() => {
+    if (!decodedName) return;
+    const favs: string[] = JSON.parse(localStorage.getItem("favourite_stations") || "[]");
+    setIsFavourite(favs.includes(decodedName));
+  }, [decodedName]);
+
+  const toggleFavourite = () => {
+    const favs: string[] = JSON.parse(localStorage.getItem("favourite_stations") || "[]");
+    const updated = isFavourite
+      ? favs.filter((f) => f !== decodedName)
+      : [...favs, decodedName].sort();
+    localStorage.setItem("favourite_stations", JSON.stringify(updated));
+    setIsFavourite(!isFavourite);
+  };
+
+  // ── 1-second ticker for countdown display ──
+  useEffect(() => {
+    const ticker = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(ticker);
+  }, []);
+
+  // ── GTFS departure lookup ──
+  const loadDepartures = useCallback(async (atTime: Date) => {
+    if (!station) return;
+    setIsLoadingDeps(true);
+    try {
+      const results: DirectionDeps[] = [];
+      const opHoursResult: { lineId: string; code: string; first: string; last: string }[] = [];
+
+      // Current day type for operational hours
+      const d = atTime.getDay();
+      const dayType: DayTab = d === 6 ? "saturday" : d === 0 ? "sunday" : "weekday";
+
+      for (const lineId of stationLines) {
+        // Find which station in the group actually has this code or matches this lineId
+        const matchingStationName = groupedStationNames.find(name => {
+          const s = stations[name];
+          return s?.codes.some(c => {
+            const match = c.match(/^[a-zA-Z]+/);
+            let id = match ? match[0] : "";
+            if (id === "SB") id = "BRT";
+            return id === lineId;
+          });
+        }) || decodedName;
+
+        // Get all GTFS directions for this line
+        const headsigns = await getGtfsDirections(lineId);
+
+        // For operational hours: aggregate across all directions
+        const ohResult = await getOperationalHours(matchingStationName, lineId, dayType);
+        const code = (stations[matchingStationName]?.codes ?? []).find(c => {
+          const m = c.match(/^[a-zA-Z]+/);
+          let id = m ? m[0] : "";
+          if (id === "SB") id = "BRT";
+          return id === lineId;
+        }) || lineId;
+        if (ohResult) {
+          opHoursResult.push({ lineId, code, first: ohResult.first, last: ohResult.last });
+        }
+
+        // For each direction, get next departures
+        for (const headsign of headsigns) {
+          const toMatch = headsign.match(/to (.+)$/i);
+          const displayDest = toMatch ? toMatch[1].trim() : headsign;
+
+          // Skip if this station IS the destination
+          if (displayDest.toUpperCase() === matchingStationName.toUpperCase()) continue;
+
+          const deps = await getNextDepartures(matchingStationName, lineId, headsign, atTime, 3);
+          if (deps.length > 0) {
+            results.push({ lineId, headsign, displayDest, departures: deps });
+          }
+        }
+      }
+
+      setDirDeps(results);
+      setOpHours(opHoursResult);
+      setUpdatedAt(new Date());
+    } catch (e) {
+      console.warn("GTFS schedule load failed:", e);
+    } finally {
+      setIsLoadingDeps(false);
+    }
+  }, [decodedName, station, stationLines.join(","), groupedStationNames.join(",")]);
+
+  // Initial load + auto-refresh every 10s
+  useEffect(() => {
+    loadDepartures(new Date());
+    const timer = setInterval(() => loadDepartures(new Date()), 10000);
+    return () => clearInterval(timer);
+  }, [loadDepartures]);
+
+  // ── Load timetable for expanded view ──
+  const loadTimetable = useCallback(async (key: string, lineId: string, headsign: string) => {
+    if (timetableData[key]?.weekday) return; // already loaded
+
+    const matchingStationName = groupedStationNames.find(name => {
+      const s = stations[name];
+      return s?.codes.some(c => {
+        const match = c.match(/^[a-zA-Z]+/);
+        let id = match ? match[0] : "";
+        if (id === "SB") id = "BRT";
+        return id === lineId;
+      });
+    }) || decodedName;
+
+    const [wd, sa, su] = await Promise.all([
+      getFullTimetable(matchingStationName, lineId, headsign, "weekday"),
+      getFullTimetable(matchingStationName, lineId, headsign, "saturday"),
+      getFullTimetable(matchingStationName, lineId, headsign, "sunday"),
+    ]);
+    setTimetableData(prev => ({ ...prev, [key]: { weekday: wd, saturday: sa, sunday: su } }));
+  }, [decodedName, timetableData, groupedStationNames]);
+
+  const toggleTimetable = (key: string, lineId: string, headsign: string) => {
+    const nowExpanded = !isTimetableExpanded[key];
+    setIsTimetableExpanded(prev => ({ ...prev, [key]: nowExpanded }));
+    if (nowExpanded) loadTimetable(key, lineId, headsign);
+  };
+
+  // ── Day type helper ──
+  const getDayType = (d: Date): DayTab => {
+    const day = d.getDay();
+    if (day === 6) return "saturday";
+    if (day === 0) return "sunday";
+    return "weekday";
+  };
+
+  // ── Departure badge label ──
+  const depLabel = (secsAway: number, isFirst: boolean) => {
+    if (secsAway < 0) {
+      return { label: "Passed", chip: null, chipColor: "", isPast: true };
+    }
+    if (secsAway <= 30) {
+      return { label: isFirst ? "Arriving" : "0m", chip: "Arriving", chipColor: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30 animate-pulse", isPast: false };
+    }
+    if (secsAway <= 120) {
+      const mins = Math.floor(secsAway / 60);
+      const secs = secsAway % 60;
+      const label = isFirst ? (mins > 0 ? `${mins}m${secs}s` : `${secs}s`) : `${mins}m`;
+      return { label, chip: "Approaching", chipColor: "text-amber-500 bg-amber-500/10 border-amber-500/30 animate-pulse", isPast: false };
+    }
+    const mins = Math.floor(secsAway / 60);
+    const secs = secsAway % 60;
+    const label = isFirst ? (mins > 0 ? `${mins}m${secs}s` : `${secs}s`) : `${mins}m`;
+    return { label, chip: null, chipColor: "", isPast: false };
+  };
+
+  // ── Group directions by line for display ──
+  const depsByLine = stationLines.map(lineId => ({
+    lineId,
+    directions: dirDeps.filter(d => d.lineId === lineId),
+  }));
 
   if (!station) {
     return (
@@ -36,302 +284,352 @@ export const StationInfoView: React.FC = () => {
     );
   }
 
-  // Get line metadata for this station
-  const stationLines = station.codes.map((code) => {
-    const match = code.match(/^[a-zA-Z]+/);
-    let lineId = match ? match[0] : "";
-    if (lineId === "SB") {
-      lineId = "BRT";
-    }
-    return lineId;
-  }).filter((value, index, self) => self.indexOf(value) === index); // unique
-
-  // Determine operational terminals and directions
-  const getDirectionsForLine = (lineId: string) => {
-    const terminalMapping: Record<string, { term1: string; term2: string }> = {
-      "KJ": { term1: "Gombak", term2: "Putra Heights" },
-      "AG": { term1: "Sentul Timur", term2: "Ampang" },
-      "SP": { term1: "Sentul Timur", term2: "Putra Heights" },
-      "KG": { term1: "Kwasa Damansara", term2: "Kajang" },
-      "PY": { term1: "Kwasa Damansara", term2: "Putrajaya Sentral" },
-      "MR": { term1: "KL Sentral", term2: "Titiwangsa" },
-      "BRT": { term1: "Sunway-Setia Jaya", term2: "USJ 7" },
-      "SA": { term1: "Bandar Utama", term2: "Johan Setia" },
-    };
-
-    const terms = terminalMapping[lineId];
-    if (!terms) return [];
-
-    const dirs = [];
-    if (decodedName !== terms.term1) {
-      dirs.push({ destination: terms.term1, directionId: 1 });
-    }
-    if (decodedName !== terms.term2) {
-      dirs.push({ destination: terms.term2, directionId: 2 });
-    }
-    return dirs;
-  };
-
-  const getDayType = () => {
-    const day = currentTime.getDay();
-    if (day === 0) return "sunday";
-    if (day === 6) return "saturday";
-    return "weekday";
-  };
-
-  const getTimesForDirection = (lineId: string, destName: string): string[] => {
-    const normSearchName = decodedName.toLowerCase().replace(/[^a-z0-9]/g, "");
-    
-    // Find the station key matching normalized name
-    const matchedKey = Object.keys(stationSchedules).find(k =>
-      k.toLowerCase().replace(/[^a-z0-9]/g, "") === normSearchName
-    );
-    if (!matchedKey) return [];
-
-    const stationData = (stationSchedules as any)[matchedKey];
-    if (!stationData || !stationData[lineId]) return [];
-
-    const destNorm = destName.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const schedKey = Object.keys(stationData[lineId]).find(k =>
-      k.toLowerCase().replace(/[^a-z0-9]/g, "").includes(destNorm)
-    );
-    if (!schedKey) return [];
-
-    const dayType = getDayType();
-    return stationData[lineId][schedKey][dayType] || [];
-  };
-
-  // Generate real departure countdowns from GTFS stop_times
-  const getDepartures = (lineId: string, destName: string) => {
-    const times = getTimesForDirection(lineId, destName);
-    const currentHH = currentTime.getHours();
-    const currentMM = currentTime.getMinutes();
-    const currentTotalMin = currentHH * 60 + currentMM;
-
-    if (times.length === 0) {
-      // Fallback if no real GTFS matches
-      const nameHash = decodedName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const interval = lineId === "MR" || lineId === "BRT" ? 6 : 5;
-      const currentMins = currentTime.getMinutes() + currentTime.getSeconds() / 60;
-      const offset = (nameHash + destName.charCodeAt(0)) % interval;
-      const timeUntilNext = interval - ((currentMins - offset + interval) % interval);
-      
-      const minutesList = [
-        Math.round(timeUntilNext),
-        Math.round(timeUntilNext + interval),
-        Math.round(timeUntilNext + interval * 2)
-      ].map(m => m === 0 ? 1 : m);
-
-      return minutesList.map(mins => {
-        const depTime = new Date(currentTime.getTime() + mins * 60 * 1000);
-        const hh = String(depTime.getHours()).padStart(2, "0");
-        const mm = String(depTime.getMinutes()).padStart(2, "0");
-        return { mins, timeStr: `${hh}:${mm}` };
-      });
-    }
-
-    // Map each scheduled departure to minutes until departure
-    const upcoming = times
-      .map(t => {
-        const [h, m] = t.split(":").map(Number);
-        let totalMin = h * 60 + m;
-        if (totalMin < currentTotalMin) {
-          totalMin += 24 * 60; // wraps around midnight
-        }
-        return { timeStr: t, mins: totalMin - currentTotalMin };
-      })
-      .sort((a, b) => a.mins - b.mins)
-      .slice(0, 3);
-
-    return upcoming;
-  };
-
-  // Generate full hourly timetables list from GTFS
-  const getTimetable = (lineId: string, destName: string) => {
-    const times = getTimesForDirection(lineId, destName);
-    if (times.length > 0) return times;
-
-    // Fallback if no GTFS found
-    const list = [];
-    const nameHash = decodedName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const offset = (nameHash + destName.charCodeAt(0)) % 5;
-    
-    for (let hour = 6; hour <= 23; hour++) {
-      for (let min = offset; min < 60; min += 5) {
-        if (hour === 23 && min > 45) continue;
-        const hh = String(hour).padStart(2, "0");
-        const mm = String(min).padStart(2, "0");
-        list.push(`${hh}:${mm}`);
-      }
-    }
-    return list;
-  };
-
-  const getLineColor = (lineId: string) => {
-    return lines[lineId]?.color || "#6b7280";
-  };
-
-  const getLineName = (lineId: string) => {
-    return lines[lineId]?.name || lineId;
-  };
-
-  const toggleTimetable = (key: string) => {
-    setIsTimetableExpanded(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  const isWeekend = (() => { const d = now.getDay(); return d === 0 || d === 6; })();
 
   return (
     <div className="flex flex-col h-full w-full bg-background text-text-primary overflow-y-auto animate-fade-in">
-      <div className="max-w-2xl mx-auto w-full px-5 py-6 space-y-6 flex-1">
-        {/* Navigation & Header */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("/")}
-            className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary transition-all active:scale-90 shadow-md"
-            title="Go back to Map"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Station Information</div>
-            <h1 className="text-xl font-bold tracking-tight text-text-primary flex items-center gap-2">
-              {decodedName}
-            </h1>
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto w-full px-5 py-6 space-y-6 flex-1">
 
-        {/* Station Card Info */}
-        <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4">
-          <div className="flex gap-2 flex-wrap">
-            {station.codes.map((code) => {
-              const match = code.match(/^[a-zA-Z]+/);
-              let lineId = match ? match[0] : "";
-              if (lineId === "SB") {
-                lineId = "BRT";
-              }
-              const color = getLineColor(lineId);
-              return (
-                <span
-                  key={code}
-                  style={{ backgroundColor: color }}
-                  className="text-xs font-extrabold text-white px-2.5 py-1 rounded shadow-sm"
-                >
-                  {code}
-                </span>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 pt-3 border-t border-border/80">
-            <div className="flex items-center gap-2 text-xs text-text-secondary font-semibold">
-              <Clock className="h-4 w-4 text-emerald-500" />
-              <span>Operational Hours: </span>
-              <span className="text-text-primary">06:00 AM - 11:30 PM</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-text-secondary font-semibold">
-              <Calendar className="h-4 w-4 text-blue-500" />
-              <span>Days of Operation: </span>
-              <span className="text-text-primary">Daily (Mon - Sun)</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Departures lists per Line */}
-        <div className="space-y-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary select-none">
-            Next Departures
-          </h2>
-
-          {stationLines.map((lineId) => {
-            const directions = getDirectionsForLine(lineId);
-            const lineColor = getLineColor(lineId);
-
-            return (
-              <div key={lineId} className="glass-panel rounded-2xl border border-border bg-card shadow-lg overflow-hidden">
-                <div style={{ borderLeftColor: lineColor }} className="p-4 border-l-4 bg-button-secondary/15 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Train style={{ color: lineColor }} className="h-5 w-5" />
-                    <span className="text-sm font-bold text-text-primary">{getLineName(lineId)}</span>
-                  </div>
+        {/* ── Header bar ── */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Left: back + title + name */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary transition-all active:scale-90 shadow-md flex-shrink-0"
+              title="Go back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Station Information</div>
+              <h1 className="text-xl font-bold tracking-tight text-text-primary">{decodedName}</h1>
+              {groupedStationNames.length > 1 && (
+                <div className="text-[10px] text-text-secondary font-medium mt-0.5 flex items-center gap-1.5 flex-wrap">
+                  <span>Connected to:</span>
+                  {groupedStationNames
+                    .filter(n => n !== decodedName)
+                    .map((name, idx, arr) => (
+                      <React.Fragment key={name}>
+                        <a
+                          href={`#/station/${encodeURIComponent(name)}`}
+                          className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer font-semibold"
+                        >
+                          {name}
+                        </a>
+                        {idx < arr.length - 1 && <span className="text-text-secondary">,</span>}
+                      </React.Fragment>
+                    ))}
                 </div>
+              )}
+            </div>
+          </div>
 
-                <div className="p-5 divide-y divide-border/60">
-                  {directions.length === 0 ? (
-                    <div className="text-xs text-text-secondary italic text-center py-4">No scheduled services.</div>
-                  ) : (
-                    directions.map((dir) => {
-                      const key = `${lineId}_${dir.destination}`;
-                      const departures = getDepartures(lineId, dir.destination);
-                      const isExpanded = isTimetableExpanded[key] || false;
-                      const timetable = getTimetable(lineId, dir.destination);
+          {/* Right: updated time + refresh */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-500 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Updated {fmtTime12(updatedAt)}
+            </span>
+            <button
+              onClick={() => loadDepartures(new Date())}
+              title="Refresh departures"
+              className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all active:scale-90 shadow-md"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
 
-                      return (
-                        <div key={dir.destination} className="py-4 first:pt-0 last:pb-0 space-y-4">
-                          <div className="flex items-center justify-between gap-4">
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">Towards</span>
-                              <span className="text-sm font-bold text-text-primary flex items-center gap-1.5 mt-1">
-                                <ArrowRight className="h-4 w-4 text-text-secondary" />
-                                {dir.destination}
-                              </span>
-                            </div>
+        {/* ── Two-column layout ── */}
+        <div className="flex flex-col lg:flex-row gap-6">
 
-                            {/* Departure countdown badges */}
-                            <div className="flex gap-2">
-                              {departures.map((dep, dIdx) => (
-                                <div
-                                  key={dIdx}
-                                  className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl border text-center min-w-[64px] ${
-                                    dIdx === 0
-                                      ? "bg-blue-600/10 border-blue-500/35 text-blue-500"
-                                      : "bg-button-secondary/30 border-border text-text-primary"
-                                  }`}
-                                >
-                                  <span className="text-xs font-extrabold">{dep.mins}m</span>
-                                  <span className="text-[8px] font-bold uppercase tracking-wider text-text-secondary mt-0.5">{dep.timeStr}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+          {/* ── Left panel: Info card ── */}
+          <div className="lg:w-80 xl:w-88 flex-shrink-0">
+            <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4 lg:sticky lg:top-4">
 
-                          {/* Full Timetable Accordion trigger */}
-                          <div className="pt-1">
-                            <button
-                              onClick={() => toggleTimetable(key)}
-                              className="flex items-center gap-1 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-wider"
-                            >
-                              {isExpanded ? (
-                                <>
-                                  <ChevronUp className="h-3 w-3" />
-                                  Hide Full Timetable
-                                </>
-                              ) : (
-                                <>
-                                  <ChevronDown className="h-3 w-3" />
-                                  View Full Timetable
-                                </>
-                              )}
-                            </button>
-
-                            {isExpanded && (
-                              <div className="mt-3 p-4 rounded-xl border border-border bg-button-secondary/15 animate-fade-in max-h-48 overflow-y-auto">
-                                <div className="grid grid-cols-4 gap-2">
-                                  {timetable.map((time, tIdx) => (
-                                    <div key={tIdx} className="text-center px-2 py-1 rounded border border-border/40 bg-card text-xs font-semibold text-text-secondary select-none">
-                                      {time}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
+              {/* Station code badges + action buttons */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex gap-2 flex-wrap">
+                  {groupedCodes.map((code) => {
+                    const match = code.match(/^[a-zA-Z]+/);
+                    let lineId = match ? match[0] : "";
+                    if (lineId === "SB") lineId = "BRT";
+                    return (
+                      <span
+                        key={code}
+                        style={{ backgroundColor: getLineColor(lineId) }}
+                        className="text-xs font-extrabold text-white px-2.5 py-1 rounded shadow-sm"
+                      >
+                        {code}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    title="Plan route to this station"
+                    onClick={() => navigate(`/plan?dest=${encodeURIComponent(decodedName)}`)}
+                    className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-blue-500 hover:border-blue-500 transition-all active:scale-90 shadow-sm"
+                  >
+                    <Navigation className="h-4 w-4" />
+                  </button>
+                  <button
+                    title={isFavourite ? "Remove from favourites" : "Add to favourites"}
+                    onClick={toggleFavourite}
+                    className={`p-2 rounded-xl border transition-all active:scale-90 shadow-sm ${
+                      isFavourite
+                        ? "border-red-500/40 bg-red-500/10 text-red-500"
+                        : "border-border bg-card text-text-secondary hover:text-red-400 hover:border-red-400"
+                    }`}
+                  >
+                    <Heart className={`h-4 w-4 ${isFavourite ? "fill-red-500" : ""}`} />
+                  </button>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Operational Hours from GTFS */}
+              {opHours.length > 0 && (
+                <div className="pt-3 border-t border-border/80 space-y-2">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                    <Clock className="h-3.5 w-3.5 text-emerald-500" />
+                    Operational Hours
+                  </div>
+                  <div className="space-y-1.5">
+                    {opHours.map(({ lineId, code, first, last }) => (
+                      <div key={lineId} className="flex items-center gap-2">
+                        <span
+                          style={{ backgroundColor: getLineColor(lineId) }}
+                          className="text-[10px] font-extrabold text-white px-1.5 py-0.5 rounded leading-none"
+                        >
+                          {code}
+                        </span>
+                        <span className="text-xs font-semibold text-text-primary">
+                          {first} – {last}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── Right panel: Next departures ── */}
+          <div className="flex-1 min-w-0 space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary select-none">
+              Next Departures
+            </h2>
+
+            {isLoadingDeps && dirDeps.length === 0 ? (
+              <div className="flex items-center justify-center py-12 text-text-secondary">
+                <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                <span className="text-sm">Loading schedule…</span>
+              </div>
+            ) : (
+              depsByLine.map(({ lineId, directions }) => {
+                const lineColor = getLineColor(lineId);
+                if (directions.length === 0) return null;
+
+                return (
+                  <div
+                    key={lineId}
+                    className="glass-panel rounded-2xl border border-border bg-card shadow-lg overflow-hidden"
+                  >
+                    {/* Full-height left color bar + content */}
+                    <div className="flex overflow-hidden">
+                      <div style={{ backgroundColor: lineColor }} className="w-1 flex-shrink-0 self-stretch" />
+                      <div className="flex-1">
+                        {/* Line title */}
+                        <div className="p-4 bg-button-secondary/15 flex items-center gap-2">
+                          <Train style={{ color: lineColor }} className="h-5 w-5" />
+                          <span className="text-sm font-bold text-text-primary">{getLineName(lineId)}</span>
+                        </div>
+
+                        <div className="p-5 divide-y divide-border/60">
+                          {directions.map((dir) => {
+                            const key = `${lineId}_${dir.headsign}`;
+                            const isExpanded = isTimetableExpanded[key] || false;
+                            const activeTab = timetableTab[key] || (isWeekend ? "saturday" : "weekday");
+                            const ttData = timetableData[key];
+                            const timetable = ttData?.[activeTab] ?? [];
+                            const hourGroups = groupByHour(timetable);
+                            const currentTotalSecs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+                            const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+
+                            return (
+                              <div key={dir.headsign} className="py-4 first:pt-0 last:pb-0 space-y-4">
+                                <div className="flex items-center justify-between gap-4 flex-wrap">
+                                  {/* Direction label + status chip */}
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">Towards</span>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-sm font-bold text-text-primary flex items-center gap-1.5">
+                                        <ArrowRight className="h-4 w-4 text-text-secondary" />
+                                        {dir.displayDest}
+                                      </span>
+                                      {/* Approaching/Arriving chip for nearest train */}
+                                      {(() => {
+                                        const first = dir.departures[0];
+                                        if (!first) return null;
+                                        let secsAway = first.targetSecs - currentTotalSecs;
+                                        if (secsAway < -60) secsAway += 86400;
+                                        const { chip, chipColor } = depLabel(secsAway, true);
+                                        if (!chip) return null;
+                                        return (
+                                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${chipColor}`}>
+                                            {chip}
+                                          </span>
+                                        );
+                                      })()}
+                                    </div>
+                                  </div>
+
+                                  {/* Countdown badges */}
+                                  <div className="flex gap-2 flex-wrap">
+                                    {dir.departures.map((dep, dIdx) => {
+                                      let secsAway = dep.targetSecs - currentTotalSecs;
+                                      if (secsAway < -60) secsAway += 86400;
+                                      const { label, isPast } = depLabel(secsAway, dIdx === 0);
+                                      const isFirst = dIdx === 0;
+                                      return (
+                                        <div
+                                          key={dIdx}
+                                          className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl border text-center w-[76px] sm:w-[84px] flex-shrink-0 ${
+                                            isPast
+                                              ? "bg-button-secondary/30 border-border/40 text-text-secondary/40"
+                                              : isFirst
+                                              ? "bg-blue-600/10 border-blue-500/35 text-blue-500"
+                                              : "bg-card border-border/80 text-text-primary"
+                                          }`}
+                                        >
+                                          <span className="text-xs font-extrabold">{label}</span>
+                                          <span className="text-[8px] font-bold uppercase tracking-wider text-text-secondary/70 mt-0.5">{dep.timeStr}</span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+
+                                {/* View Full Timetable toggle */}
+                                <div className="pt-1">
+                                  <button
+                                    onClick={() => toggleTimetable(key, lineId, dir.headsign)}
+                                    className="flex items-center gap-1 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-wider"
+                                  >
+                                    {isExpanded ? (
+                                      <><ChevronUp className="h-3 w-3" />Hide Full Timetable</>
+                                    ) : (
+                                      <><ChevronDown className="h-3 w-3" />View Full Timetable</>
+                                    )}
+                                  </button>
+
+                                  {isExpanded && (
+                                    <div className="mt-3 rounded-xl border border-border bg-button-secondary/15 animate-fade-in overflow-hidden">
+                                      {/* Weekday / Saturday / Sunday tabs */}
+                                      <div className="flex border-b border-border">
+                                        {(["weekday", "saturday", "sunday"] as DayTab[]).map(tab => (
+                                          <button
+                                            key={tab}
+                                            onClick={() => setTimetableTab(prev => ({ ...prev, [key]: tab }))}
+                                            className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                                              activeTab === tab
+                                                ? "bg-blue-600 text-white"
+                                                : "text-text-secondary hover:text-text-primary"
+                                            }`}
+                                          >
+                                            {tab === "weekday" ? "Weekday" : tab === "saturday" ? "Saturday" : "Sunday"}
+                                          </button>
+                                        ))}
+                                      </div>
+
+                                      {/* Grouped by hour */}
+                                      <div className="p-4 max-h-64 overflow-y-auto space-y-3">
+                                        {!ttData ? (
+                                          <div className="flex items-center justify-center py-4 text-text-secondary text-xs gap-2">
+                                            <RefreshCw className="h-3.5 w-3.5 animate-spin" />Loading timetable…
+                                          </div>
+                                        ) : Object.keys(hourGroups).length === 0 ? (
+                                          <p className="text-xs text-text-secondary text-center py-4">No schedule data for this day.</p>
+                                        ) : (
+                                          Object.entries(hourGroups)
+                                            .sort(([a], [b]) => {
+                                              let hrA = Number(a);
+                                              let hrB = Number(b);
+                                              if (hrA < 3) hrA += 24;
+                                              if (hrB < 3) hrB += 24;
+                                              return hrA - hrB;
+                                            })
+                                            .map(([hourStr, hourTimes]) => {
+                                              const hour = Number(hourStr);
+                                              const ampm = hour >= 12 ? "PM" : "AM";
+                                              const displayH = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+                                              const currentDay = getDayType(now);
+                                              const isPastHour = activeTab === currentDay && hour < now.getHours() && hour >= 3;
+
+                                              const intervals = hourTimes.length > 1
+                                                ? hourTimes.slice(1).map((t, i) => timeStrToTotalMins(t) - timeStrToTotalMins(hourTimes[i]))
+                                                : [];
+                                              const avgInterval = intervals.length > 0
+                                                ? Math.round(intervals.reduce((a, b) => a + b, 0) / intervals.length)
+                                                : null;
+
+                                              return (
+                                                <div key={hour}>
+                                                  <div className="flex items-center gap-2 mb-1.5">
+                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${isPastHour ? "text-text-secondary/40" : "text-text-secondary"}`}>
+                                                      {displayH} {ampm}
+                                                    </span>
+                                                    {avgInterval && (
+                                                      <span className={`text-[9px] ${isPastHour ? "text-text-secondary/30" : "text-text-secondary/60"}`}>
+                                                        — every {avgInterval} min
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                  <div className="flex flex-wrap gap-1.5">
+                                                    {hourTimes.map((t) => {
+                                                      const tMins = timeStrToTotalMins(t);
+                                                      const isPast = activeTab === currentDay && (
+                                                        (tMins < currentTotalMins && tMins >= 180) || 
+                                                        (tMins < currentTotalMins && currentTotalMins < 180)
+                                                      );
+                                                      const nextIdx = hourTimes.findIndex(tt => timeStrToTotalMins(tt) >= currentTotalMins);
+                                                      const isNextTrain = activeTab === currentDay && hour === now.getHours() && hourTimes.indexOf(t) === nextIdx;
+                                                      return (
+                                                        <span
+                                                          key={t}
+                                                          className={`text-[10px] font-semibold px-2 py-0.5 rounded border select-none ${
+                                                            isNextTrain
+                                                              ? "border-emerald-500 bg-emerald-500/10 text-emerald-500 font-bold"
+                                                              : isPast
+                                                              ? "border-border/30 text-text-secondary/30 bg-transparent"
+                                                              : "border-border/60 bg-card text-text-primary"
+                                                          }`}
+                                                        >
+                                                          {t}
+                                                        </span>
+                                                      );
+                                                    })}
+                                                  </div>
+                                                </div>
+                                              );
+                                            })
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
 

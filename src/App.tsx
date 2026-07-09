@@ -5,6 +5,7 @@ import { MapView } from "./pages/MapView";
 import { PlanView } from "./pages/PlanView";
 import { BusView } from "./pages/BusView";
 import { StationInfoView } from "./pages/StationInfoView";
+import { LinesView } from "./pages/LinesView";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<MapView />} />
+            <Route path="/lines" element={<LinesView />} />
             <Route path="/plan" element={<PlanView />} />
             <Route path="/bus" element={<BusView />} />
             <Route path="/station/:stationName" element={<StationInfoView />} />

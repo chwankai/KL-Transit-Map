@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { stations, lines, findRoute } from "../lib/transit-data";
 import type { Route } from "../lib/transit-data";
 import { fetchMyRapidRoute, getCurrentDateTime, subtractSecondsFromDatetime, geocodeStation, fetchSingleRoute } from "../lib/routing";
@@ -9,6 +10,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export const PlanView: React.FC = () => {
   const { farePref } = useSettings();
+  const location = useLocation();
+
   const [origin, setOrigin] = useState("");
   const [dest, setDest] = useState("");
   const [timeMode, setTimeMode] = useState<"now" | "depart" | "arrive">("now");
@@ -47,7 +50,27 @@ export const PlanView: React.FC = () => {
   const originRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
 
-  const sortedStationNames = Object.keys(stations).sort();
+  // Favourite stations sorted alphabetically, surfaced at top of suggestions
+  const favouriteStations: string[] = JSON.parse(localStorage.getItem("favourite_stations") || "[]");
+
+  const sortedStationNames = (() => {
+    const all = Object.keys(stations).sort();
+    if (favouriteStations.length === 0) return all;
+    const favSet = new Set(favouriteStations);
+    const favSorted = [...favouriteStations].sort();
+    const rest = all.filter(s => !favSet.has(s));
+    return [...favSorted, ...rest];
+  })();
+
+  // Pre-fill destination from URL query param (?dest=StationName)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const destParam = params.get("dest");
+    if (destParam && stations[destParam]) {
+      setDest(destParam);
+      setDestFilter("");
+    }
+  }, [location.search]);
 
   // Initialize date/time inputs
   useEffect(() => {
@@ -788,7 +811,13 @@ export const PlanView: React.FC = () => {
                             <span className="absolute left-[2px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10 animate-pulse-soft" />
                             
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs font-bold text-text-primary">{activeRoute.path[0]}</span>
+                              <a
+                                href={`#/station/${encodeURIComponent(activeRoute.path[0])}`}
+                                className="text-xs font-bold text-text-primary cursor-pointer"
+                                style={{ textDecoration: 'none' }}
+                              >
+                                {activeRoute.path[0]}
+                              </a>
                               {getStationBadges(activeRoute.path[0])}
                               {activeRoute.etaDepart && (
                                 <span className="text-[10px] text-text-secondary font-semibold ml-auto">{activeRoute.etaDepart}</span>
@@ -879,7 +908,13 @@ export const PlanView: React.FC = () => {
                                           <div key={stop} className="flex items-center justify-between text-[11px] text-text-secondary">
                                             <div className="flex items-center gap-2">
                                               <span style={{ backgroundColor: color }} className="h-1.5 w-1.5 rounded-full" />
-                                              <span>{stop}</span>
+                                              <a
+                                                href={`#/station/${encodeURIComponent(stop)}`}
+                                                className="cursor-pointer"
+                                                style={{ textDecoration: 'none', color: 'inherit' }}
+                                              >
+                                                {stop}
+                                              </a>
                                             </div>
                                             {getStationBadges(stop)}
                                           </div>
@@ -901,7 +936,13 @@ export const PlanView: React.FC = () => {
                                   <span className="absolute left-[2px] top-2 flex h-4 w-4 items-center justify-center rounded-full bg-card border-2 border-slate-400 dark:border-slate-500 z-10" />
                                   
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-xs font-bold text-text-primary">{seg.stations[seg.stations.length - 1]}</span>
+                                    <a
+                                      href={`#/station/${encodeURIComponent(seg.stations[seg.stations.length - 1])}`}
+                                      className="text-xs font-bold text-text-primary cursor-pointer"
+                                      style={{ textDecoration: 'none' }}
+                                    >
+                                      {seg.stations[seg.stations.length - 1]}
+                                    </a>
                                     {getStationBadges(seg.stations[seg.stations.length - 1])}
                                     {meta?.arriveTime && (
                                       <span className="text-[10px] text-text-secondary font-semibold ml-auto">{meta.arriveTime}</span>

@@ -1,0 +1,2130 @@
+{
+  "calendar": {
+    "Sun": {
+      "weekday": false,
+      "saturday": false,
+      "sunday": true
+    },
+    "Sat": {
+      "weekday": false,
+      "saturday": true,
+      "sunday": false
+    },
+    "SatSun": {
+      "weekday": false,
+      "saturday": true,
+      "sunday": true
+    },
+    "MonThu": {
+      "weekday": true,
+      "saturday": false,
+      "sunday": false
+    },
+    "Fri": {
+      "weekday": true,
+      "saturday": false,
+      "sunday": false
+    },
+    "MonFri": {
+      "weekday": true,
+      "saturday": false,
+      "sunday": false
+    },
+    "weekday": {
+      "weekday": true,
+      "saturday": false,
+      "sunday": false
+    },
+    "weekend": {
+      "weekday": false,
+      "saturday": true,
+      "sunday": true
+    }
+  },
+  "lines": {
+    "AG": {
+      "directions": {
+        "From Ampang to Sentul Timur": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 300
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 84300,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "AMPANG": 0,
+                "CAHAYA": 123,
+                "CEMPAKA": 195,
+                "PANDAN INDAH": 283,
+                "PANDAN JAYA": 381,
+                "MALURI": 508,
+                "MIHARJA": 609,
+                "CHAN SOW LIN": 709,
+                "PUDU": 814,
+                "HANG TUAH": 905,
+                "PLAZA RAKYAT": 989,
+                "MASJID JAMEK": 1099,
+                "BANDARAYA - UOB": 1212,
+                "SULTAN ISMAIL": 1299,
+                "PWTC": 1387,
+                "TITIWANGSA": 1490,
+                "SENTUL": 1570,
+                "SENTUL TIMUR": 1667
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84300,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "AMPANG": 0,
+                "CAHAYA": 123,
+                "CEMPAKA": 195,
+                "PANDAN INDAH": 283,
+                "PANDAN JAYA": 381,
+                "MALURI": 508,
+                "MIHARJA": 609,
+                "CHAN SOW LIN": 709,
+                "PUDU": 814,
+                "HANG TUAH": 905,
+                "PLAZA RAKYAT": 989,
+                "MASJID JAMEK": 1099,
+                "BANDARAYA - UOB": 1212,
+                "SULTAN ISMAIL": 1299,
+                "PWTC": 1387,
+                "TITIWANGSA": 1490,
+                "SENTUL": 1570,
+                "SENTUL TIMUR": 1667
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84300,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "AMPANG": 0,
+                "CAHAYA": 123,
+                "CEMPAKA": 195,
+                "PANDAN INDAH": 283,
+                "PANDAN JAYA": 381,
+                "MALURI": 508,
+                "MIHARJA": 609,
+                "CHAN SOW LIN": 709,
+                "PUDU": 814,
+                "HANG TUAH": 905,
+                "PLAZA RAKYAT": 989,
+                "MASJID JAMEK": 1099,
+                "BANDARAYA - UOB": 1212,
+                "SULTAN ISMAIL": 1299,
+                "PWTC": 1387,
+                "TITIWANGSA": 1490,
+                "SENTUL": 1570,
+                "SENTUL TIMUR": 1667
+              }
+            }
+          ]
+        },
+        "From Sentul Timur to Ampang": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 300
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 84300,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "SENTUL TIMUR": 0,
+                "SENTUL": 97,
+                "TITIWANGSA": 177,
+                "PWTC": 280,
+                "SULTAN ISMAIL": 368,
+                "BANDARAYA - UOB": 455,
+                "MASJID JAMEK": 568,
+                "PLAZA RAKYAT": 678,
+                "HANG TUAH": 762,
+                "PUDU": 853,
+                "CHAN SOW LIN": 958,
+                "MIHARJA": 1052,
+                "MALURI": 1156,
+                "PANDAN JAYA": 1282,
+                "PANDAN INDAH": 1381,
+                "CEMPAKA": 1471,
+                "CAHAYA": 1545,
+                "AMPANG": 1682
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84300,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "SENTUL TIMUR": 0,
+                "SENTUL": 97,
+                "TITIWANGSA": 177,
+                "PWTC": 280,
+                "SULTAN ISMAIL": 368,
+                "BANDARAYA - UOB": 455,
+                "MASJID JAMEK": 568,
+                "PLAZA RAKYAT": 678,
+                "HANG TUAH": 762,
+                "PUDU": 853,
+                "CHAN SOW LIN": 958,
+                "MIHARJA": 1052,
+                "MALURI": 1156,
+                "PANDAN JAYA": 1282,
+                "PANDAN INDAH": 1381,
+                "CEMPAKA": 1471,
+                "CAHAYA": 1545,
+                "AMPANG": 1682
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84300,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "SENTUL TIMUR": 0,
+                "SENTUL": 97,
+                "TITIWANGSA": 177,
+                "PWTC": 280,
+                "SULTAN ISMAIL": 368,
+                "BANDARAYA - UOB": 455,
+                "MASJID JAMEK": 568,
+                "PLAZA RAKYAT": 678,
+                "HANG TUAH": 762,
+                "PUDU": 853,
+                "CHAN SOW LIN": 958,
+                "MIHARJA": 1052,
+                "MALURI": 1156,
+                "PANDAN JAYA": 1282,
+                "PANDAN INDAH": 1381,
+                "CEMPAKA": 1471,
+                "CAHAYA": 1545,
+                "AMPANG": 1682
+              }
+            }
+          ]
+        }
+      }
+    },
+    "KJ": {
+      "directions": {
+        "From Putra Heights to Gombak": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 83700,
+                  "headway_secs": 420
+                }
+              ],
+              "offsets": {
+                "PUTRA HEIGHTS": 0,
+                "SUBANG ALAM": 199,
+                "ALAM MEGAH": 358,
+                "USJ 21": 592,
+                "WAWASAN": 745,
+                "TAIPAN": 910,
+                "USJ 7": 1035,
+                "SS 18": 1300,
+                "SS 15": 1429,
+                "SUBANG JAYA": 1627,
+                "GLENMARIE": 1838,
+                "ARA DAMANSARA": 2025,
+                "LEMBAH SUBANG": 2135,
+                "KELANA JAYA": 2303,
+                "TAMAN BAHAGIA": 2435,
+                "TAMAN PARAMOUNT": 2585,
+                "ASIA JAYA": 2746,
+                "TAMAN JAYA": 2860,
+                "UNIVERSITI": 3086,
+                "KERINCHI": 3215,
+                "ABDULLAH HUKUM": 3344,
+                "BANGSAR - BANK RAKYAT": 3505,
+                "KL SENTRAL - REDONE": 3668,
+                "PASAR SENI": 3882,
+                "MASJID JAMEK": 4063,
+                "DANG WANGI": 4217,
+                "KAMPUNG BARU - CBP COOPBANK PERTAMA": 4331,
+                "KLCC": 4479,
+                "AMPANG PARK": 4629,
+                "DAMAI": 4780,
+                "DATO' KERAMAT": 4906,
+                "JELATEK": 5021,
+                "SETIAWANGSA": 5140,
+                "SRI RAMPAI": 5405,
+                "WANGSA MAJU": 5547,
+                "TAMAN MELATI": 5725,
+                "GOMBAK": 5883
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 83700,
+                  "headway_secs": 420
+                }
+              ],
+              "offsets": {
+                "PUTRA HEIGHTS": 0,
+                "SUBANG ALAM": 199,
+                "ALAM MEGAH": 358,
+                "USJ 21": 592,
+                "WAWASAN": 745,
+                "TAIPAN": 910,
+                "USJ 7": 1035,
+                "SS 18": 1300,
+                "SS 15": 1429,
+                "SUBANG JAYA": 1627,
+                "GLENMARIE": 1838,
+                "ARA DAMANSARA": 2025,
+                "LEMBAH SUBANG": 2135,
+                "KELANA JAYA": 2303,
+                "TAMAN BAHAGIA": 2435,
+                "TAMAN PARAMOUNT": 2585,
+                "ASIA JAYA": 2746,
+                "TAMAN JAYA": 2860,
+                "UNIVERSITI": 3086,
+                "KERINCHI": 3215,
+                "ABDULLAH HUKUM": 3344,
+                "BANGSAR - BANK RAKYAT": 3505,
+                "KL SENTRAL - REDONE": 3668,
+                "PASAR SENI": 3882,
+                "MASJID JAMEK": 4063,
+                "DANG WANGI": 4217,
+                "KAMPUNG BARU - CBP COOPBANK PERTAMA": 4331,
+                "KLCC": 4479,
+                "AMPANG PARK": 4629,
+                "DAMAI": 4780,
+                "DATO' KERAMAT": 4906,
+                "JELATEK": 5021,
+                "SETIAWANGSA": 5140,
+                "SRI RAMPAI": 5405,
+                "WANGSA MAJU": 5547,
+                "TAMAN MELATI": 5725,
+                "GOMBAK": 5883
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 83700,
+                  "headway_secs": 420
+                }
+              ],
+              "offsets": {
+                "PUTRA HEIGHTS": 0,
+                "SUBANG ALAM": 199,
+                "ALAM MEGAH": 358,
+                "USJ 21": 592,
+                "WAWASAN": 745,
+                "TAIPAN": 910,
+                "USJ 7": 1035,
+                "SS 18": 1300,
+                "SS 15": 1429,
+                "SUBANG JAYA": 1627,
+                "GLENMARIE": 1838,
+                "ARA DAMANSARA": 2025,
+                "LEMBAH SUBANG": 2135,
+                "KELANA JAYA": 2303,
+                "TAMAN BAHAGIA": 2435,
+                "TAMAN PARAMOUNT": 2585,
+                "ASIA JAYA": 2746,
+                "TAMAN JAYA": 2860,
+                "UNIVERSITI": 3086,
+                "KERINCHI": 3215,
+                "ABDULLAH HUKUM": 3344,
+                "BANGSAR - BANK RAKYAT": 3505,
+                "KL SENTRAL - REDONE": 3668,
+                "PASAR SENI": 3882,
+                "MASJID JAMEK": 4063,
+                "DANG WANGI": 4217,
+                "KAMPUNG BARU - CBP COOPBANK PERTAMA": 4331,
+                "KLCC": 4479,
+                "AMPANG PARK": 4629,
+                "DAMAI": 4780,
+                "DATO' KERAMAT": 4906,
+                "JELATEK": 5021,
+                "SETIAWANGSA": 5140,
+                "SRI RAMPAI": 5405,
+                "WANGSA MAJU": 5547,
+                "TAMAN MELATI": 5725,
+                "GOMBAK": 5883
+              }
+            }
+          ]
+        },
+        "From Gombak to Putra Heights": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 83700,
+                  "headway_secs": 420
+                }
+              ],
+              "offsets": {
+                "GOMBAK": 0,
+                "TAMAN MELATI": 173,
+                "WANGSA MAJU": 348,
+                "SRI RAMPAI": 472,
+                "SETIAWANGSA": 742,
+                "JELATEK": 868,
+                "DATO' KERAMAT": 985,
+                "DAMAI": 1112,
+                "AMPANG PARK": 1285,
+                "KLCC": 1435,
+                "KAMPUNG BARU - CBP COOPBANK PERTAMA": 1564,
+                "DANG WANGI": 1676,
+                "MASJID JAMEK": 1852,
+                "PASAR SENI": 2034,
+                "KL SENTRAL - REDONE": 2242,
+                "BANGSAR - BANK RAKYAT": 2384,
+                "ABDULLAH HUKUM": 2536,
+                "KERINCHI": 2665,
+                "UNIVERSITI": 2789,
+                "TAMAN JAYA": 3006,
+                "ASIA JAYA": 3120,
+                "TAMAN PARAMOUNT": 3280,
+                "TAMAN BAHAGIA": 3426,
+                "KELANA JAYA": 3619,
+                "LEMBAH SUBANG": 3789,
+                "ARA DAMANSARA": 3897,
+                "GLENMARIE": 4063,
+                "SUBANG JAYA": 4237,
+                "SS 15": 4437,
+                "SS 18": 4576,
+                "USJ 7": 4845,
+                "TAIPAN": 4973,
+                "WAWASAN": 5143,
+                "USJ 21": 5296,
+                "ALAM MEGAH": 5530,
+                "SUBANG ALAM": 5694,
+                "PUTRA HEIGHTS": 5891
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 83700,
+                  "headway_secs": 420
+                }
+              ],
+              "offsets": {
+                "GOMBAK": 0,
+                "TAMAN MELATI": 173,
+                "WANGSA MAJU": 348,
+                "SRI RAMPAI": 472,
+                "SETIAWANGSA": 742,
+                "JELATEK": 868,
+                "DATO' KERAMAT": 985,
+                "DAMAI": 1112,
+                "AMPANG PARK": 1285,
+                "KLCC": 1435,
+                "KAMPUNG BARU - CBP COOPBANK PERTAMA": 1564,
+                "DANG WANGI": 1676,
+                "MASJID JAMEK": 1852,
+                "PASAR SENI": 2034,
+                "KL SENTRAL - REDONE": 2242,
+                "BANGSAR - BANK RAKYAT": 2384,
+                "ABDULLAH HUKUM": 2536,
+                "KERINCHI": 2665,
+                "UNIVERSITI": 2789,
+                "TAMAN JAYA": 3006,
+                "ASIA JAYA": 3120,
+                "TAMAN PARAMOUNT": 3280,
+                "TAMAN BAHAGIA": 3426,
+                "KELANA JAYA": 3619,
+                "LEMBAH SUBANG": 3789,
+                "ARA DAMANSARA": 3897,
+                "GLENMARIE": 4063,
+                "SUBANG JAYA": 4237,
+                "SS 15": 4437,
+                "SS 18": 4576,
+                "USJ 7": 4845,
+                "TAIPAN": 4973,
+                "WAWASAN": 5143,
+                "USJ 21": 5296,
+                "ALAM MEGAH": 5530,
+                "SUBANG ALAM": 5694,
+                "PUTRA HEIGHTS": 5891
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 83700,
+                  "headway_secs": 420
+                }
+              ],
+              "offsets": {
+                "GOMBAK": 0,
+                "TAMAN MELATI": 173,
+                "WANGSA MAJU": 348,
+                "SRI RAMPAI": 472,
+                "SETIAWANGSA": 742,
+                "JELATEK": 868,
+                "DATO' KERAMAT": 985,
+                "DAMAI": 1112,
+                "AMPANG PARK": 1285,
+                "KLCC": 1435,
+                "KAMPUNG BARU - CBP COOPBANK PERTAMA": 1564,
+                "DANG WANGI": 1676,
+                "MASJID JAMEK": 1852,
+                "PASAR SENI": 2034,
+                "KL SENTRAL - REDONE": 2242,
+                "BANGSAR - BANK RAKYAT": 2384,
+                "ABDULLAH HUKUM": 2536,
+                "KERINCHI": 2665,
+                "UNIVERSITI": 2789,
+                "TAMAN JAYA": 3006,
+                "ASIA JAYA": 3120,
+                "TAMAN PARAMOUNT": 3280,
+                "TAMAN BAHAGIA": 3426,
+                "KELANA JAYA": 3619,
+                "LEMBAH SUBANG": 3789,
+                "ARA DAMANSARA": 3897,
+                "GLENMARIE": 4063,
+                "SUBANG JAYA": 4237,
+                "SS 15": 4437,
+                "SS 18": 4576,
+                "USJ 7": 4845,
+                "TAIPAN": 4973,
+                "WAWASAN": 5143,
+                "USJ 21": 5296,
+                "ALAM MEGAH": 5530,
+                "SUBANG ALAM": 5694,
+                "PUTRA HEIGHTS": 5891
+              }
+            }
+          ]
+        }
+      }
+    },
+    "SP": {
+      "directions": {
+        "From Putra Heights to Sentul Timur": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 300
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 86400,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "PUTRA HEIGHTS": 0,
+                "PUCHONG PRIMA": 232,
+                "PUCHONG PERDANA": 397,
+                "BANDAR PUTERI": 526,
+                "TAMAN PERINDUSTRIAN PUCHONG": 630,
+                "PUSAT BANDAR PUCHONG": 750,
+                "IOI PUCHONG JAYA": 838,
+                "KINRARA": 1064,
+                "ALAM SUTERA": 1289,
+                "MUHIBBAH": 1421,
+                "AWAN BESAR": 1550,
+                "SRI PETALING": 1658,
+                "BUKIT JALIL": 1753,
+                "SUNGAI BESI": 1918,
+                "BANDAR TASIK SELATAN": 2042,
+                "BANDAR TUN RAZAK": 2194,
+                "SALAK SELATAN": 2332,
+                "CHERAS": 2461,
+                "CHAN SOW LIN": 2617,
+                "PUDU": 2726,
+                "HANG TUAH": 2815,
+                "PLAZA RAKYAT": 2906,
+                "MASJID JAMEK": 3015,
+                "BANDARAYA - UOB": 3129,
+                "SULTAN ISMAIL": 3216,
+                "PWTC": 3304,
+                "TITIWANGSA": 3404,
+                "SENTUL": 3486,
+                "SENTUL TIMUR": 3587
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "PUTRA HEIGHTS": 0,
+                "PUCHONG PRIMA": 232,
+                "PUCHONG PERDANA": 397,
+                "BANDAR PUTERI": 526,
+                "TAMAN PERINDUSTRIAN PUCHONG": 630,
+                "PUSAT BANDAR PUCHONG": 750,
+                "IOI PUCHONG JAYA": 838,
+                "KINRARA": 1064,
+                "ALAM SUTERA": 1289,
+                "MUHIBBAH": 1421,
+                "AWAN BESAR": 1550,
+                "SRI PETALING": 1658,
+                "BUKIT JALIL": 1753,
+                "SUNGAI BESI": 1918,
+                "BANDAR TASIK SELATAN": 2042,
+                "BANDAR TUN RAZAK": 2194,
+                "SALAK SELATAN": 2332,
+                "CHERAS": 2461,
+                "CHAN SOW LIN": 2617,
+                "PUDU": 2726,
+                "HANG TUAH": 2815,
+                "PLAZA RAKYAT": 2906,
+                "MASJID JAMEK": 3015,
+                "BANDARAYA - UOB": 3129,
+                "SULTAN ISMAIL": 3216,
+                "PWTC": 3304,
+                "TITIWANGSA": 3404,
+                "SENTUL": 3486,
+                "SENTUL TIMUR": 3587
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "PUTRA HEIGHTS": 0,
+                "PUCHONG PRIMA": 232,
+                "PUCHONG PERDANA": 397,
+                "BANDAR PUTERI": 526,
+                "TAMAN PERINDUSTRIAN PUCHONG": 630,
+                "PUSAT BANDAR PUCHONG": 750,
+                "IOI PUCHONG JAYA": 838,
+                "KINRARA": 1064,
+                "ALAM SUTERA": 1289,
+                "MUHIBBAH": 1421,
+                "AWAN BESAR": 1550,
+                "SRI PETALING": 1658,
+                "BUKIT JALIL": 1753,
+                "SUNGAI BESI": 1918,
+                "BANDAR TASIK SELATAN": 2042,
+                "BANDAR TUN RAZAK": 2194,
+                "SALAK SELATAN": 2332,
+                "CHERAS": 2461,
+                "CHAN SOW LIN": 2617,
+                "PUDU": 2726,
+                "HANG TUAH": 2815,
+                "PLAZA RAKYAT": 2906,
+                "MASJID JAMEK": 3015,
+                "BANDARAYA - UOB": 3129,
+                "SULTAN ISMAIL": 3216,
+                "PWTC": 3304,
+                "TITIWANGSA": 3404,
+                "SENTUL": 3486,
+                "SENTUL TIMUR": 3587
+              }
+            }
+          ]
+        },
+        "From Sentul Timur to Putra Heights": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 300
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 180
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 86400,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "SENTUL TIMUR": 0,
+                "SENTUL": 97,
+                "TITIWANGSA": 177,
+                "PWTC": 280,
+                "SULTAN ISMAIL": 368,
+                "BANDARAYA - UOB": 455,
+                "MASJID JAMEK": 568,
+                "PLAZA RAKYAT": 678,
+                "HANG TUAH": 762,
+                "PUDU": 853,
+                "CHAN SOW LIN": 958,
+                "CHERAS": 1104,
+                "SALAK SELATAN": 1233,
+                "BANDAR TUN RAZAK": 1377,
+                "BANDAR TASIK SELATAN": 1528,
+                "SUNGAI BESI": 1653,
+                "BUKIT JALIL": 1824,
+                "SRI PETALING": 1953,
+                "AWAN BESAR": 2061,
+                "MUHIBBAH": 2190,
+                "ALAM SUTERA": 2322,
+                "KINRARA": 2547,
+                "IOI PUCHONG JAYA": 2773,
+                "PUSAT BANDAR PUCHONG": 2861,
+                "TAMAN PERINDUSTRIAN PUCHONG": 2981,
+                "BANDAR PUTERI": 3085,
+                "PUCHONG PERDANA": 3214,
+                "PUCHONG PRIMA": 3379,
+                "PUTRA HEIGHTS": 3611
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "SENTUL TIMUR": 0,
+                "SENTUL": 97,
+                "TITIWANGSA": 177,
+                "PWTC": 280,
+                "SULTAN ISMAIL": 368,
+                "BANDARAYA - UOB": 455,
+                "MASJID JAMEK": 568,
+                "PLAZA RAKYAT": 678,
+                "HANG TUAH": 762,
+                "PUDU": 853,
+                "CHAN SOW LIN": 958,
+                "CHERAS": 1104,
+                "SALAK SELATAN": 1233,
+                "BANDAR TUN RAZAK": 1377,
+                "BANDAR TASIK SELATAN": 1528,
+                "SUNGAI BESI": 1653,
+                "BUKIT JALIL": 1824,
+                "SRI PETALING": 1953,
+                "AWAN BESAR": 2061,
+                "MUHIBBAH": 2190,
+                "ALAM SUTERA": 2322,
+                "KINRARA": 2547,
+                "IOI PUCHONG JAYA": 2773,
+                "PUSAT BANDAR PUCHONG": 2861,
+                "TAMAN PERINDUSTRIAN PUCHONG": 2981,
+                "BANDAR PUTERI": 3085,
+                "PUCHONG PERDANA": 3214,
+                "PUCHONG PRIMA": 3379,
+                "PUTRA HEIGHTS": 3611
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 300
+                }
+              ],
+              "offsets": {
+                "SENTUL TIMUR": 0,
+                "SENTUL": 97,
+                "TITIWANGSA": 177,
+                "PWTC": 280,
+                "SULTAN ISMAIL": 368,
+                "BANDARAYA - UOB": 455,
+                "MASJID JAMEK": 568,
+                "PLAZA RAKYAT": 678,
+                "HANG TUAH": 762,
+                "PUDU": 853,
+                "CHAN SOW LIN": 958,
+                "CHERAS": 1104,
+                "SALAK SELATAN": 1233,
+                "BANDAR TUN RAZAK": 1377,
+                "BANDAR TASIK SELATAN": 1528,
+                "SUNGAI BESI": 1653,
+                "BUKIT JALIL": 1824,
+                "SRI PETALING": 1953,
+                "AWAN BESAR": 2061,
+                "MUHIBBAH": 2190,
+                "ALAM SUTERA": 2322,
+                "KINRARA": 2547,
+                "IOI PUCHONG JAYA": 2773,
+                "PUSAT BANDAR PUCHONG": 2861,
+                "TAMAN PERINDUSTRIAN PUCHONG": 2981,
+                "BANDAR PUTERI": 3085,
+                "PUCHONG PERDANA": 3214,
+                "PUCHONG PRIMA": 3379,
+                "PUTRA HEIGHTS": 3611
+              }
+            }
+          ]
+        }
+      }
+    },
+    "KG": {
+      "directions": {
+        "From Kwasa Damansara to Kajang": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 360
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 360
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 86400,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KWASA DAMANSARA": 0,
+                "KWASA SENTRAL": 138,
+                "KOTA DAMANSARA": 344,
+                "SURIAN": 490,
+                "MUTIARA DAMANSARA": 636,
+                "BANDAR UTAMA": 842,
+                "TAMAN TUN DR ISMAIL": 1048,
+                "PHILEO DAMANSARA": 1194,
+                "PUSAT BANDAR DAMANSARA": 1464,
+                "SEMANTAN": 1670,
+                "MUZIUM NEGARA": 1936,
+                "PASAR SENI": 2156,
+                "MERDEKA": 2316,
+                "BUKIT BINTANG": 2536,
+                "TUN RAZAK EXCHANGE": 2756,
+                "COCHRANE": 2902,
+                "MALURI": 3048,
+                "TAMAN PERTAMA": 3268,
+                "TAMAN MIDAH": 3414,
+                "TAMAN MUTIARA": 3620,
+                "TAMAN CONNAUGHT": 3826,
+                "TAMAN SUNTEX": 4032,
+                "SRI RAYA": 4178,
+                "BANDAR TUN HUSSEIN ONN": 4384,
+                "BATU 11 CHERAS": 4530,
+                "BUKIT DUKUNG": 4736,
+                "SUNGAI JERNIH": 5002,
+                "STADIUM KAJANG": 5148,
+                "KAJANG": 5294
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KWASA DAMANSARA": 0,
+                "KWASA SENTRAL": 138,
+                "KOTA DAMANSARA": 344,
+                "SURIAN": 490,
+                "MUTIARA DAMANSARA": 636,
+                "BANDAR UTAMA": 842,
+                "TAMAN TUN DR ISMAIL": 1048,
+                "PHILEO DAMANSARA": 1194,
+                "PUSAT BANDAR DAMANSARA": 1464,
+                "SEMANTAN": 1670,
+                "MUZIUM NEGARA": 1936,
+                "PASAR SENI": 2156,
+                "MERDEKA": 2316,
+                "BUKIT BINTANG": 2536,
+                "TUN RAZAK EXCHANGE": 2756,
+                "COCHRANE": 2902,
+                "MALURI": 3048,
+                "TAMAN PERTAMA": 3268,
+                "TAMAN MIDAH": 3414,
+                "TAMAN MUTIARA": 3620,
+                "TAMAN CONNAUGHT": 3826,
+                "TAMAN SUNTEX": 4032,
+                "SRI RAYA": 4178,
+                "BANDAR TUN HUSSEIN ONN": 4384,
+                "BATU 11 CHERAS": 4530,
+                "BUKIT DUKUNG": 4736,
+                "SUNGAI JERNIH": 5002,
+                "STADIUM KAJANG": 5148,
+                "KAJANG": 5294
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KWASA DAMANSARA": 0,
+                "KWASA SENTRAL": 138,
+                "KOTA DAMANSARA": 344,
+                "SURIAN": 490,
+                "MUTIARA DAMANSARA": 636,
+                "BANDAR UTAMA": 842,
+                "TAMAN TUN DR ISMAIL": 1048,
+                "PHILEO DAMANSARA": 1194,
+                "PUSAT BANDAR DAMANSARA": 1464,
+                "SEMANTAN": 1670,
+                "MUZIUM NEGARA": 1936,
+                "PASAR SENI": 2156,
+                "MERDEKA": 2316,
+                "BUKIT BINTANG": 2536,
+                "TUN RAZAK EXCHANGE": 2756,
+                "COCHRANE": 2902,
+                "MALURI": 3048,
+                "TAMAN PERTAMA": 3268,
+                "TAMAN MIDAH": 3414,
+                "TAMAN MUTIARA": 3620,
+                "TAMAN CONNAUGHT": 3826,
+                "TAMAN SUNTEX": 4032,
+                "SRI RAYA": 4178,
+                "BANDAR TUN HUSSEIN ONN": 4384,
+                "BATU 11 CHERAS": 4530,
+                "BUKIT DUKUNG": 4736,
+                "SUNGAI JERNIH": 5002,
+                "STADIUM KAJANG": 5148,
+                "KAJANG": 5294
+              }
+            }
+          ]
+        },
+        "From Kajang to Kwasa Damansara": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 360
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 360
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 86400,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KAJANG": 0,
+                "STADIUM KAJANG": 138,
+                "SUNGAI JERNIH": 284,
+                "BUKIT DUKUNG": 550,
+                "BATU 11 CHERAS": 756,
+                "BANDAR TUN HUSSEIN ONN": 902,
+                "SRI RAYA": 1108,
+                "TAMAN SUNTEX": 1254,
+                "TAMAN CONNAUGHT": 1460,
+                "TAMAN MUTIARA": 1666,
+                "TAMAN MIDAH": 1872,
+                "TAMAN PERTAMA": 2018,
+                "MALURI": 2224,
+                "COCHRANE": 2384,
+                "TUN RAZAK EXCHANGE": 2530,
+                "BUKIT BINTANG": 2736,
+                "MERDEKA": 2956,
+                "PASAR SENI": 3116,
+                "MUZIUM NEGARA": 3336,
+                "SEMANTAN": 3616,
+                "PUSAT BANDAR DAMANSARA": 3822,
+                "PHILEO DAMANSARA": 4088,
+                "TAMAN TUN DR ISMAIL": 4248,
+                "BANDAR UTAMA": 4454,
+                "MUTIARA DAMANSARA": 4660,
+                "SURIAN": 4806,
+                "KOTA DAMANSARA": 4952,
+                "KWASA SENTRAL": 5158,
+                "KWASA DAMANSARA": 5304
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KAJANG": 0,
+                "STADIUM KAJANG": 138,
+                "SUNGAI JERNIH": 284,
+                "BUKIT DUKUNG": 550,
+                "BATU 11 CHERAS": 756,
+                "BANDAR TUN HUSSEIN ONN": 902,
+                "SRI RAYA": 1108,
+                "TAMAN SUNTEX": 1254,
+                "TAMAN CONNAUGHT": 1460,
+                "TAMAN MUTIARA": 1666,
+                "TAMAN MIDAH": 1872,
+                "TAMAN PERTAMA": 2018,
+                "MALURI": 2224,
+                "COCHRANE": 2384,
+                "TUN RAZAK EXCHANGE": 2530,
+                "BUKIT BINTANG": 2736,
+                "MERDEKA": 2956,
+                "PASAR SENI": 3116,
+                "MUZIUM NEGARA": 3336,
+                "SEMANTAN": 3616,
+                "PUSAT BANDAR DAMANSARA": 3822,
+                "PHILEO DAMANSARA": 4088,
+                "TAMAN TUN DR ISMAIL": 4248,
+                "BANDAR UTAMA": 4454,
+                "MUTIARA DAMANSARA": 4660,
+                "SURIAN": 4806,
+                "KOTA DAMANSARA": 4952,
+                "KWASA SENTRAL": 5158,
+                "KWASA DAMANSARA": 5304
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KAJANG": 0,
+                "STADIUM KAJANG": 138,
+                "SUNGAI JERNIH": 284,
+                "BUKIT DUKUNG": 550,
+                "BATU 11 CHERAS": 756,
+                "BANDAR TUN HUSSEIN ONN": 902,
+                "SRI RAYA": 1108,
+                "TAMAN SUNTEX": 1254,
+                "TAMAN CONNAUGHT": 1460,
+                "TAMAN MUTIARA": 1666,
+                "TAMAN MIDAH": 1872,
+                "TAMAN PERTAMA": 2018,
+                "MALURI": 2224,
+                "COCHRANE": 2384,
+                "TUN RAZAK EXCHANGE": 2530,
+                "BUKIT BINTANG": 2736,
+                "MERDEKA": 2956,
+                "PASAR SENI": 3116,
+                "MUZIUM NEGARA": 3336,
+                "SEMANTAN": 3616,
+                "PUSAT BANDAR DAMANSARA": 3822,
+                "PHILEO DAMANSARA": 4088,
+                "TAMAN TUN DR ISMAIL": 4248,
+                "BANDAR UTAMA": 4454,
+                "MUTIARA DAMANSARA": 4660,
+                "SURIAN": 4806,
+                "KOTA DAMANSARA": 4952,
+                "KWASA SENTRAL": 5158,
+                "KWASA DAMANSARA": 5304
+              }
+            }
+          ]
+        }
+      }
+    },
+    "PY": {
+      "directions": {
+        "From Kwasa Damansara to Putrajaya": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 300
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 300
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 79200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 79200,
+                  "end_secs": 86400,
+                  "headway_secs": 720
+                }
+              ],
+              "offsets": {
+                "KWASA DAMANSARA": 0,
+                "KAMPUNG SELAMAT": 207,
+                "SUNGAI BULOH": 314,
+                "DAMANSARA DAMAI": 440,
+                "SRI DAMANSARA BARAT": 550,
+                "SRI DAMANSARA SENTRAL": 654,
+                "SRI DAMANSARA TIMUR": 755,
+                "METRO PRIMA": 869,
+                "KEPONG BARU": 942,
+                "JINJANG": 1020,
+                "SRI DELIMA": 1108,
+                "KAMPUNG BATU": 1196,
+                "KENTOMEN": 1297,
+                "JALAN IPOH": 1369,
+                "SENTUL BARAT": 1485,
+                "TITIWANGSA": 1589,
+                "HOSPITAL KUALA LUMPUR": 1659,
+                "RAJA UDA": 1763,
+                "AMPANG PARK": 1863,
+                "PERSIARAN KLCC": 1924,
+                "CONLAY": 1996,
+                "TUN RAZAK EXCHANGE": 2078,
+                "CHAN SOW LIN": 2211,
+                "KUCHAI": 2551,
+                "TAMAN NAGA EMAS": 2655,
+                "SUNGAI BESI": 2801,
+                "SERDANG RAYA UTARA": 2961,
+                "SERDANG RAYA SELATAN": 3063,
+                "SERDANG JAYA": 3136,
+                "UPM": 3262,
+                "TAMAN EQUINE": 3502,
+                "PUTRA PERMAI": 3605,
+                "16 SIERRA": 3747,
+                "CYBERJAYA UTARA": 3897,
+                "CYBERJAYA CITY CENTRE": 4022,
+                "PUTRAJAYA SENTRAL": 4092
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KWASA DAMANSARA": 0,
+                "KAMPUNG SELAMAT": 207,
+                "SUNGAI BULOH": 314,
+                "DAMANSARA DAMAI": 440,
+                "SRI DAMANSARA BARAT": 550,
+                "SRI DAMANSARA SENTRAL": 654,
+                "SRI DAMANSARA TIMUR": 755,
+                "METRO PRIMA": 869,
+                "KEPONG BARU": 942,
+                "JINJANG": 1020,
+                "SRI DELIMA": 1108,
+                "KAMPUNG BATU": 1196,
+                "KENTOMEN": 1297,
+                "JALAN IPOH": 1369,
+                "SENTUL BARAT": 1485,
+                "TITIWANGSA": 1589,
+                "HOSPITAL KUALA LUMPUR": 1659,
+                "RAJA UDA": 1763,
+                "AMPANG PARK": 1863,
+                "PERSIARAN KLCC": 1924,
+                "CONLAY": 1996,
+                "TUN RAZAK EXCHANGE": 2078,
+                "CHAN SOW LIN": 2211,
+                "KUCHAI": 2551,
+                "TAMAN NAGA EMAS": 2655,
+                "SUNGAI BESI": 2801,
+                "SERDANG RAYA UTARA": 2961,
+                "SERDANG RAYA SELATAN": 3063,
+                "SERDANG JAYA": 3136,
+                "UPM": 3262,
+                "TAMAN EQUINE": 3502,
+                "PUTRA PERMAI": 3605,
+                "16 SIERRA": 3747,
+                "CYBERJAYA UTARA": 3897,
+                "CYBERJAYA CITY CENTRE": 4022,
+                "PUTRAJAYA SENTRAL": 4092
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KWASA DAMANSARA": 0,
+                "KAMPUNG SELAMAT": 207,
+                "SUNGAI BULOH": 314,
+                "DAMANSARA DAMAI": 440,
+                "SRI DAMANSARA BARAT": 550,
+                "SRI DAMANSARA SENTRAL": 654,
+                "SRI DAMANSARA TIMUR": 755,
+                "METRO PRIMA": 869,
+                "KEPONG BARU": 942,
+                "JINJANG": 1020,
+                "SRI DELIMA": 1108,
+                "KAMPUNG BATU": 1196,
+                "KENTOMEN": 1297,
+                "JALAN IPOH": 1369,
+                "SENTUL BARAT": 1485,
+                "TITIWANGSA": 1589,
+                "HOSPITAL KUALA LUMPUR": 1659,
+                "RAJA UDA": 1763,
+                "AMPANG PARK": 1863,
+                "PERSIARAN KLCC": 1924,
+                "CONLAY": 1996,
+                "TUN RAZAK EXCHANGE": 2078,
+                "CHAN SOW LIN": 2211,
+                "KUCHAI": 2551,
+                "TAMAN NAGA EMAS": 2655,
+                "SUNGAI BESI": 2801,
+                "SERDANG RAYA UTARA": 2961,
+                "SERDANG RAYA SELATAN": 3063,
+                "SERDANG JAYA": 3136,
+                "UPM": 3262,
+                "TAMAN EQUINE": 3502,
+                "PUTRA PERMAI": 3605,
+                "16 SIERRA": 3747,
+                "CYBERJAYA UTARA": 3897,
+                "CYBERJAYA CITY CENTRE": 4022,
+                "PUTRAJAYA SENTRAL": 4092
+              }
+            }
+          ]
+        },
+        "From Putrajaya to Kwasa Damansara": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 34200,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 34200,
+                  "end_secs": 61200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 70200,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 70200,
+                  "end_secs": 79200,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 79200,
+                  "end_secs": 86400,
+                  "headway_secs": 840
+                }
+              ],
+              "offsets": {
+                "PUTRAJAYA SENTRAL": 0,
+                "CYBERJAYA CITY CENTRE": 88,
+                "CYBERJAYA UTARA": 213,
+                "16 SIERRA": 363,
+                "PUTRA PERMAI": 505,
+                "TAMAN EQUINE": 608,
+                "UPM": 848,
+                "SERDANG JAYA": 974,
+                "SERDANG RAYA SELATAN": 1047,
+                "SERDANG RAYA UTARA": 1149,
+                "SUNGAI BESI": 1309,
+                "TAMAN NAGA EMAS": 1455,
+                "KUCHAI": 1559,
+                "CHAN SOW LIN": 1899,
+                "TUN RAZAK EXCHANGE": 2032,
+                "CONLAY": 2114,
+                "PERSIARAN KLCC": 2186,
+                "AMPANG PARK": 2247,
+                "RAJA UDA": 2347,
+                "HOSPITAL KUALA LUMPUR": 2451,
+                "TITIWANGSA": 2521,
+                "SENTUL BARAT": 2625,
+                "JALAN IPOH": 2741,
+                "KENTOMEN": 2813,
+                "KAMPUNG BATU": 2914,
+                "SRI DELIMA": 3002,
+                "JINJANG": 3090,
+                "KEPONG BARU": 3168,
+                "METRO PRIMA": 3241,
+                "SRI DAMANSARA TIMUR": 3355,
+                "SRI DAMANSARA SENTRAL": 3456,
+                "SRI DAMANSARA BARAT": 3560,
+                "DAMANSARA DAMAI": 3670,
+                "SUNGAI BULOH": 3796,
+                "KAMPUNG SELAMAT": 3903,
+                "KWASA DAMANSARA": 4092
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "PUTRAJAYA SENTRAL": 0,
+                "CYBERJAYA CITY CENTRE": 88,
+                "CYBERJAYA UTARA": 213,
+                "16 SIERRA": 363,
+                "PUTRA PERMAI": 505,
+                "TAMAN EQUINE": 608,
+                "UPM": 848,
+                "SERDANG JAYA": 974,
+                "SERDANG RAYA SELATAN": 1047,
+                "SERDANG RAYA UTARA": 1149,
+                "SUNGAI BESI": 1309,
+                "TAMAN NAGA EMAS": 1455,
+                "KUCHAI": 1559,
+                "CHAN SOW LIN": 1899,
+                "TUN RAZAK EXCHANGE": 2032,
+                "CONLAY": 2114,
+                "PERSIARAN KLCC": 2186,
+                "AMPANG PARK": 2247,
+                "RAJA UDA": 2347,
+                "HOSPITAL KUALA LUMPUR": 2451,
+                "TITIWANGSA": 2521,
+                "SENTUL BARAT": 2625,
+                "JALAN IPOH": 2741,
+                "KENTOMEN": 2813,
+                "KAMPUNG BATU": 2914,
+                "SRI DELIMA": 3002,
+                "JINJANG": 3090,
+                "KEPONG BARU": 3168,
+                "METRO PRIMA": 3241,
+                "SRI DAMANSARA TIMUR": 3355,
+                "SRI DAMANSARA SENTRAL": 3456,
+                "SRI DAMANSARA BARAT": 3560,
+                "DAMANSARA DAMAI": 3670,
+                "SUNGAI BULOH": 3796,
+                "KAMPUNG SELAMAT": 3903,
+                "KWASA DAMANSARA": 4092
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 82500,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "PUTRAJAYA SENTRAL": 0,
+                "CYBERJAYA CITY CENTRE": 88,
+                "CYBERJAYA UTARA": 213,
+                "16 SIERRA": 363,
+                "PUTRA PERMAI": 505,
+                "TAMAN EQUINE": 608,
+                "UPM": 848,
+                "SERDANG JAYA": 974,
+                "SERDANG RAYA SELATAN": 1047,
+                "SERDANG RAYA UTARA": 1149,
+                "SUNGAI BESI": 1309,
+                "TAMAN NAGA EMAS": 1455,
+                "KUCHAI": 1559,
+                "CHAN SOW LIN": 1899,
+                "TUN RAZAK EXCHANGE": 2032,
+                "CONLAY": 2114,
+                "PERSIARAN KLCC": 2186,
+                "AMPANG PARK": 2247,
+                "RAJA UDA": 2347,
+                "HOSPITAL KUALA LUMPUR": 2451,
+                "TITIWANGSA": 2521,
+                "SENTUL BARAT": 2625,
+                "JALAN IPOH": 2741,
+                "KENTOMEN": 2813,
+                "KAMPUNG BATU": 2914,
+                "SRI DELIMA": 3002,
+                "JINJANG": 3090,
+                "KEPONG BARU": 3168,
+                "METRO PRIMA": 3241,
+                "SRI DAMANSARA TIMUR": 3355,
+                "SRI DAMANSARA SENTRAL": 3456,
+                "SRI DAMANSARA BARAT": 3560,
+                "DAMANSARA DAMAI": 3670,
+                "SUNGAI BULOH": 3796,
+                "KAMPUNG SELAMAT": 3903,
+                "KWASA DAMANSARA": 4092
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MR": {
+      "directions": {
+        "From KL Sentral to Titiwangsa": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 84600,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "KL SENTRAL": 0,
+                "TUN SAMBANTHAN": 168,
+                "MAHARAJALELA": 396,
+                "HANG TUAH": 564,
+                "IMBI": 672,
+                "BUKIT BINTANG": 810,
+                "RAJA CHULAN": 948,
+                "BUKIT NANAS": 1086,
+                "MEDAN TUANKU": 1224,
+                "CHOW KIT": 1392,
+                "TITIWANGSA": 1560
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84600,
+                  "headway_secs": 720
+                }
+              ],
+              "offsets": {
+                "KL SENTRAL": 0,
+                "TUN SAMBANTHAN": 168,
+                "MAHARAJALELA": 396,
+                "HANG TUAH": 564,
+                "IMBI": 672,
+                "BUKIT BINTANG": 810,
+                "RAJA CHULAN": 948,
+                "BUKIT NANAS": 1086,
+                "MEDAN TUANKU": 1224,
+                "CHOW KIT": 1392,
+                "TITIWANGSA": 1560
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84600,
+                  "headway_secs": 720
+                }
+              ],
+              "offsets": {
+                "KL SENTRAL": 0,
+                "TUN SAMBANTHAN": 168,
+                "MAHARAJALELA": 396,
+                "HANG TUAH": 564,
+                "IMBI": 672,
+                "BUKIT BINTANG": 810,
+                "RAJA CHULAN": 948,
+                "BUKIT NANAS": 1086,
+                "MEDAN TUANKU": 1224,
+                "CHOW KIT": 1392,
+                "TITIWANGSA": 1560
+              }
+            }
+          ]
+        },
+        "From Titiwangsa to KL Sentral": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 32400,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 420
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 84600,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "TITIWANGSA": 0,
+                "CHOW KIT": 168,
+                "MEDAN TUANKU": 336,
+                "BUKIT NANAS": 474,
+                "RAJA CHULAN": 612,
+                "BUKIT BINTANG": 750,
+                "IMBI": 888,
+                "HANG TUAH": 996,
+                "MAHARAJALELA": 1164,
+                "TUN SAMBANTHAN": 1392,
+                "KL SENTRAL": 1560
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84600,
+                  "headway_secs": 720
+                }
+              ],
+              "offsets": {
+                "TITIWANGSA": 0,
+                "CHOW KIT": 168,
+                "MEDAN TUANKU": 336,
+                "BUKIT NANAS": 474,
+                "RAJA CHULAN": 612,
+                "BUKIT BINTANG": 750,
+                "IMBI": 888,
+                "HANG TUAH": 996,
+                "MAHARAJALELA": 1164,
+                "TUN SAMBANTHAN": 1392,
+                "KL SENTRAL": 1560
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84600,
+                  "headway_secs": 720
+                }
+              ],
+              "offsets": {
+                "TITIWANGSA": 0,
+                "CHOW KIT": 168,
+                "MEDAN TUANKU": 336,
+                "BUKIT NANAS": 474,
+                "RAJA CHULAN": 612,
+                "BUKIT BINTANG": 750,
+                "IMBI": 888,
+                "HANG TUAH": 996,
+                "MAHARAJALELA": 1164,
+                "TUN SAMBANTHAN": 1392,
+                "KL SENTRAL": 1560
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BRT": {
+      "directions": {
+        "From Sunway-Setia Jaya to USJ 7": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 86400,
+                  "headway_secs": 480
+                }
+              ],
+              "offsets": {
+                "SUNWAY-SETIA JAYA": 0,
+                "MENTARI": 175,
+                "SUNWAY LAGOON": 350,
+                "SUNMED": 495,
+                "SUNU-MONASH": 640,
+                "SOUTH QUAY-USJ 1": 785,
+                "USJ7": 930
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 360
+                }
+              ],
+              "offsets": {
+                "SUNWAY-SETIA JAYA": 0,
+                "MENTARI": 175,
+                "SUNWAY LAGOON": 350,
+                "SUNMED": 495,
+                "SUNU-MONASH": 640,
+                "SOUTH QUAY-USJ 1": 785,
+                "USJ7": 930
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 360
+                }
+              ],
+              "offsets": {
+                "SUNWAY-SETIA JAYA": 0,
+                "MENTARI": 175,
+                "SUNWAY LAGOON": 350,
+                "SUNMED": 495,
+                "SUNU-MONASH": 640,
+                "SOUTH QUAY-USJ 1": 785,
+                "USJ7": 930
+              }
+            }
+          ]
+        },
+        "From USJ 7 to Sunway-Setia Jaya": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 61200,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 61200,
+                  "end_secs": 68400,
+                  "headway_secs": 240
+                },
+                {
+                  "start_secs": 68400,
+                  "end_secs": 86400,
+                  "headway_secs": 480
+                }
+              ],
+              "offsets": {
+                "USJ7": 0,
+                "SOUTH QUAY-USJ 1": 175,
+                "SUNU-MONASH": 350,
+                "SUNMED": 495,
+                "SUNWAY LAGOON": 640,
+                "MENTARI": 785,
+                "SUNWAY-SETIA JAYA": 930
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 360
+                }
+              ],
+              "offsets": {
+                "USJ7": 0,
+                "SOUTH QUAY-USJ 1": 175,
+                "SUNU-MONASH": 350,
+                "SUNMED": 495,
+                "SUNWAY LAGOON": 640,
+                "MENTARI": 785,
+                "SUNWAY-SETIA JAYA": 930
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 360
+                }
+              ],
+              "offsets": {
+                "USJ7": 0,
+                "SOUTH QUAY-USJ 1": 175,
+                "SUNU-MONASH": 350,
+                "SUNMED": 495,
+                "SUNWAY LAGOON": 640,
+                "MENTARI": 785,
+                "SUNWAY-SETIA JAYA": 930
+              }
+            }
+          ]
+        }
+      }
+    },
+    "SA": {
+      "directions": {
+        "From Bandar Utama to Johan Setia": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 59400,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 59400,
+                  "end_secs": 70200,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 70200,
+                  "end_secs": 86400,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "BANDAR UTAMA": 0,
+                "KAYU ARA": 134,
+                "BANDAR UTAMA 11": 292,
+                "DAMANSARA IDAMAN": 478,
+                "SUBANG": 689,
+                "GLENMARIE 2": 834,
+                "KERJAYA": 1209,
+                "STADIUM SHAH ALAM": 1378,
+                "DATO' MENTERI - SA SENTRAL": 1751,
+                "UITM SHAH ALAM": 2031,
+                "SEKSYEN 7": 2222,
+                "BANDAR BARU KLANG": 2487,
+                "PASAR KLANG": 2683,
+                "JALAN MERU": 2803,
+                "JAMBATAN KOTA": 2963,
+                "TAMAN SELATAN": 3223,
+                "SERI ANDALAS": 3366,
+                "KLANG JAYA": 3505,
+                "BANDAR BUKIT TINGGI": 3670,
+                "JOHAN SETIA": 3952
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 86400,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "BANDAR UTAMA": 0,
+                "KAYU ARA": 134,
+                "BANDAR UTAMA 11": 292,
+                "DAMANSARA IDAMAN": 478,
+                "SUBANG": 689,
+                "GLENMARIE 2": 834,
+                "KERJAYA": 1209,
+                "STADIUM SHAH ALAM": 1378,
+                "DATO' MENTERI - SA SENTRAL": 1751,
+                "UITM SHAH ALAM": 2031,
+                "SEKSYEN 7": 2222,
+                "BANDAR BARU KLANG": 2487,
+                "PASAR KLANG": 2683,
+                "JALAN MERU": 2803,
+                "JAMBATAN KOTA": 2963,
+                "TAMAN SELATAN": 3223,
+                "SERI ANDALAS": 3366,
+                "KLANG JAYA": 3505,
+                "BANDAR BUKIT TINGGI": 3670,
+                "JOHAN SETIA": 3952
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 84600,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "BANDAR UTAMA": 0,
+                "KAYU ARA": 134,
+                "BANDAR UTAMA 11": 292,
+                "DAMANSARA IDAMAN": 478,
+                "SUBANG": 689,
+                "GLENMARIE 2": 834,
+                "KERJAYA": 1209,
+                "STADIUM SHAH ALAM": 1378,
+                "DATO' MENTERI - SA SENTRAL": 1751,
+                "UITM SHAH ALAM": 2031,
+                "SEKSYEN 7": 2222,
+                "BANDAR BARU KLANG": 2487,
+                "PASAR KLANG": 2683,
+                "JALAN MERU": 2803,
+                "JAMBATAN KOTA": 2963,
+                "TAMAN SELATAN": 3223,
+                "SERI ANDALAS": 3366,
+                "KLANG JAYA": 3505,
+                "BANDAR BUKIT TINGGI": 3670,
+                "JOHAN SETIA": 3952
+              }
+            }
+          ]
+        },
+        "From Johan Setia to Bandar Utama": {
+          "services": [
+            {
+              "service_id": "MonFri",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 25200,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 25200,
+                  "end_secs": 32400,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 32400,
+                  "end_secs": 59400,
+                  "headway_secs": 600
+                },
+                {
+                  "start_secs": 59400,
+                  "end_secs": 70200,
+                  "headway_secs": 480
+                },
+                {
+                  "start_secs": 70200,
+                  "end_secs": 85200,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "JOHAN SETIA": 0,
+                "BANDAR BUKIT TINGGI": 282,
+                "KLANG JAYA": 447,
+                "SERI ANDALAS": 586,
+                "TAMAN SELATAN": 729,
+                "JAMBATAN KOTA": 989,
+                "JALAN MERU": 1149,
+                "PASAR KLANG": 1269,
+                "BANDAR BARU KLANG": 1465,
+                "SEKSYEN 7": 1730,
+                "UITM SHAH ALAM": 1921,
+                "DATO' MENTERI - SA SENTRAL": 2201,
+                "STADIUM SHAH ALAM": 2574,
+                "KERJAYA": 2743,
+                "GLENMARIE 2": 3118,
+                "SUBANG": 3263,
+                "DAMANSARA IDAMAN": 3474,
+                "BANDAR UTAMA 11": 3660,
+                "KAYU ARA": 3818,
+                "BANDAR UTAMA": 3952
+              }
+            },
+            {
+              "service_id": "Sat",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 85200,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "JOHAN SETIA": 0,
+                "BANDAR BUKIT TINGGI": 282,
+                "KLANG JAYA": 447,
+                "SERI ANDALAS": 586,
+                "TAMAN SELATAN": 729,
+                "JAMBATAN KOTA": 989,
+                "JALAN MERU": 1149,
+                "PASAR KLANG": 1269,
+                "BANDAR BARU KLANG": 1465,
+                "SEKSYEN 7": 1730,
+                "UITM SHAH ALAM": 1921,
+                "DATO' MENTERI - SA SENTRAL": 2201,
+                "STADIUM SHAH ALAM": 2574,
+                "KERJAYA": 2743,
+                "GLENMARIE 2": 3118,
+                "SUBANG": 3263,
+                "DAMANSARA IDAMAN": 3474,
+                "BANDAR UTAMA 11": 3660,
+                "KAYU ARA": 3818,
+                "BANDAR UTAMA": 3952
+              }
+            },
+            {
+              "service_id": "Sun",
+              "frequencies": [
+                {
+                  "start_secs": 21600,
+                  "end_secs": 83400,
+                  "headway_secs": 600
+                }
+              ],
+              "offsets": {
+                "JOHAN SETIA": 0,
+                "BANDAR BUKIT TINGGI": 282,
+                "KLANG JAYA": 447,
+                "SERI ANDALAS": 586,
+                "TAMAN SELATAN": 729,
+                "JAMBATAN KOTA": 989,
+                "JALAN MERU": 1149,
+                "PASAR KLANG": 1269,
+                "BANDAR BARU KLANG": 1465,
+                "SEKSYEN 7": 1730,
+                "UITM SHAH ALAM": 1921,
+                "DATO' MENTERI - SA SENTRAL": 2201,
+                "STADIUM SHAH ALAM": 2574,
+                "KERJAYA": 2743,
+                "GLENMARIE 2": 3118,
+                "SUBANG": 3263,
+                "DAMANSARA IDAMAN": 3474,
+                "BANDAR UTAMA 11": 3660,
+                "KAYU ARA": 3818,
+                "BANDAR UTAMA": 3952
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
