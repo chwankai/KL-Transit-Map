@@ -60,6 +60,35 @@ export const PlanView: React.FC = () => {
   const destRef = useRef<HTMLDivElement>(null);
   const originInputRef = useRef<HTMLInputElement>(null);
   const destInputRef = useRef<HTMLInputElement>(null);
+  const sidebarScrollRef = useRef<HTMLDivElement>(null);
+  const resultsScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const savedSidebar = sessionStorage.getItem("scroll_position_plan_sidebar");
+    if (savedSidebar && sidebarScrollRef.current) {
+      setTimeout(() => {
+        if (sidebarScrollRef.current) {
+          sidebarScrollRef.current.scrollTop = parseInt(savedSidebar, 10);
+        }
+      }, 50);
+    }
+    const savedResults = sessionStorage.getItem("scroll_position_plan_results");
+    if (savedResults && resultsScrollRef.current) {
+      setTimeout(() => {
+        if (resultsScrollRef.current) {
+          resultsScrollRef.current.scrollTop = parseInt(savedResults, 10);
+        }
+      }, 50);
+    }
+  }, []);
+
+  const handleSidebarScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    sessionStorage.setItem("scroll_position_plan_sidebar", String(e.currentTarget.scrollTop));
+  };
+
+  const handleResultsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    sessionStorage.setItem("scroll_position_plan_results", String(e.currentTarget.scrollTop));
+  };
 
   // Favourite stations sorted alphabetically, surfaced at top of suggestions
   const favouriteStations: string[] = (() => {
@@ -387,6 +416,8 @@ export const PlanView: React.FC = () => {
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative animate-fade-in">
       {/* Sidebar Selector Form */}
       <div
+        ref={sidebarScrollRef}
+        onScroll={handleSidebarScroll}
         className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto md:overflow-y-visible bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${language === "zh" ? "zh-body" : ""} ${
           routes.length > 0
             ? isMobileFormOpen
@@ -680,7 +711,7 @@ export const PlanView: React.FC = () => {
       </div>
 
       {/* Main Results / Detailed Column */}
-      <div className={`flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full bg-results ${language === "zh" ? "zh-body" : ""}`}>
+      <div ref={resultsScrollRef} onScroll={handleResultsScroll} className={`flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full bg-results ${language === "zh" ? "zh-body" : ""}`}>
         <div className="space-y-5">
           <AnimatePresence mode="wait">
             {isLoading && (

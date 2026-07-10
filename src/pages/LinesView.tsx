@@ -27,6 +27,23 @@ export const LinesView: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const saved = sessionStorage.getItem("scroll_position_lines");
+    if (saved && containerRef.current) {
+      setTimeout(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = parseInt(saved, 10);
+        }
+      }, 50);
+    }
+  }, []);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    sessionStorage.setItem("scroll_position_lines", String(e.currentTarget.scrollTop));
+  };
+
   // Read query parameter "?line=KG"
   const queryLine = searchParams.get("line");
   const selectedLineId = queryLine && lines[queryLine.toUpperCase()] ? queryLine.toUpperCase() : "KG";
@@ -83,7 +100,7 @@ export const LinesView: React.FC = () => {
   const isSearching = searchQuery.trim().length > 0;
 
   return (
-    <div className="flex flex-col h-full w-full bg-background text-text-primary overflow-y-auto animate-fade-in select-none">
+    <div ref={containerRef} onScroll={handleScroll} className="flex flex-col h-full w-full bg-background text-text-primary overflow-y-auto animate-fade-in select-none">
       <div className="max-w-4xl mx-auto w-full px-5 py-6 space-y-6 flex-1">
         
         {/* Header with Back Button & Search Toggle */}

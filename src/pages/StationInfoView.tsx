@@ -4,7 +4,7 @@ import { stations, lines } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
 import {
   ArrowLeft, Clock, ArrowRight, Train, ChevronDown, ChevronUp,
-  Navigation, Heart, RefreshCw, Map, X, ZoomIn
+  Navigation, Heart, RefreshCw, Map, X, ZoomIn, ZoomOut
 } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
@@ -132,14 +132,36 @@ export const StationInfoView: React.FC = () => {
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [directoryImgExists, setDirectoryImgExists] = useState(false);
   const [directoryModalOpen, setDirectoryModalOpen] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [isDirLoading, setIsDirLoading] = useState(false);
 
   useEffect(() => {
-    if (!directoryUrl) { setDirectoryImgExists(false); return; }
+    if (!directoryUrl) {
+      setDirectoryImgExists(false);
+      setIsDirLoading(false);
+      return;
+    }
+    setIsDirLoading(true);
     const img = new Image();
-    img.onload = () => setDirectoryImgExists(true);
-    img.onerror = () => setDirectoryImgExists(false);
+    img.onload = () => {
+      // Simulate slow loading delay of 1.2 seconds
+      setTimeout(() => {
+        setDirectoryImgExists(true);
+        setIsDirLoading(false);
+      }, 1200);
+    };
+    img.onerror = () => {
+      setDirectoryImgExists(false);
+      setIsDirLoading(false);
+    };
     img.src = directoryUrl;
   }, [directoryUrl]);
+
+  useEffect(() => {
+    if (!directoryModalOpen) {
+      setZoomScale(1);
+    }
+  }, [directoryModalOpen]);
 
   // ── Favourites ──
   useEffect(() => {
@@ -351,10 +373,10 @@ export const StationInfoView: React.FC = () => {
                           href={`#/station/${encodeURIComponent(name)}`}
                           className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer font-semibold"
                         >
-                          <span className="inline-flex flex-col">
+                          <span className="inline-flex items-center gap-1 flex-wrap">
                             <span>{tStation(name)}</span>
                             {language === "zh" && (
-                              <span className="text-[8px] font-normal text-text-secondary leading-none mt-0.5">{name}</span>
+                              <span className="text-[8px] font-normal text-text-secondary leading-none">({name})</span>
                             )}
                           </span>
                         </a>
@@ -387,7 +409,7 @@ export const StationInfoView: React.FC = () => {
 
           {/* ── Left panel: Info card ── */}
           <div className="lg:w-80 xl:w-88 flex-shrink-0 space-y-4">
-            <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4 lg:sticky lg:top-4">
+            <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4">
 
               {/* Station code badges + action buttons */}
               <div className="flex items-start justify-between gap-3">
@@ -456,43 +478,54 @@ export const StationInfoView: React.FC = () => {
             </div>
 
             {/* ── Station Directory ── */}
-            {directoryImgExists && directoryUrl && (
+            {hasDirectory && (
               <div>
                 {/* Mobile: toggle button */}
                 <div className="block lg:hidden">
                   <button
+                    disabled={isDirLoading}
                     onClick={() => setDirectoryOpen(p => !p)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all text-xs font-bold uppercase tracking-wider shadow-sm"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all text-xs font-bold uppercase tracking-wider shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <Map className="h-3.5 w-3.5" />
-                    {directoryOpen ? "Close Directory" : "Open Directory"}
+                    {isDirLoading ? (
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Map className="h-3.5 w-3.5" />
+                    )}
+                    {isDirLoading
+                      ? t("loading")
+                      : directoryOpen
+                      ? t("closeDirectory")
+                      : t("openDirectory")}
                   </button>
                 </div>
 
-                {/* Desktop: always visible; Mobile: only when open */}
-                <div className={`${directoryOpen ? "block" : "hidden"} lg:block mt-3 lg:mt-0`}>
+                {/* Desktop: always visible; Mobile: only when open or when loading */}
+                <div className={`${directoryOpen || isDirLoading ? "block" : "hidden"} lg:block mt-3 lg:mt-0`}>
                   <div className="glass-panel rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
                     <div className="px-4 py-3 border-b border-border/60 flex items-center gap-2">
                       <Map className="h-3.5 w-3.5 text-text-secondary" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Station Directory</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{t("stationDirectory")}</span>
                     </div>
-                    <div
-                      className="relative group cursor-zoom-in"
-                      onClick={() => setDirectoryModalOpen(true)}
-                      title="Click to enlarge"
-                    >
-                      <img
-                        src={directoryUrl}
-                        alt={`${decodedName} station directory`}
-                        className="w-full object-contain"
-                      />
-                      {/* Hover overlay hint */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-b-2xl">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-sm text-white rounded-full p-2 shadow-lg">
-                          <ZoomIn className="h-5 w-5" />
-                        </div>
+                    {isDirLoading ? (
+                      <div className="p-4">
+                        <div className="w-full aspect-square bg-button-secondary rounded-xl animate-pulse"></div>
                       </div>
-                    </div>
+                    ) : (
+                      directoryImgExists && directoryUrl && (
+                        <div
+                          className="cursor-zoom-in hover:brightness-95 transition-all flex justify-center"
+                          onClick={() => setDirectoryModalOpen(true)}
+                          title="Click to enlarge"
+                        >
+                          <img
+                            src={directoryUrl}
+                            alt={`${decodedName} station directory`}
+                            className="w-full h-auto object-contain"
+                          />
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -744,9 +777,45 @@ export const StationInfoView: React.FC = () => {
           onClick={() => setDirectoryModalOpen(false)}
         >
           <div
-            className="relative max-w-3xl w-full max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl"
+            className="relative max-w-4xl w-full max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-card"
             onClick={e => e.stopPropagation()}
           >
+            {/* Header */}
+            <div className="px-4 py-3 bg-card border-b border-border/60 flex items-center justify-between gap-4 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <Map className="h-3.5 w-3.5 text-text-secondary" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{tStation(decodedName)} — {t("stationDirectory")}</span>
+              </div>
+              
+              {/* Zoom controls */}
+              <div className="flex items-center gap-2 mr-8">
+                <button
+                  onClick={() => setZoomScale(s => Math.max(s - 0.25, 0.5))}
+                  className="p-1.5 rounded-lg border border-border bg-button-secondary/50 text-text-secondary hover:text-text-primary hover:bg-button-secondary transition-all active:scale-90"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </button>
+                <span className="text-xs font-bold text-text-primary min-w-[36px] text-center">
+                  {Math.round(zoomScale * 100)}%
+                </span>
+                <button
+                  onClick={() => setZoomScale(s => Math.min(s + 0.25, 3.0))}
+                  className="p-1.5 rounded-lg border border-border bg-button-secondary/50 text-text-secondary hover:text-text-primary hover:bg-button-secondary transition-all active:scale-90"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setZoomScale(1)}
+                  className="p-1.5 rounded-lg border border-border bg-button-secondary/50 text-text-secondary hover:text-text-primary hover:bg-button-secondary transition-all active:scale-90"
+                  title="Reset Zoom"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
             {/* Close button */}
             <button
               onClick={() => setDirectoryModalOpen(false)}
@@ -755,17 +824,20 @@ export const StationInfoView: React.FC = () => {
             >
               <X className="h-4 w-4" />
             </button>
-            {/* Header */}
-            <div className="px-4 py-3 bg-card border-b border-border/60 flex items-center gap-2">
-              <Map className="h-3.5 w-3.5 text-text-secondary" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{decodedName} — Station Directory</span>
-            </div>
+
             {/* Image */}
-            <div className="overflow-y-auto max-h-[80vh] bg-card">
+            <div className="overflow-auto flex-1 bg-card p-4 text-center">
               <img
                 src={directoryUrl}
                 alt={`${decodedName} station directory`}
-                className="w-full object-contain"
+                className="transition-all duration-200 ease-out inline-block"
+                style={{
+                  width: `${zoomScale * 100}%`,
+                  maxWidth: zoomScale > 1 ? "none" : "100%",
+                  height: "auto",
+                  maxHeight: zoomScale > 1 ? "none" : "75vh",
+                  objectFit: "contain"
+                }}
               />
             </div>
           </div>

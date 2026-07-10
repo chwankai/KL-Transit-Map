@@ -76,10 +76,18 @@ function currentDayType(now: Date): "weekday" | "saturday" | "sunday" {
 }
 
 function normalizeName(name: string): string {
-  return name.trim().toUpperCase()
+  let norm = name.trim().toUpperCase()
     .replace(/\s+STATION\s*$/i, "")
     .replace(/\s+(LRT|MRT|MONORAIL|KTM)\s*$/i, "")
     .trim();
+
+  if (norm === "TTDI") {
+    return "TAMAN TUN DR ISMAIL";
+  }
+  if (norm === "KENTONMEN") {
+    return "KENTOMEN";
+  }
+  return norm;
 }
 
 function serviceActive(cal: CalendarEntry, dayType: "weekday" | "saturday" | "sunday"): boolean {
