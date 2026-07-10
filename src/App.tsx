@@ -6,6 +6,7 @@ import { PlanView } from "./pages/PlanView";
 import { BusView } from "./pages/BusView";
 import { StationInfoView } from "./pages/StationInfoView";
 import { LinesView } from "./pages/LinesView";
+import { GuideView } from "./pages/GuideView";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/plan" element={<PlanView />} />
             <Route path="/bus" element={<BusView />} />
             <Route path="/station/:stationName" element={<StationInfoView />} />
+            <Route path="/guide" element={<GuideView />} />
           </Routes>
         </Layout>
       </Router>

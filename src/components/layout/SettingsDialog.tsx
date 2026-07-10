@@ -1,7 +1,8 @@
 import React from "react";
 import { useSettings } from "../../context/SettingsContext";
-import { X, Sun, Moon, Laptop, EyeOff, Globe } from "lucide-react";
+import { X, Sun, Moon, Laptop, EyeOff, Globe, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -62,8 +63,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               {(
                 [
                   { id: "en", label: "English" },
-                  { id: "zh", label: "中文" },
                   { id: "ms", label: "Melayu" },
+                  { id: "zh", label: "中文" },
                 ] as const
               ).map(({ id, label }) => (
                 <button
@@ -139,25 +140,50 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Hide Bus Tracker Button Toggle */}
-          <div className="flex items-center justify-between py-2 border-t border-border pt-4">
-            <div className="flex items-center gap-2">
-              <EyeOff className="h-4 w-4 text-text-secondary" />
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-text-primary">
-                  {t("hideBus")}
-                </span>
-                <span className="text-[10px] text-text-secondary">
-                  {t("hideBusDesc")}
-                </span>
+          {/* Additional Settings Group */}
+          <div className="border-t border-border pt-4 space-y-4">
+            {/* Hide Bus Tracker Button Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <EyeOff className="h-4 w-4 text-text-secondary" />
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-text-primary">
+                    {t("hideBus")}
+                  </span>
+                  <span className="text-[10px] text-text-secondary">
+                    {t("hideBusDesc")}
+                  </span>
+                </div>
               </div>
+              <input
+                type="checkbox"
+                checked={hideBusButton}
+                onChange={(e) => setHideBusButton(e.target.checked)}
+                className="rounded bg-input border-border text-blue-600 focus:ring-0 cursor-pointer h-4 w-4"
+              />
             </div>
-            <input
-              type="checkbox"
-              checked={hideBusButton}
-              onChange={(e) => setHideBusButton(e.target.checked)}
-              className="rounded bg-input border-border text-blue-600 focus:ring-0 cursor-pointer h-4 w-4"
-            />
+
+            {/* How-to Guide Link */}
+            <div className="flex items-center justify-between border-t border-border/40 pt-4">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-text-secondary" />
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-text-primary">
+                    {t("howToGuide")}
+                  </span>
+                  <span className="text-[10px] text-text-secondary">
+                    {t("howToGuideDesc")}
+                  </span>
+                </div>
+              </div>
+              <Link
+                to="/guide"
+                onClick={onClose}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm active:scale-95"
+              >
+                {t("open")}
+              </Link>
+            </div>
           </div>
         </div>
       </motion.div>

@@ -863,7 +863,7 @@ export const StationInfoView: React.FC = () => {
           onClick={() => setDirectoryModalOpen(false)}
         >
           <div
-            className="relative max-w-4xl w-full h-[80vh] max-h-[80vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-card"
+            className="relative max-w-4xl w-full h-[55vh] max-h-[55vh] md:h-[80vh] md:max-h-[80vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-card"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
