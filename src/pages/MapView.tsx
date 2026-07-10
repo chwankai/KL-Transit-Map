@@ -48,12 +48,6 @@ export const MapView: React.FC = () => {
   const getStationCoord = (key: string): { lat: number; lng: number } | null => {
     if (!key) return null;
     const cleanKey = key.trim().toUpperCase();
-    
-    // Explicit override for Bandar Utama Shah Alam line platform
-    if (cleanKey === "SA01") {
-      return (stationCoords as any)["BANDAR UTAMA 11"] || null;
-    }
-    
     if ((stationCoords as any)[cleanKey]) return (stationCoords as any)[cleanKey];
     if ((stationCoords as any)[key]) return (stationCoords as any)[key];
     
@@ -405,7 +399,9 @@ export const MapView: React.FC = () => {
       "Tun Razak Exchange (TRX)",
       "Kwasa Damansara",
       "Sungai Besi",
-      "Putra Heights"
+      "Putra Heights",
+      "Pasar Seni",
+      "USJ 7"
     ]);
 
     Object.entries(stations).forEach(([name, node]) => {
@@ -433,37 +429,25 @@ export const MapView: React.FC = () => {
       `;
 
       if (isSharedAmpangSriPetaling || isSingleDotInterchange) {
-        // Plot a single dot for parallel Ampang-Sri Petaling connection stations and specific integrated interchanges
+        // Plot a single gradient-bordered dot for integrated interchanges and shared-platform stations
         const coord = getStationCoord(name) || getStationCoord(node.codes[0]);
         if (!coord) return;
 
-        if (isSingleDotInterchange) {
-          const colors = node.lines.filter(l => l !== "WALKWAY").map(l => getLineColor(l));
-          const gradient = colors.length > 1
-            ? `linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(${[...colors, colors[0]].join(", ")}) border-box`
-            : `linear-gradient(#ffffff, #ffffff) padding-box, ${colors[0] || "#0f172a"} border-box`;
+        const colors = node.lines.filter(l => l !== "WALKWAY").map(l => getLineColor(l));
+        const gradient = colors.length > 1
+          ? `linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(${[...colors, colors[0]].join(", ")}) border-box`
+          : `linear-gradient(#ffffff, #ffffff) padding-box, ${colors[0] || "#0f172a"} border-box`;
 
-          const customIcon = L.divIcon({
-            className: "custom-interchange-marker",
-            html: `<div style="width: 15px; height: 15px; border-radius: 50%; border: 3px solid transparent; background: ${gradient}; box-shadow: 0 1px 3px rgba(0,0,0,0.35);"></div>`,
-            iconSize: [15, 15],
-            iconAnchor: [7.5, 7.5],
-          });
+        const customIcon = L.divIcon({
+          className: "custom-interchange-marker",
+          html: `<div style="width: 15px; height: 15px; border-radius: 50%; border: 3px solid transparent; background: ${gradient}; box-shadow: 0 1px 3px rgba(0,0,0,0.35);"></div>`,
+          iconSize: [15, 15],
+          iconAnchor: [7.5, 7.5],
+        });
 
-          L.marker([coord.lat, coord.lng], { icon: customIcon })
-            .addTo(map)
-            .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
-        } else {
-          L.circleMarker([coord.lat, coord.lng], {
-            radius: 6.5,
-            fillColor: "#ffffff",
-            color: getLineColor("SP"),
-            weight: 3,
-            fillOpacity: 1,
-          })
-            .addTo(map)
-            .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
-        }
+        L.marker([coord.lat, coord.lng], { icon: customIcon })
+          .addTo(map)
+          .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
       } else {
         // Plot separate platform dots for other interchanges (like Bandar Utama KG and SA) and single stations
         node.codes.forEach(code => {

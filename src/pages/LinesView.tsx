@@ -226,18 +226,14 @@ export const LinesView: React.FC = () => {
                     <button
                       onClick={() => setIsReversed((prev) => !prev)}
                       title="Reverse station list"
-                      className={`px-3 py-2 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md flex items-center gap-1.5 leading-none select-none ${
+                      style={isReversed ? { backgroundColor: "#0f172a", color: selectedLine.color } : { color: selectedLine.color }}
+                      className={`p-3 rounded-xl shadow-md flex items-center justify-center flex-shrink-0 transition-colors ${
                         isReversed
-                          ? isDarkText
-                            ? "bg-slate-900 border-slate-900 text-white"
-                            : "bg-white border-white text-blue-600"
-                          : isDarkText
-                          ? "bg-slate-950/20 border-slate-950/20 text-slate-950 hover:bg-slate-950/30"
-                          : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          ? "bg-slate-900"
+                          : "bg-white hover:bg-white/80"
                       }`}
                     >
-                      <ArrowUpDown className="h-3.5 w-3.5" />
-                      <span>{t("reverse") || "Reverse"}</span>
+                      <ArrowUpDown className="h-4 w-4" />
                     </button>
                   </div>
                 </div>

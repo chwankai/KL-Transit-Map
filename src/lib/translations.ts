@@ -271,7 +271,7 @@ export const translations: Record<Language, Record<string, string>> = {
     exploreNetwork: "轨道交通网络",
     transitLines: "地铁/轻快铁线路",
     routeCode: "路线编号",
-    stationsCount: "站",
+    stationsCount: "站点数量",
     searchPlaceholder: "输入车站名称以搜索...",
     searchAllPlaceholder: "搜索车站名称...",
     globalSearchResults: "搜索结果",
