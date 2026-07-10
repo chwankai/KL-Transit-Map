@@ -347,7 +347,7 @@ export const LinesView: React.FC = () => {
                   <div className="flex items-center gap-3.5">
                     <span
                       style={{ backgroundColor: selectedLine.color }}
-                      className="text-[10px] font-black text-white py-1 rounded shadow-sm leading-none flex-shrink-0 w-[52px] text-center"
+                      className="text-[10px] font-black text-white py-1 rounded shadow-sm leading-none flex-shrink-0 w-[45px] text-center"
                     >
                       {st.code}
                     </span>
