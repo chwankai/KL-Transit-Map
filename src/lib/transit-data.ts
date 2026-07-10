@@ -2,6 +2,9 @@ export interface Line {
   id: string;
   name: string;
   color: string;
+  length?: string;
+  ridership?: string;
+  hours?: string;
 }
 
 export interface Connection {
@@ -42,14 +45,14 @@ export interface Route {
 }
 
 export const lines: Record<string, Line> = {
-  "KJ": { id: "KJ", name: "LRT Kelana Jaya Line", color: "#ff2e48" },
-  "AG": { id: "AG", name: "LRT Ampang Line", color: "#ff8d26" },
-  "SP": { id: "SP", name: "LRT Sri Petaling Line", color: "#8d170a" },
-  "KG": { id: "KG", name: "MRT Kajang Line", color: "#1f8f4c" },
-  "PY": { id: "PY", name: "MRT Putrajaya Line", color: "#ffce36" },
-  "MR": { id: "MR", name: "KL Monorail Line", color: "#88c946" },
-  "BRT": { id: "BRT", name: "BRT Sunway Line", color: "#00422b" },
-  "SA": { id: "SA", name: "LRT Shah Alam Line", color: "#01abe4" }
+  "KJ": { id: "KJ", name: "LRT Kelana Jaya Line", color: "#ff2e48", length: "46.4 km", ridership: "286,000", hours: "06:00 - 00:00" },
+  "AG": { id: "AG", name: "LRT Ampang Line", color: "#ff8d26", length: "18.0 km", ridership: "112,000", hours: "06:00 - 00:00" },
+  "SP": { id: "SP", name: "LRT Sri Petaling Line", color: "#8d170a", length: "37.0 km", ridership: "112,000", hours: "06:00 - 00:00" },
+  "KG": { id: "KG", name: "MRT Kajang Line", color: "#1f8f4c", length: "47.0 km", ridership: "287,000", hours: "06:00 - 00:00" },
+  "PY": { id: "PY", name: "MRT Putrajaya Line", color: "#ffce36", length: "57.7 km", ridership: "183,000", hours: "06:00 - 00:00" },
+  "MR": { id: "MR", name: "KL Monorail Line", color: "#88c946", length: "8.6 km", ridership: "56,000", hours: "06:00 - 00:00" },
+  "BRT": { id: "BRT", name: "BRT Sunway Line", color: "#00422b", length: "5.4 km", ridership: "21,700", hours: "06:00 - 00:00" },
+  "SA": { id: "SA", name: "LRT Shah Alam Line", color: "#01abe4", length: "37.8 km", ridership: "67,000 (target)", hours: "06:00 - 00:00" }
 };
 
 const KJ_Line = [

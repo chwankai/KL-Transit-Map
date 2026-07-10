@@ -6,6 +6,20 @@ import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
 import { translateStation } from "../lib/translations";
 
+function getLineNumberText(lineId: string): string {
+  const mapping: Record<string, string> = {
+    "AG": "Line 3",
+    "SP": "Line 4",
+    "KJ": "Line 5",
+    "MR": "Line 8",
+    "KG": "Line 9",
+    "SA": "Line 11",
+    "PY": "Line 12",
+    "BRT": "Line B1"
+  };
+  return mapping[lineId] || `Line ${lineId}`;
+}
+
 export const LinesView: React.FC = () => {
   const navigate = useNavigate();
   const { t, tStation, tLine } = useSettings();
@@ -143,34 +157,66 @@ export const LinesView: React.FC = () => {
             </div>
 
             {/* Line Summary */}
-            {selectedLine && (
-              <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-lg flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <div
-                    style={{ backgroundColor: selectedLine.color }}
-                    className="p-3 rounded-xl text-white shadow-md flex items-center justify-center animate-pulse"
-                  >
-                    <Train className="h-6 w-6" />
+            {selectedLine && (() => {
+              const isDarkText = ["PY", "SA", "MR"].includes(selectedLine.id);
+              const textClass = isDarkText ? "text-slate-950" : "text-white";
+              const textMutedClass = isDarkText ? "text-slate-700" : "text-white/80";
+              return (
+                <div
+                  style={{ backgroundColor: selectedLine.color, borderColor: selectedLine.color }}
+                  className={`rounded-2xl p-5 border shadow-lg flex items-center justify-between gap-4 ${textClass}`}
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div
+                      className="p-3 rounded-xl bg-white shadow-md flex items-center justify-center flex-shrink-0"
+                      style={{ color: selectedLine.color }}
+                    >
+                      <Train className="h-6 w-6 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="flex mb-1">
+                        <span
+                          style={{ color: selectedLine.color }}
+                          className="text-[10px] font-black px-2 py-0.5 rounded bg-white shadow-sm font-mono tracking-wider uppercase"
+                        >
+                          {getLineNumberText(selectedLine.id)}
+                        </span>
+                      </div>
+                      <h2 className={`text-base font-bold leading-tight ${textClass}`}>
+                        {tLine(selectedLine.name)}
+                      </h2>
+                      <div className={`flex flex-col gap-0.5 mt-1.5 text-[10px] ${textMutedClass} font-medium`}>
+                        <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+                          {selectedLine.length && (
+                            <span>
+                              <span className="font-bold">{t("lineLength")}:</span> {selectedLine.length}
+                            </span>
+                          )}
+                          {selectedLine.ridership && (
+                            <span>
+                              <span className="font-bold">{t("dailyRidership")}:</span> {selectedLine.ridership}
+                            </span>
+                          )}
+                        </div>
+                        {selectedLine.hours && (
+                          <div className="mt-0.5">
+                            <span className="font-bold">{t("hoursOfOperation")}:</span> {selectedLine.hours}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-base font-bold text-text-primary leading-tight">
-                      {tLine(selectedLine.name)}
-                    </h2>
-                    <p className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mt-0.5">
-                      {t("routeCode")}: {selectedLine.id}
+                  <div className="text-right flex-shrink-0">
+                    <span className={`text-2xl font-black leading-none ${textClass}`}>
+                      {selectedStations.length}
+                    </span>
+                    <p className={`text-[10px] font-bold uppercase tracking-widest mt-0.5 ${textMutedClass}`}>
+                      {t("stationsCount")}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-2xl font-black text-text-primary leading-none">
-                    {selectedStations.length}
-                  </span>
-                  <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mt-0.5">
-                    {t("stationsCount")}
-                  </p>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </>
         )}
 
@@ -220,7 +266,7 @@ export const LinesView: React.FC = () => {
                                     <span
                                       key={code}
                                       style={{ backgroundColor: getLineColor(lId) }}
-                                      className="text-[8px] font-extrabold text-white px-1 py-0.5 rounded leading-none"
+                                      className="text-[8px] font-extrabold text-white px-1.5 py-1 rounded leading-none"
                                     >
                                       {code}
                                     </span>
@@ -301,7 +347,7 @@ export const LinesView: React.FC = () => {
                   <div className="flex items-center gap-3.5">
                     <span
                       style={{ backgroundColor: selectedLine.color }}
-                      className="text-[10px] font-black text-white px-2 py-0.5 rounded shadow-sm leading-none flex-shrink-0"
+                      className="text-[10px] font-black text-white py-1 rounded shadow-sm leading-none flex-shrink-0 w-[52px] text-center"
                     >
                       {st.code}
                     </span>
@@ -318,7 +364,7 @@ export const LinesView: React.FC = () => {
                       return (
                         <div
                           key={conn.to}
-                          className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-0.5 rounded-xl"
+                          className="flex items-center gap-1.5 text-[9px] font-bold text-text-secondary bg-button-secondary/50 border border-border px-2 py-1 rounded-xl"
                           title={`${t("walkTo")} ${tStation(conn.to)}`}
                         >
                           <Footprints className="h-3.5 w-3.5 text-text-secondary" />
@@ -333,7 +379,7 @@ export const LinesView: React.FC = () => {
                                   <span
                                     key={code}
                                     style={{ backgroundColor: getLineColor(lId) }}
-                                    className="text-[8px] font-extrabold text-white px-1 py-0.5 rounded leading-none"
+                                    className="text-[8px] font-extrabold text-white px-1.5 py-1 rounded leading-none"
                                   >
                                     {code}
                                   </span>
@@ -354,7 +400,7 @@ export const LinesView: React.FC = () => {
                             <span
                               key={lineId}
                               style={{ backgroundColor: getLineColor(lineId) }}
-                              className="text-[9px] font-black text-white px-2 py-0.5 rounded shadow-sm leading-none"
+                              className="text-[9px] font-black text-white px-2 py-1 rounded shadow-sm leading-none"
                               title={getLineName(lineId)}
                             >
                               {code}

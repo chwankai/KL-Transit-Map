@@ -250,6 +250,13 @@ export const PlanView: React.FC = () => {
         }
       }
 
+      // Check if there is a direct walkway connection in the local graph
+      const startNode = stations[origin];
+      const hasDirectWalkway = startNode?.connections.some(conn => conn.to === dest && conn.line === "WALKWAY");
+      if (hasDirectWalkway) {
+        throw new Error("Direct walkway connection exists, bypassing API to force walkable route");
+      }
+
       const results = await fetchMyRapidRoute(origin, dest, departureTime);
       setRoutes(results);
       setSelectedRouteIndex(0);
@@ -260,9 +267,14 @@ export const PlanView: React.FC = () => {
       console.warn("RapidKL API failed, falling back to local Dijkstra:", err);
       const localRoute = findRoute(origin, dest, []);
       if (localRoute) {
-        // Estimate duration: ~2 min per stop
+        // Estimate duration: ~2 min per stop, or calculated walking time
         const stopCount = localRoute.path.length;
-        localRoute.totalDurationSec = stopCount * 120;
+        if (localRoute.edges.length > 0 && localRoute.edges.every(e => e.line === "WALKWAY")) {
+          // Walking speed: ~5 km/h (720 seconds per km)
+          localRoute.totalDurationSec = Math.max(120, Math.round(localRoute.totalDistance * 720));
+        } else {
+          localRoute.totalDurationSec = stopCount * 120;
+        }
         localRoute._routeLabel = "Best";
         
         // Generate mock schedule times
@@ -280,7 +292,7 @@ export const PlanView: React.FC = () => {
         setSelectedRouteIndex(0);
         setSearchedOrigin(origin);
         setSearchedDest(dest);
-        setIsMobileFormOpen(false); // Hide form overlay on mobile after search
+        setIsMobileFormOpen(false);
       } else {
         setErrorMsg("No route found between selected stations.");
       }

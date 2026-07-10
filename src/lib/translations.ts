@@ -60,6 +60,8 @@ export const translations: Record<Language, Record<string, string>> = {
     minUnit: "m",
     secUnit: "s",
     everyMin: "— every {count} min",
+    lineLength: "Line Length",
+    dailyRidership: "Daily Ridership (Avg)",
     noSchedule: "No schedule data for this day.",
     loadingSchedule: "Loading timetable…",
     loading: "Loading...",
@@ -208,6 +210,8 @@ export const translations: Record<Language, Record<string, string>> = {
     minUnit: "分",
     secUnit: "秒",
     everyMin: "— 每 {count} 分钟",
+    lineLength: "线路长度",
+    dailyRidership: "日均客流量",
     noSchedule: "该日无时刻表数据。",
     loadingSchedule: "正在加载时刻表…",
     loading: "载入中...",
@@ -356,6 +360,8 @@ export const translations: Record<Language, Record<string, string>> = {
     minUnit: "m",
     secUnit: "s",
     everyMin: "— setiap {count} min",
+    lineLength: "Panjang Laluan",
+    dailyRidership: "Jumlah Penumpang Harian (Purata)",
     noSchedule: "Tiada data jadual untuk hari ini.",
     loadingSchedule: "Memuatkan jadual waktu…",
     loading: "Memuatkan...",
@@ -629,7 +635,17 @@ export const translateStation = (name: string, lang: Language): string => {
 };
 
 export const translateLine = (lineName: string, lang: Language): string => {
-  if (lang === "en" || lang === "ms") return lineName;
+  if (lang === "ms") {
+    if (lineName === "LRT Kelana Jaya Line") return "Laluan LRT Kelana Jaya";
+    if (lineName === "LRT Ampang Line") return "Laluan LRT Ampang";
+    if (lineName === "LRT Sri Petaling Line") return "Laluan LRT Sri Petaling";
+    if (lineName === "MRT Kajang Line") return "Laluan MRT Kajang";
+    if (lineName === "MRT Putrajaya Line") return "Laluan MRT Putrajaya";
+    if (lineName === "KL Monorail Line") return "Laluan Monorel KL";
+    if (lineName === "BRT Sunway Line") return "Laluan BRT Sunway";
+    if (lineName === "LRT Shah Alam Line") return "Laluan LRT Shah Alam";
+  }
+  if (lang === "en") return lineName;
   if (lineName === "LRT Kelana Jaya Line") return "格拉那再也轻快铁线";
   if (lineName === "LRT Ampang Line") return "安邦轻快铁线";
   if (lineName === "LRT Sri Petaling Line") return "大城堡轻快铁线";
