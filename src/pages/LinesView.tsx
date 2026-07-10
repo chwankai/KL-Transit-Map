@@ -4,6 +4,7 @@ import { ArrowLeft, Train, Footprints, Search, X } from "lucide-react";
 import { lines, stations, lineStations } from "../lib/transit-data";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
+import { translateStation } from "../lib/translations";
 
 export const LinesView: React.FC = () => {
   const navigate = useNavigate();
@@ -50,7 +51,12 @@ export const LinesView: React.FC = () => {
 
   const globalFiltered = allStations.filter((st) => {
     const query = searchQuery.toLowerCase().trim();
-    return st.name.toLowerCase().includes(query) || st.codes.some((c) => c.toLowerCase().includes(query));
+    const zhName = translateStation(st.name, "zh");
+    return (
+      st.name.toLowerCase().includes(query) ||
+      zhName.toLowerCase().includes(query) ||
+      st.codes.some((c) => c.toLowerCase().includes(query))
+    );
   }).sort((a, b) => a.name.localeCompare(b.name));
 
   const isSearching = searchQuery.trim().length > 0;
