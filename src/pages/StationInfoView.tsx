@@ -128,7 +128,7 @@ export const StationInfoView: React.FC = () => {
   // Only KG (Kajang) and PY (Putrajaya) lines have directory maps available
   const directoryLines = ["KG", "PY"];
   const hasDirectory = stationLines.some(l => directoryLines.includes(l));
-  const directoryUrl = hasDirectory ? `/location map/${encodeURIComponent(decodedName)}.png` : null;
+  const directoryUrl = hasDirectory ? `/location map/${encodeURIComponent(decodedName)}.webp` : null;
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [directoryImgExists, setDirectoryImgExists] = useState(false);
   const [directoryModalOpen, setDirectoryModalOpen] = useState(false);
