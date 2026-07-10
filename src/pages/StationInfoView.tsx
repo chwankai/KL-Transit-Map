@@ -148,7 +148,7 @@ export const StationInfoView: React.FC = () => {
     if (delta < 0) {
       setZoomScale(s => Math.min(s + 0.15, 3.0));
     } else {
-      setZoomScale(s => Math.max(s - 0.15, 0.5));
+      setZoomScale(s => Math.max(s - 0.15, 1.0));
     }
   };
 
@@ -206,7 +206,7 @@ export const StationInfoView: React.FC = () => {
       const currentDist = getTouchDist(e);
       if (touchStartDist > 0) {
         const scaleDiff = (currentDist - touchStartDist) * 0.007;
-        setZoomScale(s => Math.min(Math.max(s + scaleDiff, 0.5), 3.0));
+        setZoomScale(s => Math.min(Math.max(s + scaleDiff, 1.0), 3.0));
       }
       setTouchStartDist(currentDist);
     } else if (e.touches.length === 1 && isDragging && imgContainerRef.current) {
@@ -565,7 +565,7 @@ export const StationInfoView: React.FC = () => {
               {station?.facility?.includes("P") && (
                 <div className="pt-3 border-t border-border/80 space-y-2">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-600/10 text-blue-500 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/20 select-none w-fit">
-                    <span className="flex items-center justify-center w-3.5 h-3.5 rounded bg-blue-600 text-white text-[9px] font-black">P</span>
+                    <span className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-blue-600 text-white text-[9px] font-black">P</span>
                     <span>Park n' Ride</span>
                   </div>
                 </div>
@@ -863,7 +863,7 @@ export const StationInfoView: React.FC = () => {
           onClick={() => setDirectoryModalOpen(false)}
         >
           <div
-            className="relative max-w-4xl w-full max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-card"
+            className="relative max-w-4xl w-full h-[80vh] max-h-[80vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col bg-card"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
@@ -876,7 +876,7 @@ export const StationInfoView: React.FC = () => {
               {/* Zoom controls */}
               <div className="flex items-center gap-2 mr-8">
                 <button
-                  onClick={() => setZoomScale(s => Math.max(s - 0.25, 0.5))}
+                  onClick={() => setZoomScale(s => Math.max(s - 0.25, 1.0))}
                   className="p-1.5 rounded-lg border border-border bg-button-secondary/50 text-text-secondary hover:text-text-primary hover:bg-button-secondary transition-all active:scale-90"
                   title="Zoom Out"
                 >
