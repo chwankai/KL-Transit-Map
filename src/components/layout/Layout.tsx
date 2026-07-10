@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Map, Compass, Bus, Settings, Train } from "lucide-react";
+import { Map, Compass, Bus, Settings, Train, X } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
 import { useSettings } from "../../context/SettingsContext";
 import { AnimatePresence } from "framer-motion";
@@ -13,6 +13,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const { hideBusButton, t } = useSettings();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [showOfflineBanner, setShowOfflineBanner] = useState(true);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      setShowOfflineBanner(false);
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+      setShowOfflineBanner(true);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const navItems = [
     { path: "/", labelKey: "map", icon: Map },
@@ -83,6 +104,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         )}
       </AnimatePresence>
+
+      {/* Offline Warning Banner */}
+      {isOffline && showOfflineBanner && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-amber-600/95 backdrop-blur text-white rounded-xl shadow-2xl p-3 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom duration-200 border border-amber-500/20">
+          <div className="flex items-center gap-2">
+            <span className="text-sm select-none">⚠️</span>
+            <span className="text-[10px] sm:text-[11px] font-bold leading-normal">
+              {t("offlineWarning") || "Not connected to the Internet, some features might be unavailable."}
+            </span>
+          </div>
+          <button
+            onClick={() => setShowOfflineBanner(false)}
+            className="flex-shrink-0 p-1 hover:bg-white/10 rounded-full transition-colors active:scale-90"
+            title="Close warning"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
