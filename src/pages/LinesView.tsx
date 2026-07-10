@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Train, Footprints, Search, X } from "lucide-react";
+import { ArrowLeft, Train, Footprints, Search, X, ArrowUpDown } from "lucide-react";
 import { lines, stations, lineStations } from "../lib/transit-data";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
@@ -37,7 +37,14 @@ export const LinesView: React.FC = () => {
   };
 
   const selectedLine = lines[selectedLineId];
-  const selectedStations = lineStations[selectedLineId] || [];
+  const [isReversed, setIsReversed] = useState(false);
+
+  React.useEffect(() => {
+    setIsReversed(false);
+  }, [selectedLineId]);
+
+  const rawStations = lineStations[selectedLineId] || [];
+  const selectedStations = isReversed ? [...rawStations].reverse() : rawStations;
 
   const getLineColor = (id: string) => lines[id]?.color || "#6b7280";
   const getLineName = (id: string) => lines[id]?.name || id;
@@ -209,16 +216,29 @@ export const LinesView: React.FC = () => {
                             <span className="font-bold">{t("hoursOfOperation")}:</span> {selectedLine.hours}
                           </div>
                         )}
+                        <div className="mt-0.5">
+                          <span className="font-bold">{t("stationsCount")}:</span> {selectedStations.length}
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <span className={`text-2xl font-black leading-none ${textClass}`}>
-                      {selectedStations.length}
-                    </span>
-                    <p className={`text-[10px] font-bold uppercase tracking-widest mt-0.5 ${textMutedClass}`}>
-                      {t("stationsCount")}
-                    </p>
+                  <div className="flex-shrink-0 flex items-center justify-center">
+                    <button
+                      onClick={() => setIsReversed((prev) => !prev)}
+                      title="Reverse station list"
+                      className={`px-3 py-2 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md flex items-center gap-1.5 leading-none select-none ${
+                        isReversed
+                          ? isDarkText
+                            ? "bg-slate-900 border-slate-900 text-white"
+                            : "bg-white border-white text-blue-600"
+                          : isDarkText
+                          ? "bg-slate-950/20 border-slate-950/20 text-slate-950 hover:bg-slate-950/30"
+                          : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      }`}
+                    >
+                      <ArrowUpDown className="h-3.5 w-3.5" />
+                      <span>{t("reverse") || "Reverse"}</span>
+                    </button>
                   </div>
                 </div>
               );

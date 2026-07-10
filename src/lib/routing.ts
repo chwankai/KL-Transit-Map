@@ -190,8 +190,13 @@ export function convertApiRoute(apiRoute: any, excluded?: string[]): Route {
 
 export function extractDirection(headsign: string): string | null {
   if (!headsign) return null;
-  const match = headsign.match(/to (.+)$/i);
-  return match ? match[1].trim() : null;
+  const cleanHead = headsign.trim();
+  const match = cleanHead.match(/to\s+(.+)$/i);
+  if (match) return match[1].trim();
+  
+  // Fall back to cleanHead itself, stripping code prefix if present, e.g. "PY41 Putrajaya Sentral" -> "Putrajaya Sentral"
+  const cleanDest = cleanHead.replace(/^[a-zA-Z0-9]+\s+/, "").trim();
+  return cleanDest || cleanHead;
 }
 
 export function formatApiTime(dtStr: string): string | null {

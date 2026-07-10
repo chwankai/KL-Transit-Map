@@ -49,20 +49,35 @@ export const MapView: React.FC = () => {
     if (!key) return null;
     const cleanKey = key.trim().toUpperCase();
     
+    // Explicit override for Bandar Utama Shah Alam line platform
+    if (cleanKey === "SA01") {
+      return (stationCoords as any)["BANDAR UTAMA 11"] || null;
+    }
+    
     if ((stationCoords as any)[cleanKey]) return (stationCoords as any)[cleanKey];
     if ((stationCoords as any)[key]) return (stationCoords as any)[key];
     
-    // Heuristic matching: strip symbols, spaces
-    let normalizedKey = cleanKey.replace(/[^A-Z0-9]/g, "");
+    const getNormalized = (str: string): string => {
+      return str.replace(/[^A-Z0-9]/g, "").toUpperCase();
+    };
+    
+    const getZeroStripped = (str: string): string => {
+      return str.replace(/^([A-Z]+)0+([0-9]+)$/, "$1$2");
+    };
+
+    let normalizedKey = getNormalized(cleanKey);
     if (normalizedKey.endsWith("TRX") && normalizedKey !== "TRX") {
       normalizedKey = normalizedKey.slice(0, -3);
     }
+    const strippedKey = getZeroStripped(normalizedKey);
+
     const foundKey = Object.keys(stationCoords).find(k => {
-      let normK = k.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      let normK = getNormalized(k);
       if (normK.endsWith("TRX") && normK !== "TRX") {
         normK = normK.slice(0, -3);
       }
-      return normK === normalizedKey;
+      const stripK = getZeroStripped(normK);
+      return normK === normalizedKey || stripK === strippedKey || normK === strippedKey || stripK === normalizedKey;
     });
     if (foundKey) return (stationCoords as any)[foundKey];
     
@@ -238,8 +253,9 @@ export const MapView: React.FC = () => {
     }).setView([3.1390, 101.6868], 12);
     mapRef.current = map;
 
-    // Use high contrast thematic tiles matching active body dark mode class
-    const isDark = document.documentElement.classList.contains("dark");
+    // Use high contrast thematic tiles matching theme settings
+    const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = theme === "dark" || (theme === "system" && systemIsDark);
     const tileUrl = isDark
       ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
       : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
@@ -421,15 +437,33 @@ export const MapView: React.FC = () => {
         const coord = getStationCoord(name) || getStationCoord(node.codes[0]);
         if (!coord) return;
 
-        L.circleMarker([coord.lat, coord.lng], {
-          radius: 6.5,
-          fillColor: "#ffffff",
-          color: isSingleDotInterchange ? "#0f172a" : getLineColor("SP"),
-          weight: 3,
-          fillOpacity: 1,
-        })
-          .addTo(map)
-          .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
+        if (isSingleDotInterchange) {
+          const colors = node.lines.filter(l => l !== "WALKWAY").map(l => getLineColor(l));
+          const gradient = colors.length > 1
+            ? `linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(${[...colors, colors[0]].join(", ")}) border-box`
+            : `linear-gradient(#ffffff, #ffffff) padding-box, ${colors[0] || "#0f172a"} border-box`;
+
+          const customIcon = L.divIcon({
+            className: "custom-interchange-marker",
+            html: `<div style="width: 15px; height: 15px; border-radius: 50%; border: 3px solid transparent; background: ${gradient}; box-shadow: 0 1px 3px rgba(0,0,0,0.35);"></div>`,
+            iconSize: [15, 15],
+            iconAnchor: [7.5, 7.5],
+          });
+
+          L.marker([coord.lat, coord.lng], { icon: customIcon })
+            .addTo(map)
+            .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
+        } else {
+          L.circleMarker([coord.lat, coord.lng], {
+            radius: 6.5,
+            fillColor: "#ffffff",
+            color: getLineColor("SP"),
+            weight: 3,
+            fillOpacity: 1,
+          })
+            .addTo(map)
+            .bindPopup(popupHtml, { closeButton: false, minWidth: 150 });
+        }
       } else {
         // Plot separate platform dots for other interchanges (like Bandar Utama KG and SA) and single stations
         node.codes.forEach(code => {
@@ -458,7 +492,7 @@ export const MapView: React.FC = () => {
         mapRef.current = null;
       }
     };
-  }, [showRealScale, theme]);
+  }, [showRealScale, theme, language]);
 
   return (
     <div className="relative w-full h-full bg-background overflow-hidden select-none">

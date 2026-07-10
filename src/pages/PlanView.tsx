@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { stations, lines, findRoute } from "../lib/transit-data";
+import { stations, lines, findRoute, lineStations } from "../lib/transit-data";
 import type { Route } from "../lib/transit-data";
 import { fetchMyRapidRoute, getCurrentDateTime, subtractSecondsFromDatetime, geocodeStation, fetchSingleRoute } from "../lib/routing";
 import { useSettings } from "../context/SettingsContext";
@@ -58,6 +58,8 @@ export const PlanView: React.FC = () => {
 
   const originRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
+  const originInputRef = useRef<HTMLInputElement>(null);
+  const destInputRef = useRef<HTMLInputElement>(null);
 
   // Favourite stations sorted alphabetically, surfaced at top of suggestions
   const favouriteStations: string[] = (() => {
@@ -370,6 +372,15 @@ export const PlanView: React.FC = () => {
     return segments;
   };
 
+  const getFallbackDirection = (lineId: string, fromStation: string, toStation: string): string | null => {
+    const list = lineStations[lineId];
+    if (!list || list.length === 0) return null;
+    const idx1 = list.findIndex((s) => s.name === fromStation);
+    const idx2 = list.findIndex((s) => s.name === toStation);
+    if (idx1 === -1 || idx2 === -1) return null;
+    return idx2 > idx1 ? list[list.length - 1].name : list[0].name;
+  };
+
   const segments = activeRoute ? getRouteSegments(activeRoute) : [];
 
   return (
@@ -412,6 +423,7 @@ export const PlanView: React.FC = () => {
                 </label>
                 <div className="relative mt-1">
                   <input
+                    ref={originInputRef}
                     type="text"
                     value={origin}
                     onChange={(e) => {
@@ -431,6 +443,7 @@ export const PlanView: React.FC = () => {
                       onClick={() => {
                         setOrigin("");
                         setOriginFilter("");
+                        originInputRef.current?.focus();
                       }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary p-0.5 rounded-full hover:bg-button-secondary transition-colors"
                     >
@@ -482,6 +495,7 @@ export const PlanView: React.FC = () => {
                 </label>
                 <div className="relative mt-1">
                   <input
+                    ref={destInputRef}
                     type="text"
                     value={dest}
                     onChange={(e) => {
@@ -501,6 +515,7 @@ export const PlanView: React.FC = () => {
                       onClick={() => {
                         setDest("");
                         setDestFilter("");
+                        destInputRef.current?.focus();
                       }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary p-0.5 rounded-full hover:bg-button-secondary transition-colors"
                     >
@@ -610,7 +625,7 @@ export const PlanView: React.FC = () => {
               <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" />
               {t("savedJourneys")}
             </h3>
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1 p-0.5">
               {savedRoutes.length === 0 ? (
                 <div className="text-[10px] text-text-secondary italic text-center py-4">
                   {t("noSavedJourneys")}
@@ -620,7 +635,7 @@ export const PlanView: React.FC = () => {
                   <div
                     key={idx}
                     onClick={() => handleSelectSavedRoute(route)}
-                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-input hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] active:scale-98"
+                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-input hover:border-blue-500/35 hover:bg-button-secondary/65 cursor-pointer transition-all hover:scale-[1.01] hover:shadow-sm hover:relative hover:z-10 active:scale-98"
                   >
                     <button
                       type="button"
@@ -894,6 +909,13 @@ export const PlanView: React.FC = () => {
                             const intermediateStops = seg.stations.slice(0, -1);
                             const meta = activeRoute.legMeta?.[idx] || null;
 
+                            let resolvedDirection = meta?.direction || null;
+                            if (!resolvedDirection && !isWalk && seg.stations.length > 0) {
+                              const fromSt = idx === 0 ? activeRoute.path[0] : segments[idx - 1].stations[segments[idx - 1].stations.length - 1];
+                              const toSt = seg.stations[0];
+                              resolvedDirection = getFallbackDirection(seg.line, fromSt, toSt);
+                            }
+
                             return (
                               <React.Fragment key={idx}>
                                 {/* Board segment row */}
@@ -915,9 +937,9 @@ export const PlanView: React.FC = () => {
                                           {isWalk
                                             ? `${t("walkTo")} ${tStation(seg.stations[seg.stations.length - 1])}`
                                             : `${t("board")} ${tLine(getLineName(seg.line))}`}
-                                          {meta?.direction && (
+                                          {resolvedDirection && (
                                             <span className="text-[10px] text-text-secondary font-normal ml-1.5">
-                                              {t("towardLabel")} {tStation(meta.direction)}
+                                              {t("towardLabel")} {tStation(resolvedDirection)}
                                             </span>
                                           )}
                                         </span>
@@ -926,7 +948,7 @@ export const PlanView: React.FC = () => {
                                             {isWalk
                                               ? `Walk to ${seg.stations[seg.stations.length - 1]}`
                                               : `Board ${getLineName(seg.line)}`}
-                                            {meta?.direction && ` towards ${meta.direction}`}
+                                            {resolvedDirection && ` towards ${resolvedDirection}`}
                                           </span>
                                         )}
                                       </div>
