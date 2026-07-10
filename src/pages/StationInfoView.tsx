@@ -365,7 +365,7 @@ export const StationInfoView: React.FC = () => {
         </div>
 
         {/* ── Two-column layout ── */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className={language === "zh" ? "zh-body flex flex-col lg:flex-row gap-6" : "flex flex-col lg:flex-row gap-6"}>
 
           {/* ── Left panel: Info card ── */}
           <div className="lg:w-80 xl:w-88 flex-shrink-0">

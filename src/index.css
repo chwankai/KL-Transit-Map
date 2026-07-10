@@ -102,3 +102,49 @@ body {
     transform: scale(1.05);
   }
 }
+
+/* Chinese font scaling for body content */
+.zh-body {
+  font-size: 1.05em;
+}
+.zh-body .text-\[8px\] {
+  font-size: 9px !important;
+}
+.zh-body .text-\[9px\] {
+  font-size: 10px !important;
+}
+.zh-body .text-\[10px\] {
+  font-size: 11.5px !important;
+}
+.zh-body .text-\[11px\] {
+  font-size: 12.5px !important;
+}
+.zh-body .text-xs {
+  font-size: 0.875rem !important; /* text-sm = 14px */
+}
+.zh-body .text-sm {
+  font-size: 1rem !important; /* text-base = 16px */
+}
+.zh-body .text-base {
+  font-size: 1.125rem !important; /* text-lg = 18px */
+}
+.zh-body .text-lg {
+  font-size: 1.25rem !important; /* text-xl = 20px */
+}
+.zh-body .text-xl {
+  font-size: 1.5rem !important; /* text-2xl = 24px */
+}
+
+/* Exclude specific containers from scaling */
+.zh-body .not-zh-body {
+  font-size: 1rem !important;
+}
+.zh-body .not-zh-body .text-\[10px\] {
+  font-size: 10px !important;
+}
+.zh-body .not-zh-body .text-xs {
+  font-size: 0.75rem !important;
+}
+.zh-body .not-zh-body .text-sm {
+  font-size: 0.875rem !important;
+}

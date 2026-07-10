@@ -113,8 +113,9 @@ export const LinesView: React.FC = () => {
           </button>
         </div>
 
-        {/* Search Input field */}
-        {(showSearch || isSearching) && (
+        <div className={language === "zh" ? "zh-body space-y-6 flex-1" : "space-y-6 flex-1"}>
+          {/* Search Input field */}
+          {(showSearch || isSearching) && (
           <div className="relative animate-fade-in">
             <input
               type="text"
@@ -184,12 +185,8 @@ export const LinesView: React.FC = () => {
                       </div>
                       <h2 className={`text-base font-bold leading-tight ${textClass}`}>
                         {tLine(selectedLine.name)}
+                        {language === "zh" && ` (${selectedLine.name})`}
                       </h2>
-                      {language === "zh" && (
-                        <div className={`text-[10px] ${textMutedClass} font-medium mt-0.5 leading-none`}>
-                          {selectedLine.name}
-                        </div>
-                      )}
                       <div className={`flex flex-col gap-0.5 mt-1.5 text-[10px] ${textMutedClass} font-medium`}>
                         <div className="flex flex-wrap gap-x-4 gap-y-0.5">
                           {selectedLine.length && (
@@ -436,6 +433,7 @@ export const LinesView: React.FC = () => {
             })}
           </div>
         )}
+        </div>
       </div>
       
       <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-4 pb-6 flex-shrink-0">

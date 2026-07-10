@@ -376,7 +376,7 @@ export const PlanView: React.FC = () => {
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative animate-fade-in">
       {/* Sidebar Selector Form */}
       <div
-        className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto md:overflow-y-visible bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${
+        className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto md:overflow-y-visible bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${language === "zh" ? "zh-body" : ""} ${
           routes.length > 0
             ? isMobileFormOpen
               ? "absolute inset-x-0 top-0 max-h-[90%] shadow-2xl border-b border-border md:relative md:inset-auto md:max-h-none md:shadow-none md:border-r animate-in slide-in-from-top duration-200"
@@ -665,7 +665,7 @@ export const PlanView: React.FC = () => {
       </div>
 
       {/* Main Results / Detailed Column */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full bg-results">
+      <div className={`flex-1 overflow-y-auto p-5 space-y-5 flex flex-col justify-between h-full bg-results ${language === "zh" ? "zh-body" : ""}`}>
         <div className="space-y-5">
           <AnimatePresence mode="wait">
             {isLoading && (
@@ -1084,7 +1084,7 @@ export const PlanView: React.FC = () => {
         </div>
 
         {/* Non-Sticky Footer (Appears at bottom of results area only) */}
-        <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-4 flex-shrink-0">
+        <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-4 flex-shrink-0 not-zh-body">
           <Footer />
         </div>
       </div>
