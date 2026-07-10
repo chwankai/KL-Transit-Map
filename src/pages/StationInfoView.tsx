@@ -69,6 +69,13 @@ export const StationInfoView: React.FC = () => {
   const decodedName = stationName ? decodeURIComponent(stationName) : "";
   const station: StationObj | undefined = stations[decodedName];
 
+  // Redirect to formal station name if accessed via legacy/alias name
+  useEffect(() => {
+    if (station && station.name !== decodedName) {
+      navigate(`/station/${encodeURIComponent(station.name)}`, { replace: true });
+    }
+  }, [station, decodedName, navigate]);
+
   // ── Grouped / walkway connected stations helper ──
   const getGroupedStations = useCallback((baseName: string): string[] => {
     const group = [baseName];
@@ -180,7 +187,12 @@ export const StationInfoView: React.FC = () => {
         // For each direction, get next departures
         for (const headsign of headsigns) {
           const toMatch = headsign.match(/to (.+)$/i);
-          const displayDest = toMatch ? toMatch[1].trim() : headsign;
+          let displayDest = toMatch ? toMatch[1].trim() : headsign;
+
+          // Map "Putrajaya" destination to "Putrajaya Sentral"
+          if (displayDest === "Putrajaya") {
+            displayDest = "Putrajaya Sentral";
+          }
 
           // Skip if this station IS the destination
           if (displayDest.toUpperCase() === matchingStationName.toUpperCase()) continue;
@@ -247,21 +259,22 @@ export const StationInfoView: React.FC = () => {
 
   // ── Departure badge label ──
   const depLabel = (secsAway: number, isFirst: boolean) => {
+    const minUnit = t("minUnit") || "m";
+    const secUnit = t("secUnit") || "s";
+
     if (secsAway < 0) {
-      return { label: "Passed", chip: null, chipColor: "", isPast: true };
+      return { label: t("passed"), chip: null, chipColor: "", isPast: true };
     }
     if (secsAway <= 30) {
-      return { label: isFirst ? "Arriving" : "0m", chip: "Arriving", chipColor: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30 animate-pulse", isPast: false };
-    }
-    if (secsAway <= 120) {
-      const mins = Math.floor(secsAway / 60);
-      const secs = secsAway % 60;
-      const label = isFirst ? (mins > 0 ? `${mins}m${secs}s` : `${secs}s`) : `${mins}m`;
-      return { label, chip: "Approaching", chipColor: "text-amber-500 bg-amber-500/10 border-amber-500/30 animate-pulse", isPast: false };
+      return { label: isFirst ? t("arriving") : `0${minUnit}`, chip: "Arriving", chipColor: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30 animate-pulse", isPast: false };
     }
     const mins = Math.floor(secsAway / 60);
     const secs = secsAway % 60;
-    const label = isFirst ? (mins > 0 ? `${mins}m${secs}s` : `${secs}s`) : `${mins}m`;
+    const label = isFirst ? (mins > 0 ? `${mins}${minUnit}${secs}${secUnit}` : `${secs}${secUnit}`) : `${mins}${minUnit}`;
+
+    if (secsAway <= 120) {
+      return { label, chip: "Approaching", chipColor: "text-amber-500 bg-amber-500/10 border-amber-500/30 animate-pulse", isPast: false };
+    }
     return { label, chip: null, chipColor: "", isPast: false };
   };
 
@@ -331,7 +344,7 @@ export const StationInfoView: React.FC = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-500 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Updated {fmtTime12(updatedAt)}
+              {t("updated")} {fmtTime12(updatedAt)}
             </span>
             <button
               onClick={() => loadDepartures(new Date())}
@@ -590,7 +603,7 @@ export const StationInfoView: React.FC = () => {
                                                     </span>
                                                     {avgInterval && (
                                                       <span className={`text-[9px] ${isPastHour ? "text-text-secondary/30" : "text-text-secondary/60"}`}>
-                                                        — every {avgInterval} min
+                                                        {t("everyMin") !== "everyMin" ? t("everyMin").replace("{count}", String(avgInterval)) : `— every ${avgInterval} min`}
                                                       </span>
                                                     )}
                                                   </div>

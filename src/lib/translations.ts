@@ -1,4 +1,4 @@
-export type Language = "en" | "zh";
+export type Language = "en" | "zh" | "ms";
 
 export const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -22,9 +22,10 @@ export const translations: Record<Language, Record<string, string>> = {
     concession: "Concession",
     hideBus: "Hide Bus Tracker link",
     hideBusDesc: "Hides the live bus page button from navigation.",
-    languageLabel: "Language / 语言",
+    languageLabel: "Language / Bahasa / 语言",
     langEn: "English",
     langZh: "中文 (Chinese)",
+    langMs: "Bahasa Melayu (Malay)",
 
     // Map View page
     schematicMap: "Schematic Map",
@@ -56,6 +57,9 @@ export const translations: Record<Language, Record<string, string>> = {
     lastTrain: "Last Train",
     hoursOfOperation: "Operational Hours",
     backToMap: "Back to Map",
+    minUnit: "m",
+    secUnit: "s",
+    everyMin: "— every {count} min",
     noSchedule: "No schedule data for this day.",
     loadingSchedule: "Loading timetable…",
     loading: "Loading...",
@@ -166,9 +170,10 @@ export const translations: Record<Language, Record<string, string>> = {
     concession: "优惠车资",
     hideBus: "隐藏实时巴士按钮",
     hideBusDesc: "从主导航栏中隐藏实时巴士页面链接。",
-    languageLabel: "Language / 语言",
+    languageLabel: "Language / Bahasa / 语言",
     langEn: "English",
     langZh: "中文 (Chinese)",
+    langMs: "Bahasa Melayu (Malay)",
 
     // Map View page
     schematicMap: "系统示意图",
@@ -200,6 +205,9 @@ export const translations: Record<Language, Record<string, string>> = {
     lastTrain: "末班车时间",
     hoursOfOperation: "运营服务时间",
     backToMap: "返回地图",
+    minUnit: "分",
+    secUnit: "秒",
+    everyMin: "— 每 {count} 分钟",
     noSchedule: "该日无时刻表数据。",
     loadingSchedule: "正在加载时刻表…",
     loading: "载入中...",
@@ -288,6 +296,154 @@ export const translations: Record<Language, Record<string, string>> = {
     showTrackerSidebar: "显示监测侧边栏",
     johor: "柔佛 (Johor)",
     melaka: "马六甲 (Melaka)",
+  },
+  ms: {
+    // Nav / Layout
+    map: "Peta",
+    line: "Laluan",
+    plan: "Rancang",
+    bus: "Bas",
+    settings: "Tetapan",
+    integratedPlanner: "Perancang Laluan Bersepadu",
+    
+    // Settings dialog
+    appTheme: "Tema Aplikasi",
+    system: "Sistem",
+    light: "Cerah",
+    dark: "Gelap",
+    farePreference: "Pilihan Paparan Tambang",
+    all: "Semua",
+    cashless: "Tanpa Tunai",
+    cash: "Tunai",
+    concession: "Konsesi",
+    hideBus: "Sembunyikan Pautan Penjejak Bas",
+    hideBusDesc: "Sembunyikan butang halaman bas langsung dari navigasi.",
+    languageLabel: "Language / Bahasa / 语言",
+    langEn: "English",
+    langZh: "中文 (Chinese)",
+    langMs: "Bahasa Melayu (Malay)",
+
+    // Map View page
+    schematicMap: "Peta Skematik",
+    realScaleMap: "Peta Skala Sebenar",
+    resetView: "Set Semula Pandangan",
+    standardMap: "Peta Standard",
+    circleLineMap: "Peta Laluan Lingkaran",
+    zoomHint: "Gunakan cubitan-untuk-zum atau skrol tetikus untuk memeriksa",
+    viewArrivals: "Lihat Ketibaan",
+    viewLine: "Lihat Laluan",
+    hide: "Sembunyikan",
+    view: "Lihat",
+
+    // Station Info page
+    stationInfo: "Maklumat Stesen",
+    nextDepartures: "Pelepasan Seterusnya",
+    connectedTo: "Bersambung ke",
+    updated: "Dikemas kini",
+    towards: "Hala ke",
+    passed: "Telah lalu",
+    arriving: "Tiba",
+    approaching: "Menghampiri",
+    serviceEnd: "Perkhidmatan Tamat",
+    fullTimetable: "Jadual Waktu Penuh",
+    weekday: "Hari Bekerja",
+    saturday: "Sabtu",
+    sunday: "Ahad",
+    firstTrain: "Kereta Api Pertama",
+    lastTrain: "Kereta Api Terakhir",
+    hoursOfOperation: "Waktu Operasi",
+    backToMap: "Kembali ke Peta",
+    minUnit: "m",
+    secUnit: "s",
+    everyMin: "— setiap {count} min",
+    noSchedule: "Tiada data jadual untuk hari ini.",
+    loadingSchedule: "Memuatkan jadual waktu…",
+    loading: "Memuatkan...",
+    calculatingRouteDesc: "Sila tunggu sebentar sementara kami mengira laluan terbaik untuk anda.",
+
+    // Plan View page
+    routePlanner: "Perancang Laluan",
+    origin: "Stesen Asal",
+    destination: "Stesen Destinasi",
+    selectOrigin: "Pilih Stesen Asal",
+    selectDest: "Pilih Stesen Destinasi",
+    excludeLines: "Kecualikan Laluan",
+    clearOptions: "Kosongkan Pilihan",
+    calculateRoute: "Kira Laluan",
+    cashlessFare: "Tambang Tanpa Tunai",
+    cashFare: "Tambang Tunai",
+    concessionFare: "Tambang Konsesi",
+    totalDistance: "Jumlah Jarak",
+    transfers: "Pertukaran",
+    walkTo: "Jalan kaki ke",
+    showDirections: "Tunjukkan Arah",
+    journeySummary: "Ringkasan Perjalanan",
+    stationPassedCount: "stesen",
+    interchangeTransfer: "Tukar ke",
+    savedJourneys: "Perjalanan Disimpan",
+    noSavedJourneys: "Tiada perjalanan disimpan lagi. Cari dan simpan laluan kegemaran anda!",
+    time: "Masa",
+    now: "Sekarang",
+    depart: "Berlepas",
+    arrive: "Tiba",
+    planJourney: "Rancang Perjalanan",
+    planJourneyDesc: "Pilih stesen asal dan destinasi pada panel kiri untuk mencari laluan terpantas anda.",
+    recommendedRoutes: "Laluan Disyorkan",
+    direct: "Terus",
+    transfer: "pertukaran",
+    transfersLabel: "pertukaran",
+    optionLabel: "Pilihan",
+    bestOption: "Terbaik",
+    arriveDest: "Tiba di destinasi",
+    departingStation: "Stesen Berlepas",
+    searchAgain: "Cari Semula",
+    savedText: "Disimpan!",
+    saveRoute: "Simpan laluan ini",
+    alreadyAt: "Anda sudah berada di",
+    noTravelNeeded: "Tiada perjalanan diperlukan kerana stesen asal dan destinasi adalah sama.",
+    walkableInterchange: "Sambungan Pertukaran Boleh Berjalan Kaki",
+    walkableInterchangeDesc: "Kedua-dua stesen berada dalam jarak pertukaran boleh berjalan kaki. Anda boleh berjalan ke destinasi dengan merujuk kepada papan tanda.",
+    board: "Naik",
+    ride: "Naik",
+    stopLabel: "hentian",
+    stopsLabel: "hentian",
+    towardLabel: "ke arah",
+    transferTo: "Tukar ke",
+    journeyDirections: "Arah Perjalanan",
+
+    // Lines Explorer page
+    exploreNetwork: "Teroka Rangkaian",
+    transitLines: "Laluan Transit",
+    routeCode: "Kod Laluan",
+    stationsCount: "Stesen",
+    searchPlaceholder: "Cari nama stesen atau kod...",
+    searchAllPlaceholder: "Cari stesen di Lembah Klang mengikut nama atau kod...",
+    globalSearchResults: "Keputusan Carian Global",
+    noSearchMatches: "Tiada stesen padan dengan carian anda.",
+    noGlobalSearchMatches: "Tiada stesen padan dengan carian anda secara global.",
+    transferToWalkway: "Tukar ke",
+
+    // Bus view
+    busTracker: "Penjejak Langsung myBAS",
+    selectRoute: "Pilih Laluan Bas",
+    selectDirection: "Pilih Arah",
+    noActiveBuses: "Tiada bas aktif ditemui pada laluan ini.",
+    busPlate: "Plat Bas",
+    busSpeed: "Kelajuan",
+    refreshHint: "Mengemas kini secara automatik dalam 15 saat",
+    showTracker: "Tunjukkan Penjejak",
+    selectAll: "Pilih Semua",
+    deselectAll: "Nyahpilih Semua",
+    hideInactive: "Sembunyikan Laluan Tidak Aktif",
+    activeBusesCount: "Menemui {count} bas aktif di {routes} laluan.",
+    refreshingFeed: "Mengemas kini lokasi langsung...",
+    refreshFailed: "Gagal mengemas kini kedudukan langsung. Cuba sebentar lagi...",
+    live: "langsung",
+    noRoutesMatched: "Tiada laluan aktif padan dengan penapis.",
+    hideSidebar: "Sembunyikan Bar Sisi",
+    showTrackerSidebar: "Tunjukkan Bar Sisi Penjejak",
+    johor: "Johor",
+    melaka: "Melaka",
   }
 };
 
@@ -297,6 +453,7 @@ export const stationNamesZh: Record<string, string> = {
   "Pasar Seni": "中央艺术坊",
   "Masjid Jamek": "占美清真寺",
   "Tun Razak Exchange": "敦拉萨国际贸易中心 (TRX)",
+  "Tun Razak Exchange (TRX)": "敦拉萨国际贸易中心 (TRX)",
   "Ampang Park": "安邦购物中心站",
   "Bukit Bintang": "武吉免登",
   "KLCC": "城中城 (KLCC)",
@@ -456,16 +613,23 @@ export const stationNamesZh: Record<string, string> = {
   "Pasar Klang": "中路大巴刹",
   "Jalan Meru": "中路",
   "Pasar Jawa": "哥打桥",
+  "Jambatan Kota": "哥打桥",
   "Klang Jaya": "良木园",
 };
 
 export const translateStation = (name: string, lang: Language): string => {
-  if (lang === "en") return name;
-  return stationNamesZh[name] || name;
+  let displayName = name;
+  if (name === "Tun Razak Exchange") {
+    displayName = "Tun Razak Exchange (TRX)";
+  } else if (name === "Pasar Jawa") {
+    displayName = "Jambatan Kota";
+  }
+  if (lang === "en" || lang === "ms") return displayName;
+  return stationNamesZh[name] || stationNamesZh[displayName] || displayName;
 };
 
 export const translateLine = (lineName: string, lang: Language): string => {
-  if (lang === "en") return lineName;
+  if (lang === "en" || lang === "ms") return lineName;
   if (lineName === "LRT Kelana Jaya Line") return "格拉那再也轻快铁线";
   if (lineName === "LRT Ampang Line") return "安邦轻快铁线";
   if (lineName === "LRT Sri Petaling Line") return "大城堡轻快铁线";
