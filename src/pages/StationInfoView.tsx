@@ -4,7 +4,7 @@ import { stations, lines } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
 import {
   ArrowLeft, Clock, ArrowRight, Train, ChevronDown, ChevronUp,
-  Navigation, Heart, RefreshCw
+  Navigation, Heart, RefreshCw, Map, X, ZoomIn
 } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
@@ -112,6 +112,7 @@ export const StationInfoView: React.FC = () => {
   // ── Favourites ──
   const [isFavourite, setIsFavourite] = useState(false);
 
+
   // ── Line metadata ──
   const stationLines = groupedCodes.map((code) => {
     const match = code.match(/^[a-zA-Z]+/);
@@ -122,6 +123,23 @@ export const StationInfoView: React.FC = () => {
 
   const getLineColor = (lineId: string) => lines[lineId]?.color || "#6b7280";
   const getLineName = (lineId: string) => lines[lineId]?.name || lineId;
+
+  // ── Station directory ──
+  // Only KG (Kajang) and PY (Putrajaya) lines have directory maps available
+  const directoryLines = ["KG", "PY"];
+  const hasDirectory = stationLines.some(l => directoryLines.includes(l));
+  const directoryUrl = hasDirectory ? `/location map/${encodeURIComponent(decodedName)}.png` : null;
+  const [directoryOpen, setDirectoryOpen] = useState(false);
+  const [directoryImgExists, setDirectoryImgExists] = useState(false);
+  const [directoryModalOpen, setDirectoryModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!directoryUrl) { setDirectoryImgExists(false); return; }
+    const img = new Image();
+    img.onload = () => setDirectoryImgExists(true);
+    img.onerror = () => setDirectoryImgExists(false);
+    img.src = directoryUrl;
+  }, [directoryUrl]);
 
   // ── Favourites ──
   useEffect(() => {
@@ -368,7 +386,7 @@ export const StationInfoView: React.FC = () => {
         <div className={language === "zh" ? "zh-body flex flex-col lg:flex-row gap-6" : "flex flex-col lg:flex-row gap-6"}>
 
           {/* ── Left panel: Info card ── */}
-          <div className="lg:w-80 xl:w-88 flex-shrink-0">
+          <div className="lg:w-80 xl:w-88 flex-shrink-0 space-y-4">
             <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4 lg:sticky lg:top-4">
 
               {/* Station code badges + action buttons */}
@@ -436,6 +454,49 @@ export const StationInfoView: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* ── Station Directory ── */}
+            {directoryImgExists && directoryUrl && (
+              <div>
+                {/* Mobile: toggle button */}
+                <div className="block lg:hidden">
+                  <button
+                    onClick={() => setDirectoryOpen(p => !p)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all text-xs font-bold uppercase tracking-wider shadow-sm"
+                  >
+                    <Map className="h-3.5 w-3.5" />
+                    {directoryOpen ? "Close Directory" : "Open Directory"}
+                  </button>
+                </div>
+
+                {/* Desktop: always visible; Mobile: only when open */}
+                <div className={`${directoryOpen ? "block" : "hidden"} lg:block mt-3 lg:mt-0`}>
+                  <div className="glass-panel rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
+                    <div className="px-4 py-3 border-b border-border/60 flex items-center gap-2">
+                      <Map className="h-3.5 w-3.5 text-text-secondary" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Station Directory</span>
+                    </div>
+                    <div
+                      className="relative group cursor-zoom-in"
+                      onClick={() => setDirectoryModalOpen(true)}
+                      title="Click to enlarge"
+                    >
+                      <img
+                        src={directoryUrl}
+                        alt={`${decodedName} station directory`}
+                        className="w-full object-contain"
+                      />
+                      {/* Hover overlay hint */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-b-2xl">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-sm text-white rounded-full p-2 shadow-lg">
+                          <ZoomIn className="h-5 w-5" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Right panel: Next departures ── */}
@@ -675,6 +736,41 @@ export const StationInfoView: React.FC = () => {
       <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-4 pb-6 flex-shrink-0">
         <Footer />
       </div>
+
+      {/* ── Directory Image Modal ── */}
+      {directoryModalOpen && directoryUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in"
+          onClick={() => setDirectoryModalOpen(false)}
+        >
+          <div
+            className="relative max-w-3xl w-full max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setDirectoryModalOpen(false)}
+              className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
+              title="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            {/* Header */}
+            <div className="px-4 py-3 bg-card border-b border-border/60 flex items-center gap-2">
+              <Map className="h-3.5 w-3.5 text-text-secondary" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{decodedName} — Station Directory</span>
+            </div>
+            {/* Image */}
+            <div className="overflow-y-auto max-h-[80vh] bg-card">
+              <img
+                src={directoryUrl}
+                alt={`${decodedName} station directory`}
+                className="w-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
