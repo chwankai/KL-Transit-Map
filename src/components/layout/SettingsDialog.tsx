@@ -58,11 +58,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               <Globe className="h-3.5 w-3.5" />
               {t("languageLabel")}
             </label>
-            <div className="grid grid-cols-2 gap-2 rounded-xl bg-button-secondary p-1 border border-border">
+            <div className="grid grid-cols-3 gap-2 rounded-xl bg-button-secondary p-1 border border-border">
               {(
                 [
                   { id: "en", label: "English" },
                   { id: "zh", label: "中文" },
+                  { id: "ms", label: "Melayu" },
                 ] as const
               ).map(({ id, label }) => (
                 <button

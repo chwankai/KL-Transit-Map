@@ -160,7 +160,7 @@ const KG_Line = [
   { code: "KG16", name: "Pasar Seni", distance: 1.07 },
   { code: "KG17", name: "Merdeka", distance: 0.72 },
   { code: "KG18A", name: "Bukit Bintang", distance: 1.11 },
-  { code: "KG20", name: "Tun Razak Exchange", distance: 1.12 },
+  { code: "KG20", name: "Tun Razak Exchange (TRX)", distance: 1.12 },
   { code: "KG21", name: "Cochrane", distance: 1.11 },
   { code: "KG22", name: "Maluri", distance: 1.16 },
   { code: "KG23", name: "Taman Pertama", distance: 1.24 },
@@ -199,7 +199,7 @@ const PY_Line = [
   { code: "PY20", name: "Ampang Park", distance: 1.06 },
   { code: "PY21", name: "Persiaran KLCC", distance: 0.57 },
   { code: "PY22", name: "Conlay", distance: 0.63 },
-  { code: "PY23", name: "Tun Razak Exchange", distance: 0.99 },
+  { code: "PY23", name: "Tun Razak Exchange (TRX)", distance: 0.99 },
   { code: "PY24", name: "Chan Sow Lin", distance: 1.66 },
   { code: "PY27", name: "Kuchai", distance: 4.99 },
   { code: "PY28", name: "Taman Naga Emas", distance: 1.46 },
@@ -255,7 +255,7 @@ const SA_Line = [
   { code: "SA17", name: "Bandar Baru Klang" },
   { code: "SA18", name: "Pasar Klang" },
   { code: "SA19", name: "Jalan Meru" },
-  { code: "SA20", name: "Pasar Jawa" },
+  { code: "SA20", name: "Jambatan Kota" },
   { code: "SA21", name: "Taman Selatan" },
   { code: "SA22", name: "Seri Andalas" },
   { code: "SA23", name: "Klang Jaya" },
@@ -347,6 +347,24 @@ function buildGraph(): Record<string, StationObj> {
     if (nodeFrom && !nodeFrom.lines.includes("WALKWAY")) nodeFrom.lines.push("WALKWAY");
     if (nodeTo && !nodeTo.lines.includes("WALKWAY")) nodeTo.lines.push("WALKWAY");
   });
+
+  // Add non-enumerable aliases for backward compatibility/local storage migrations
+  if (stations["Tun Razak Exchange (TRX)"]) {
+    Object.defineProperty(stations, "Tun Razak Exchange", {
+      value: stations["Tun Razak Exchange (TRX)"],
+      writable: true,
+      enumerable: false,
+      configurable: true
+    });
+  }
+  if (stations["Jambatan Kota"]) {
+    Object.defineProperty(stations, "Pasar Jawa", {
+      value: stations["Jambatan Kota"],
+      writable: true,
+      enumerable: false,
+      configurable: true
+    });
+  }
 
   return stations;
 }

@@ -43,7 +43,16 @@ export const PlanView: React.FC = () => {
   // Local storage saved routes
   const [savedRoutes, setSavedRoutes] = useState<{ origin: string; dest: string }[]>(() => {
     const saved = localStorage.getItem("saved_routes");
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved) as { origin: string; dest: string }[];
+      return parsed.map(route => ({
+        origin: route.origin === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (route.origin === "Pasar Jawa" ? "Jambatan Kota" : route.origin),
+        dest: route.dest === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (route.dest === "Pasar Jawa" ? "Jambatan Kota" : route.dest)
+      }));
+    } catch {
+      return [];
+    }
   });
   const [isJustSaved, setIsJustSaved] = useState(false);
 
@@ -51,7 +60,14 @@ export const PlanView: React.FC = () => {
   const destRef = useRef<HTMLDivElement>(null);
 
   // Favourite stations sorted alphabetically, surfaced at top of suggestions
-  const favouriteStations: string[] = JSON.parse(localStorage.getItem("favourite_stations") || "[]");
+  const favouriteStations: string[] = (() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem("favourite_stations") || "[]") as string[];
+      return parsed.map(s => s === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (s === "Pasar Jawa" ? "Jambatan Kota" : s));
+    } catch {
+      return [];
+    }
+  })();
 
   const sortedStationNames = (() => {
     const all = Object.keys(stations).sort();
@@ -67,7 +83,7 @@ export const PlanView: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const destParam = params.get("dest");
     if (destParam && stations[destParam]) {
-      setDest(destParam);
+      setDest(stations[destParam].name);
       setDestFilter("");
     }
   }, [location.search]);

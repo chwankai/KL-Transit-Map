@@ -53,8 +53,17 @@ export const MapView: React.FC = () => {
     if ((stationCoords as any)[key]) return (stationCoords as any)[key];
     
     // Heuristic matching: strip symbols, spaces
-    const normalizedKey = cleanKey.replace(/[^A-Z0-9]/g, "");
-    const foundKey = Object.keys(stationCoords).find(k => k.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() === normalizedKey);
+    let normalizedKey = cleanKey.replace(/[^A-Z0-9]/g, "");
+    if (normalizedKey.endsWith("TRX") && normalizedKey !== "TRX") {
+      normalizedKey = normalizedKey.slice(0, -3);
+    }
+    const foundKey = Object.keys(stationCoords).find(k => {
+      let normK = k.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+      if (normK.endsWith("TRX") && normK !== "TRX") {
+        normK = normK.slice(0, -3);
+      }
+      return normK === normalizedKey;
+    });
     if (foundKey) return (stationCoords as any)[foundKey];
     
     return null;
@@ -371,7 +380,7 @@ export const MapView: React.FC = () => {
     // 3. Plot station dots (circle markers), splitting interchanges where platforms are distinct
     const singleDotInterchanges = new Set([
       "Maluri",
-      "Tun Razak Exchange",
+      "Tun Razak Exchange (TRX)",
       "Kwasa Damansara",
       "Sungai Besi",
       "Putra Heights"
