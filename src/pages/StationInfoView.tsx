@@ -483,25 +483,16 @@ export const StationInfoView: React.FC = () => {
                 {/* Mobile: toggle button */}
                 <div className="block lg:hidden">
                   <button
-                    disabled={isDirLoading}
                     onClick={() => setDirectoryOpen(p => !p)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all text-xs font-bold uppercase tracking-wider shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all text-xs font-bold uppercase tracking-wider shadow-sm"
                   >
-                    {isDirLoading ? (
-                      <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Map className="h-3.5 w-3.5" />
-                    )}
-                    {isDirLoading
-                      ? t("loading")
-                      : directoryOpen
-                      ? t("closeDirectory")
-                      : t("openDirectory")}
+                    <Map className="h-3.5 w-3.5" />
+                    {directoryOpen ? t("closeDirectory") : t("openDirectory")}
                   </button>
                 </div>
 
-                {/* Desktop: always visible; Mobile: only when open or when loading */}
-                <div className={`${directoryOpen || isDirLoading ? "block" : "hidden"} lg:block mt-3 lg:mt-0`}>
+                {/* Desktop: always visible; Mobile: only when open */}
+                <div className={`${directoryOpen ? "block" : "hidden lg:block"} mt-3 lg:mt-0`}>
                   <div className="glass-panel rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
                     <div className="px-4 py-3 border-b border-border/60 flex items-center gap-2">
                       <Map className="h-3.5 w-3.5 text-text-secondary" />
