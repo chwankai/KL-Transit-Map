@@ -10,7 +10,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export const MapView: React.FC = () => {
-  const { theme, t, tStation, tLine } = useSettings();
+  const { language, theme, t, tStation, tLine } = useSettings();
   const [mapType, setMapType] = useState<"standard" | "upcoming">("standard");
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -261,11 +261,14 @@ export const MapView: React.FC = () => {
           const colorSP = getLineColor("SP");
           const colorAG = getLineColor("AG");
           const lineNameSP = tLine(lines["SP"]?.name || "LRT Sri Petaling Line");
+          const rawNameSP = lines["SP"]?.name || "LRT Sri Petaling Line";
           const lineNameAG = tLine(lines["AG"]?.name || "LRT Ampang Line");
+          const rawNameAG = lines["AG"]?.name || "LRT Ampang Line";
 
           const popupHtmlSP = `
             <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
               <div class="text-xs font-bold text-slate-900">${lineNameSP}</div>
+              ${language === 'zh' ? `<div style="font-size: 9px; color: #64748b; font-weight: 500; margin-top: 2px;">${rawNameSP}</div>` : ''}
               <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
                 <a href="#/lines?line=SP" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewLine")}</a>
               </div>
@@ -275,6 +278,7 @@ export const MapView: React.FC = () => {
           const popupHtmlAG = `
             <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
               <div class="text-xs font-bold text-slate-900">${lineNameAG}</div>
+              ${language === 'zh' ? `<div style="font-size: 9px; color: #64748b; font-weight: 500; margin-top: 2px;">${rawNameAG}</div>` : ''}
               <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
                 <a href="#/lines?line=AG" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewLine")}</a>
               </div>
@@ -302,9 +306,11 @@ export const MapView: React.FC = () => {
         } else {
           // Standard solid color line
           const lineName = tLine(lines[track.lineId]?.name || track.lineId);
+          const rawName = lines[track.lineId]?.name || track.lineId;
           const popupHtml = `
             <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
               <div class="text-xs font-bold text-slate-900">${lineName}</div>
+              ${language === 'zh' ? `<div style="font-size: 9px; color: #64748b; font-weight: 500; margin-top: 2px;">${rawName}</div>` : ''}
               <div class="pt-2.5 border-t border-slate-200 mt-1 flex justify-center">
                 <a href="#/lines?line=${track.lineId}" style="color: white !important;" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewLine")}</a>
               </div>
@@ -397,6 +403,7 @@ export const MapView: React.FC = () => {
       const popupHtml = `
         <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
           <div class="text-xs font-bold text-slate-900">${tStation(name)}</div>
+          ${language === 'zh' ? `<div style="font-size: 9px; color: #64748b; font-weight: 500; margin-top: 2px;">${name}</div>` : ''}
           <div class="flex gap-1 flex-wrap justify-center">
             ${node.codes.map(code => {
               const lineId = getLineOfCode(code);

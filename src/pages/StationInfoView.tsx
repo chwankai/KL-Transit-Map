@@ -64,7 +64,7 @@ interface TimetableData {
 export const StationInfoView: React.FC = () => {
   const { stationName } = useParams<{ stationName: string }>();
   const navigate = useNavigate();
-  const { t, tStation, tLine } = useSettings();
+  const { language, t, tStation, tLine } = useSettings();
 
   const decodedName = stationName ? decodeURIComponent(stationName) : "";
   const station: StationObj | undefined = stations[decodedName];
@@ -319,6 +319,9 @@ export const StationInfoView: React.FC = () => {
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{t("stationInfo")}</div>
               <h1 className="text-xl font-bold tracking-tight text-text-primary">{tStation(decodedName)}</h1>
+              {language === "zh" && (
+                <div className="text-[11px] text-text-secondary font-medium mt-0.5 leading-none">{decodedName}</div>
+              )}
               {groupedStationNames.length > 1 && (
                 <div className="text-[10px] text-text-secondary font-medium mt-0.5 flex items-center gap-1.5 flex-wrap">
                   <span>{t("connectedTo")}</span>
@@ -330,7 +333,12 @@ export const StationInfoView: React.FC = () => {
                           href={`#/station/${encodeURIComponent(name)}`}
                           className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer font-semibold"
                         >
-                          {tStation(name)}
+                          <span className="inline-flex flex-col">
+                            <span>{tStation(name)}</span>
+                            {language === "zh" && (
+                              <span className="text-[8px] font-normal text-text-secondary leading-none mt-0.5">{name}</span>
+                            )}
+                          </span>
                         </a>
                         {idx < arr.length - 1 && <span className="text-text-secondary">,</span>}
                       </React.Fragment>
@@ -458,7 +466,12 @@ export const StationInfoView: React.FC = () => {
                         {/* Line title */}
                         <div className="p-4 bg-button-secondary/15 flex items-center gap-2">
                           <Train style={{ color: lineColor }} className="h-5 w-5" />
-                          <span className="text-sm font-bold text-text-primary">{tLine(getLineName(lineId))}</span>
+                          <span className="flex flex-col">
+                            <span className="text-sm font-bold text-text-primary">{tLine(getLineName(lineId))}</span>
+                            {language === "zh" && (
+                              <span className="text-[10px] font-normal text-text-secondary leading-none mt-0.5">{getLineName(lineId)}</span>
+                            )}
+                          </span>
                         </div>
 
                         <div className="p-5 divide-y divide-border/60">
@@ -480,8 +493,13 @@ export const StationInfoView: React.FC = () => {
                                     <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">{t("towards")}</span>
                                     <div className="flex items-center gap-2 mt-1">
                                       <span className="text-sm font-bold text-text-primary flex items-center gap-1.5">
-                                        <ArrowRight className="h-4 w-4 text-text-secondary" />
-                                        {tStation(dir.displayDest)}
+                                        <ArrowRight className="h-4 w-4 text-text-secondary self-start mt-0.5" />
+                                        <span className="flex flex-col">
+                                          <span>{tStation(dir.displayDest)}</span>
+                                          {language === "zh" && (
+                                            <span className="text-[10px] font-normal text-text-secondary leading-none mt-0.5">{dir.displayDest}</span>
+                                          )}
+                                        </span>
                                       </span>
                                       {/* Approaching/Arriving chip for nearest train */}
                                       {(() => {

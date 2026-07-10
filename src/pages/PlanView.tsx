@@ -9,7 +9,7 @@ import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp,
 import { motion, AnimatePresence } from "framer-motion";
 
 export const PlanView: React.FC = () => {
-  const { farePref, t, tStation, tLine } = useSettings();
+  const { language, farePref, t, tStation, tLine } = useSettings();
   const location = useLocation();
 
   const [origin, setOrigin] = useState("");
@@ -451,7 +451,12 @@ export const PlanView: React.FC = () => {
                         }}
                         className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
                       >
-                        {tStation(name)}
+                        <span className="flex flex-col text-left">
+                          <span>{tStation(name)}</span>
+                          {language === "zh" && (
+                            <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{name}</span>
+                          )}
+                        </span>
                         {getStationBadges(name)}
                       </button>
                     ))}
@@ -516,7 +521,12 @@ export const PlanView: React.FC = () => {
                         }}
                         className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
                       >
-                        {tStation(name)}
+                        <span className="flex flex-col text-left">
+                          <span>{tStation(name)}</span>
+                          {language === "zh" && (
+                            <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{name}</span>
+                          )}
+                        </span>
                         {getStationBadges(name)}
                       </button>
                     ))}
@@ -622,19 +632,29 @@ export const PlanView: React.FC = () => {
                     </button>
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       {/* Origin Row */}
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold text-text-primary truncate">{tStation(route.origin)}</span>
-                        <div className="flex-shrink-0">{getStationBadges(route.origin)}</div>
-                      </div>
+                       <div className="flex items-center justify-between gap-2">
+                         <span className="inline-flex flex-col min-w-0">
+                           <span className="text-[10px] font-bold text-text-primary truncate">{tStation(route.origin)}</span>
+                           {language === "zh" && (
+                             <span className="text-[8px] font-normal text-text-secondary leading-none mt-0.5">{route.origin}</span>
+                           )}
+                         </span>
+                         <div className="flex-shrink-0">{getStationBadges(route.origin)}</div>
+                       </div>
                       {/* Down Arrow Row */}
                       <div className="text-[9px] text-text-secondary font-extrabold pl-1 leading-none select-none">
                         ↓
                       </div>
                       {/* Destination Row */}
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold text-text-primary truncate">{tStation(route.dest)}</span>
-                        <div className="flex-shrink-0">{getStationBadges(route.dest)}</div>
-                      </div>
+                       <div className="flex items-center justify-between gap-2">
+                         <span className="inline-flex flex-col min-w-0">
+                           <span className="text-[10px] font-bold text-text-primary truncate">{tStation(route.dest)}</span>
+                           {language === "zh" && (
+                             <span className="text-[8px] font-normal text-text-secondary leading-none mt-0.5">{route.dest}</span>
+                           )}
+                         </span>
+                         <div className="flex-shrink-0">{getStationBadges(route.dest)}</div>
+                       </div>
                     </div>
                   </div>
                 ))
@@ -813,7 +833,12 @@ export const PlanView: React.FC = () => {
                         <div className="relative pl-8 py-2">
                           <span className="absolute left-[2px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600/20 border-2 border-blue-500 z-10" />
                           <div className="text-xs font-bold text-text-primary">
-                            {t("alreadyAt")} {tStation(activeRoute.path[0])}
+                            <span className="flex flex-col">
+                              <span>{t("alreadyAt")} {tStation(activeRoute.path[0])}</span>
+                              {language === "zh" && (
+                                <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{activeRoute.path[0]}</span>
+                              )}
+                            </span>
                           </div>
                           <p className="text-[10px] text-text-secondary font-medium mt-1 leading-relaxed">
                             {t("noTravelNeeded")}
@@ -846,7 +871,12 @@ export const PlanView: React.FC = () => {
                                 className="text-xs font-bold text-text-primary cursor-pointer"
                                 style={{ textDecoration: 'none' }}
                               >
-                                {tStation(activeRoute.path[0])}
+                                <span className="flex flex-col">
+                                  <span>{tStation(activeRoute.path[0])}</span>
+                                  {language === "zh" && (
+                                    <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{activeRoute.path[0]}</span>
+                                  )}
+                                </span>
                               </a>
                               {getStationBadges(activeRoute.path[0])}
                               {activeRoute.etaDepart && (
@@ -880,16 +910,26 @@ export const PlanView: React.FC = () => {
 
                                   <div className="space-y-2">
                                     <div className="flex flex-wrap items-center justify-between">
-                                      <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
-                                        {isWalk
-                                          ? `${t("walkTo")} ${tStation(seg.stations[seg.stations.length - 1])}`
-                                          : `${t("board")} ${tLine(getLineName(seg.line))}`}
-                                        {meta?.direction && (
-                                          <span className="text-[10px] text-text-secondary font-normal ml-1.5">
-                                            {t("towardLabel")} {tStation(meta.direction)}
+                                      <div className="flex flex-col">
+                                        <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
+                                          {isWalk
+                                            ? `${t("walkTo")} ${tStation(seg.stations[seg.stations.length - 1])}`
+                                            : `${t("board")} ${tLine(getLineName(seg.line))}`}
+                                          {meta?.direction && (
+                                            <span className="text-[10px] text-text-secondary font-normal ml-1.5">
+                                              {t("towardLabel")} {tStation(meta.direction)}
+                                            </span>
+                                          )}
+                                        </span>
+                                        {language === "zh" && (
+                                          <span className="text-[9px] text-text-secondary font-normal mt-0.5 leading-none">
+                                            {isWalk
+                                              ? `Walk to ${seg.stations[seg.stations.length - 1]}`
+                                              : `Board ${getLineName(seg.line)}`}
+                                            {meta?.direction && ` towards ${meta.direction}`}
                                           </span>
                                         )}
-                                      </span>
+                                      </div>
                                     </div>
 
                                     {/* Ride Toggles */}
@@ -943,7 +983,12 @@ export const PlanView: React.FC = () => {
                                                 className="cursor-pointer"
                                                 style={{ textDecoration: 'none', color: 'inherit' }}
                                               >
-                                                {tStation(stop)}
+                                                <span className="flex flex-col">
+                                                   <span>{tStation(stop)}</span>
+                                                   {language === "zh" && (
+                                                     <span className="text-[8px] font-normal text-text-secondary leading-none mt-0.5">{stop}</span>
+                                                   )}
+                                                 </span>
                                               </a>
                                             </div>
                                             {getStationBadges(stop)}
@@ -971,18 +1016,30 @@ export const PlanView: React.FC = () => {
                                       className="text-xs font-bold text-text-primary cursor-pointer"
                                       style={{ textDecoration: 'none' }}
                                     >
-                                      {tStation(seg.stations[seg.stations.length - 1])}
+                                      <span className="flex flex-col">
+                                        <span>{tStation(seg.stations[seg.stations.length - 1])}</span>
+                                        {language === "zh" && (
+                                          <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{seg.stations[seg.stations.length - 1]}</span>
+                                        )}
+                                      </span>
                                     </a>
                                     {getStationBadges(seg.stations[seg.stations.length - 1])}
                                     {meta?.arriveTime && (
                                       <span className="text-[10px] text-text-secondary font-semibold ml-auto">{meta.arriveTime}</span>
                                     )}
                                   </div>
-                                  <p className="text-[10px] text-text-secondary font-medium mt-0.5">
-                                    {idx === segments.length - 1
-                                      ? t("arriveDest")
-                                      : `${t("transferTo")} ${tLine(getLineName(segments[idx + 1].line))}`}
-                                  </p>
+                                  <div className="flex flex-col text-[10px] text-text-secondary font-medium mt-0.5">
+                                    <span>
+                                      {idx === segments.length - 1
+                                        ? t("arriveDest")
+                                        : `${t("transferTo")} ${tLine(getLineName(segments[idx + 1].line))}`}
+                                    </span>
+                                    {language === "zh" && idx < segments.length - 1 && (
+                                      <span className="text-[8px] font-normal text-text-secondary leading-none mt-0.5">
+                                        Transfer to {getLineName(segments[idx + 1].line)}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </React.Fragment>
                             );

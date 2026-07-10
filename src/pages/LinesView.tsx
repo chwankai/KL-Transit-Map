@@ -22,7 +22,7 @@ function getLineNumberText(lineId: string): string {
 
 export const LinesView: React.FC = () => {
   const navigate = useNavigate();
-  const { t, tStation, tLine } = useSettings();
+  const { language, t, tStation, tLine } = useSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -185,6 +185,11 @@ export const LinesView: React.FC = () => {
                       <h2 className={`text-base font-bold leading-tight ${textClass}`}>
                         {tLine(selectedLine.name)}
                       </h2>
+                      {language === "zh" && (
+                        <div className={`text-[10px] ${textMutedClass} font-medium mt-0.5 leading-none`}>
+                          {selectedLine.name}
+                        </div>
+                      )}
                       <div className={`flex flex-col gap-0.5 mt-1.5 text-[10px] ${textMutedClass} font-medium`}>
                         <div className="flex flex-wrap gap-x-4 gap-y-0.5">
                           {selectedLine.length && (
@@ -239,8 +244,11 @@ export const LinesView: React.FC = () => {
                     className="group relative flex items-center justify-between p-4 rounded-2xl border border-border bg-card hover:bg-button-secondary/30 transition-all duration-200 active:scale-[0.99] cursor-pointer shadow-sm overflow-hidden"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors">
-                        {tStation(st.name)}
+                      <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors flex flex-col">
+                        <span>{tStation(st.name)}</span>
+                        {language === "zh" && (
+                          <span className="text-[10px] text-text-secondary font-normal mt-0.5 leading-none">{st.name}</span>
+                        )}
                       </span>
                     </div>
 
@@ -255,7 +263,12 @@ export const LinesView: React.FC = () => {
                             title={`${t("walkTo")} ${tStation(conn.to)}`}
                           >
                             <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                            <span>{tStation(conn.to)}</span>
+                            <span className="flex flex-col">
+                              <span>{tStation(conn.to)}</span>
+                              {language === "zh" && (
+                                <span className="text-[8px] font-normal text-text-secondary/80 leading-none mt-0.5">{conn.to}</span>
+                              )}
+                            </span>
                             {targetNode && (
                               <div className="flex gap-1">
                                 {targetNode.codes.map((code) => {
@@ -351,8 +364,11 @@ export const LinesView: React.FC = () => {
                     >
                       {st.code}
                     </span>
-                    <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors">
-                      {tStation(st.name)}
+                    <span className="text-sm font-bold text-text-primary group-hover:text-blue-500 transition-colors flex flex-col">
+                      <span>{tStation(st.name)}</span>
+                      {language === "zh" && (
+                        <span className="text-[10px] text-text-secondary font-normal mt-0.5 leading-none">{st.name}</span>
+                      )}
                     </span>
                   </div>
 
@@ -368,7 +384,12 @@ export const LinesView: React.FC = () => {
                           title={`${t("walkTo")} ${tStation(conn.to)}`}
                         >
                           <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                          <span>{tStation(conn.to)}</span>
+                          <span className="flex flex-col">
+                            <span>{tStation(conn.to)}</span>
+                            {language === "zh" && (
+                              <span className="text-[8px] font-normal text-text-secondary/80 leading-none mt-0.5">{conn.to}</span>
+                            )}
+                          </span>
                           {targetNode && (
                             <div className="flex gap-1">
                               {targetNode.codes.map((code) => {
