@@ -107,7 +107,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Offline Warning Banner */}
       {isOffline && showOfflineBanner && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-amber-600/95 backdrop-blur text-white rounded-xl shadow-2xl p-3 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom duration-200 border border-amber-500/20">
+        <div className="fixed bottom-[calc(24px+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md bg-amber-600/95 backdrop-blur text-white rounded-xl shadow-2xl p-3 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom duration-200 border border-amber-500/20">
           <div className="flex items-center gap-2">
             <span className="text-sm select-none">⚠️</span>
             <span className="text-[10px] sm:text-[11px] font-bold leading-normal">
