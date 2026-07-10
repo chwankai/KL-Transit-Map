@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { stations, lines } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
@@ -134,6 +134,91 @@ export const StationInfoView: React.FC = () => {
   const [directoryModalOpen, setDirectoryModalOpen] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
   const [isDirLoading, setIsDirLoading] = useState(false);
+  const imgContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollTopPos, setScrollTopPos] = useState(0);
+  const [touchStartDist, setTouchStartDist] = useState(0);
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY;
+    if (delta < 0) {
+      setZoomScale(s => Math.min(s + 0.15, 3.0));
+    } else {
+      setZoomScale(s => Math.max(s - 0.15, 0.5));
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoomScale <= 1) return;
+    setIsDragging(true);
+    if (imgContainerRef.current) {
+      setStartX(e.pageX - imgContainerRef.current.offsetLeft);
+      setStartY(e.pageY - imgContainerRef.current.offsetTop);
+      setScrollLeft(imgContainerRef.current.scrollLeft);
+      setScrollTopPos(imgContainerRef.current.scrollTop);
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !imgContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - imgContainerRef.current.offsetLeft;
+    const y = e.pageY - imgContainerRef.current.offsetTop;
+    const walkX = (x - startX) * 1.5;
+    const walkY = (y - startY) * 1.5;
+    imgContainerRef.current.scrollLeft = scrollLeft - walkX;
+    imgContainerRef.current.scrollTop = scrollTopPos - walkY;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
+
+  const getTouchDist = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) return 0;
+    const dx = e.touches[0].pageX - e.touches[1].pageX;
+    const dy = e.touches[0].pageY - e.touches[1].pageY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      setTouchStartDist(getTouchDist(e));
+    } else if (e.touches.length === 1 && zoomScale > 1) {
+      const touch = e.touches[0];
+      setIsDragging(true);
+      if (imgContainerRef.current) {
+        setStartX(touch.pageX - imgContainerRef.current.offsetLeft);
+        setStartY(touch.pageY - imgContainerRef.current.offsetTop);
+        setScrollLeft(imgContainerRef.current.scrollLeft);
+        setScrollTopPos(imgContainerRef.current.scrollTop);
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const currentDist = getTouchDist(e);
+      if (touchStartDist > 0) {
+        const scaleDiff = (currentDist - touchStartDist) * 0.007;
+        setZoomScale(s => Math.min(Math.max(s + scaleDiff, 0.5), 3.0));
+      }
+      setTouchStartDist(currentDist);
+    } else if (e.touches.length === 1 && isDragging && imgContainerRef.current) {
+      const touch = e.touches[0];
+      const x = touch.pageX - imgContainerRef.current.offsetLeft;
+      const y = touch.pageY - imgContainerRef.current.offsetTop;
+      const walkX = (x - startX) * 1.5;
+      const walkY = (y - startY) * 1.5;
+      imgContainerRef.current.scrollLeft = scrollLeft - walkX;
+      imgContainerRef.current.scrollTop = scrollTopPos - walkY;
+    }
+  };
 
   useEffect(() => {
     if (!directoryUrl) {
@@ -475,6 +560,16 @@ export const StationInfoView: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* Park n' Ride Facility */}
+              {station?.facility?.includes("P") && (
+                <div className="pt-3 border-t border-border/80 space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-600/10 text-blue-500 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/20 select-none w-fit">
+                    <span className="flex items-center justify-center w-3.5 h-3.5 rounded bg-blue-600 text-white text-[9px] font-black">P</span>
+                    <span>Park n' Ride</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* ── Station Directory ── */}
@@ -726,7 +821,7 @@ export const StationInfoView: React.FC = () => {
                                                             isNextTrain
                                                               ? "border-emerald-500 bg-emerald-500/10 text-emerald-500 font-bold"
                                                               : isPast
-                                                              ? "border-border/30 text-text-secondary/30 bg-transparent"
+                                                              ? "border-gray-200 dark:border-gray-800 bg-gray-100/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500"
                                                               : "border-border/60 bg-card text-text-primary"
                                                           }`}
                                                         >
@@ -817,11 +912,24 @@ export const StationInfoView: React.FC = () => {
             </button>
 
             {/* Image */}
-            <div className="overflow-auto flex-1 bg-card p-4 text-center">
+            <div
+              ref={imgContainerRef}
+              onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleMouseUpOrLeave}
+              className={`overflow-auto flex-1 bg-card p-4 text-center select-none ${
+                zoomScale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+              }`}
+            >
               <img
                 src={directoryUrl}
                 alt={`${decodedName} station directory`}
-                className="transition-all duration-200 ease-out inline-block"
+                className="transition-all duration-200 ease-out inline-block pointer-events-none"
                 style={{
                   width: `${zoomScale * 100}%`,
                   maxWidth: zoomScale > 1 ? "none" : "100%",

@@ -225,6 +225,7 @@ export const PlanView: React.FC = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!origin || !dest) return;
+    setIsMobileFormOpen(false);
 
     if (origin.trim().toLowerCase() === dest.trim().toLowerCase()) {
       const sameStationRoute: Route = {
@@ -419,7 +420,7 @@ export const PlanView: React.FC = () => {
         ref={sidebarScrollRef}
         onScroll={handleSidebarScroll}
         className={`w-full md:w-[360px] flex-shrink-0 p-5 md:border-r border-border overflow-y-auto md:overflow-y-visible bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between gap-4 ${language === "zh" ? "zh-body" : ""} ${
-          routes.length > 0
+          (routes.length > 0 || isLoading)
             ? isMobileFormOpen
               ? "absolute inset-x-0 top-0 max-h-[90%] shadow-2xl border-b border-border md:relative md:inset-auto md:max-h-none md:shadow-none md:border-r animate-in slide-in-from-top duration-200"
               : "hidden md:flex"

@@ -18,6 +18,7 @@ export interface StationObj {
   codes: string[];
   lines: string[];
   connections: Connection[];
+  facility?: string;
 }
 
 export interface Edge {
@@ -368,6 +369,31 @@ function buildGraph(): Record<string, StationObj> {
       configurable: true
     });
   }
+  const parkAndRideStations = new Set([
+    "Gombak", "Taman Melati", "Wangsa Maju", "Sri Rampai", "Setiawangsa", "Jelatek",
+    "KL Sentral", "Taman Jaya", "Asia Jaya", "Taman Paramount", "Taman Bahagia",
+    "Kelana Jaya", "Ara Damansara", "Glenmarie", "USJ 21", "Alam Megah", "Subang Alam",
+    "Putra Heights", "Sentul Timur", "Sentul", "Pudu", "Miharja", "Maluri", "Pandan Jaya",
+    "Pandan Indah", "Cempaka", "Ampang", "Cheras", "Salak Selatan", "Bandar Tasik Selatan",
+    "Sungai Besi", "Bukit Jalil", "Sri Petaling", "Awan Besar", "Muhibbah", "Kinrara Bk5",
+    "IOI Puchong Jaya", "Pusat Bandar Puchong", "Taman Perindustrian Puchong",
+    "Kwasa Damansara", "Kwasa Sentral", "Bandar Utama", "Phileo Damansara",
+    "Pusat Bandar Damansara", "Cochrane", "Taman Midah", "Taman Suntex", "Sri Raya",
+    "Bandar Tun Hussein Onn", "Bukit Dukung", "Sungai Jernih", "Kajang", "Sungai Buloh",
+    "Sri Damansara Barat", "Sri Damansara Timur", "Metro Prima", "Jinjang", "Kentonmen",
+    "Kuchai", "Taman Naga Emas", "Serdang Raya Utara", "Serdang Raya Selatan", "UPM",
+    "Taman Equine", "Cyberjaya Utara", "Putrajaya Sentral", "SunU-Monash", "Kayu Ara",
+    "Damansara Idaman", "Glenmarie 2", "Pasar Klang", "Seri Andalas", "Bandar Bukit Tinggi",
+    "Johan Setia"
+  ]);
+
+  Object.keys(stations).forEach(name => {
+    if (parkAndRideStations.has(name)) {
+      stations[name].facility = "P";
+    } else {
+      stations[name].facility = "";
+    }
+  });
 
   return stations;
 }
