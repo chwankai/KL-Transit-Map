@@ -13,7 +13,6 @@ const ASSETS_TO_CACHE = [
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Use silent failure so that missing assets don't fail the whole cache installation
       return Promise.allSettled(
         ASSETS_TO_CACHE.map((url) =>
           cache.add(url).catch((err) => console.warn("Failed to cache asset during install:", url, err))
@@ -40,8 +39,11 @@ self.addEventListener("activate", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
-  // Ignore browser extension requests or non-http requests
-  if (!e.request.url.startsWith(self.location.origin)) return;
+  const isSelfOrigin = e.request.url.startsWith(self.location.origin);
+  const isGoogleFont = e.request.url.includes("fonts.googleapis.com") || e.request.url.includes("fonts.gstatic.com");
+
+  // Only intercept requests to our own site or Google Fonts
+  if (!isSelfOrigin && !isGoogleFont) return;
 
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
@@ -50,7 +52,7 @@ self.addEventListener("fetch", (e) => {
       }
       return fetch(e.request).then((networkResponse) => {
         // Cache valid successful responses
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+        if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(e.request, responseToCache);

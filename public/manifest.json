@@ -1,6 +1,6 @@
 {
-  "name": "Klang Valley Transit Map",
-  "short_name": "KV Transit",
+  "name": "Kuala Lumpur Transit Map",
+  "short_name": "KL Transit Map",
   "description": "Interactive transit map, route planner, and timetables for Klang Valley rail network.",
   "start_url": "/",
   "display": "standalone",
