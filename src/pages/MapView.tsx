@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-
-import { RotateCcw, Map as MapIcon } from "lucide-react";
+import { Link } from "react-router-dom";
+import { RotateCcw, Map as MapIcon, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { stations, lines } from "../lib/transit-data";
 import stationCoords from "../../public/station_coords.json";
 import railTracks from "../../public/rail_tracks.json";
+import { SCHEMATIC_COORDS } from "../lib/schematic-coords";
 import { useSettings } from "../context/SettingsContext";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -24,6 +25,8 @@ export const MapView: React.FC = () => {
   const imageRef = useRef<HTMLImageElement>(null);
   const lastTouchDistance = useRef<number | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const popupMapRef = useRef<L.Map | null>(null);
+  const [selectedPopupStation, setSelectedPopupStation] = useState<string | null>(null);
 
   const mapUrl =
     mapType === "standard"
@@ -82,6 +85,59 @@ export const MapView: React.FC = () => {
   useEffect(() => {
     localStorage.setItem("show_real_scale", String(showRealScale));
   }, [showRealScale]);
+
+  // Leaflet popup map initialization
+  useEffect(() => {
+    if (!selectedPopupStation) return;
+    const coord = getStationCoord(selectedPopupStation);
+    if (!coord) return;
+
+    const timer = setTimeout(() => {
+      const miniMap = L.map("mini-leaflet-map", {
+        zoomControl: true,
+        attributionControl: false,
+      }).setView([coord.lat, coord.lng], 15);
+
+      const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isDark = theme === "dark" || (theme === "system" && systemIsDark);
+      const tileUrl = isDark
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+
+      L.tileLayer(tileUrl, {
+        maxZoom: 18,
+      }).addTo(miniMap);
+
+      // Add platform/station marker
+      L.circleMarker([coord.lat, coord.lng], {
+        radius: 8,
+        fillColor: "#3b82f6",
+        color: "#ffffff",
+        weight: 2,
+        fillOpacity: 1,
+      }).addTo(miniMap);
+
+      popupMapRef.current = miniMap;
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      if (popupMapRef.current) {
+        popupMapRef.current.remove();
+        popupMapRef.current = null;
+      }
+    };
+  }, [selectedPopupStation, theme]);
+
+  const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (e.shiftKey) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      console.log(`"${tStation("Clicked Station") || "Station"}" coordinate: { x: ${x.toFixed(1)}, y: ${y.toFixed(1)} }`);
+      alert(`Shift+Clicked Coords:\nx: ${x.toFixed(2)}, y: ${y.toFixed(2)}`);
+    }
+  };
 
   // Clamp map panning offsets to ensure a portion of the map remains visible
   const clampPosition = (x: number, y: number, currentScale: number) => {
@@ -541,16 +597,111 @@ export const MapView: React.FC = () => {
               y: position.y,
               scale: scale,
             }}
-            className="relative w-full md:w-auto max-w-full max-h-full flex items-center justify-center"
+            className="relative w-fit h-fit flex items-center justify-center"
             transition={isResetting ? { type: "spring", damping: 25, stiffness: 200 } : { duration: 0 }}
           >
             <img
               ref={imageRef}
               src={mapUrl}
               alt="Klang Valley Rail Map"
-              className="pointer-events-none select-none w-full h-auto object-contain md:max-h-[90vh] rounded-lg shadow-2xl border border-border"
+              draggable="false"
+              onClick={handleImageClick}
+              className="select-none w-full h-auto object-contain md:max-h-[90vh] rounded-lg shadow-2xl border border-border pointer-events-auto cursor-default"
             />
+
+            {/* Interactive Hotspot Buttons Overlay */}
+            {mapType === "standard" &&
+              Object.entries(SCHEMATIC_COORDS).map(([stationName, hotspot]) => {
+                const node = stations[stationName];
+                if (!node) return null;
+
+                return (
+                  <button
+                    key={stationName}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPopupStation(stationName);
+                    }}
+                    style={{
+                      left: `${hotspot.x}%`,
+                      top: `${hotspot.y}%`,
+                      width: `${hotspot.radius || 1.8}%`,
+                      height: `${hotspot.radius || 1.8}%`,
+                    }}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 opacity-0 cursor-pointer z-20"
+                    title={tStation(stationName)}
+                  />
+                );
+              })}
           </motion.div>
+        </div>
+      )}
+
+      {/* Real-Scale Map Popup Modal */}
+      {selectedPopupStation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-card border border-border rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="p-4 flex items-center justify-between gap-4">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-extrabold text-text-primary leading-tight">
+                    {tStation(selectedPopupStation)}
+                  </h3>
+                  <div className="flex items-center gap-1">
+                    {stations[selectedPopupStation]?.codes.map((code) => {
+                      const lineId = getLineOfCode(code);
+                      return (
+                        <span
+                          key={code}
+                          style={{ backgroundColor: getLineColor(lineId) }}
+                          className="px-1.5 py-0.5 text-[8px] font-extrabold text-white rounded select-none shadow-sm"
+                        >
+                          {code}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+                {language === "zh" && (
+                  <span className="text-[10px] text-text-secondary font-medium mt-0.5">
+                    {selectedPopupStation}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => setSelectedPopupStation(null)}
+                className="rounded-full p-1.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Map Canvas */}
+            <div id="mini-leaflet-map" className="w-full h-56 sm:h-64 bg-background relative z-10 border-y border-border" />
+
+            {/* Actions */}
+            <div className="p-4 flex items-center justify-between gap-4 bg-button-secondary/30">
+              <span className="text-[10px] sm:text-xs text-text-secondary font-medium">
+                {t("realScaleMap")}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedPopupStation(null)}
+                  className="px-4 py-2 border border-border rounded-xl text-xs font-bold text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-95"
+                >
+                  {t("close")}
+                </button>
+                <Link
+                  to={`/station/${encodeURIComponent(selectedPopupStation)}`}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold uppercase tracking-wide transition-all active:scale-95 shadow-md flex items-center gap-1"
+                >
+                  <span>{t("viewArrivals")}</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
