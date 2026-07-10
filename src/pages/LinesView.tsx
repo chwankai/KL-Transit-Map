@@ -255,7 +255,6 @@ export const LinesView: React.FC = () => {
                             title={`${t("walkTo")} ${tStation(conn.to)}`}
                           >
                             <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                            <span>{t("transferToWalkway")} {tStation(conn.to)}</span>
                             {targetNode && (
                               <div className="flex gap-1">
                                 {targetNode.codes.map((code) => {
@@ -368,7 +367,6 @@ export const LinesView: React.FC = () => {
                           title={`${t("walkTo")} ${tStation(conn.to)}`}
                         >
                           <Footprints className="h-3.5 w-3.5 text-text-secondary" />
-                          <span>{t("transferToWalkway")} {tStation(conn.to)}</span>
                           {targetNode && (
                             <div className="flex gap-1">
                               {targetNode.codes.map((code) => {
