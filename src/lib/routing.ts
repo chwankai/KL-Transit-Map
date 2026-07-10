@@ -2,7 +2,13 @@ import { stations } from "./transit-data";
 import type { Route, Edge } from "./transit-data";
 
 export async function geocodeStation(stationName: string) {
-  const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/geocode?scope=WMcentral&agency=rapidkl&input=${encodeURIComponent(stationName)}`;
+  let apiName = stationName;
+  if (stationName === "Tun Razak Exchange (TRX)") {
+    apiName = "Tun Razak Exchange";
+  } else if (stationName === "Jambatan Kota") {
+    apiName = "Pasar Jawa";
+  }
+  const url = `https://jp-web.myrapid.com.my/endpoint/geoservice/geocode?scope=WMcentral&agency=rapidkl&input=${encodeURIComponent(apiName)}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Geocoding failed for ${stationName}`);
   const data = await response.json();
@@ -38,17 +44,20 @@ export function mapApiLineId(apiLineId: string): string {
 export function findStationByCodeOrName(code: string | null, name: string | null): string | null {
   const cleanCode = code ? code.trim().toUpperCase() : "";
   if (cleanCode) {
-    for (const [stationName, stationObj] of Object.entries(stations)) {
+    for (const key of Object.getOwnPropertyNames(stations)) {
+      const stationObj = stations[key];
       if (stationObj.codes.some((c) => c.toUpperCase() === cleanCode)) {
-        return stationName;
+        return stationObj.name;
       }
     }
   }
 
   const cleanName = name ? name.replace(/\s*-\s*.+$/, "").trim().toUpperCase() : "";
-  for (const stationName of Object.keys(stations)) {
-    if (stationName.toUpperCase() === cleanName) {
-      return stationName;
+  if (cleanName) {
+    for (const key of Object.getOwnPropertyNames(stations)) {
+      if (key.toUpperCase() === cleanName) {
+        return stations[key].name;
+      }
     }
   }
   return null;

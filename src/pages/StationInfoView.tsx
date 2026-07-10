@@ -533,7 +533,7 @@ export const StationInfoView: React.FC = () => {
                                         return (
                                           <div
                                             key={dIdx}
-                                            className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl border text-center w-[76px] sm:w-[84px] flex-shrink-0 ${
+                                            className={`flex flex-col items-center justify-center px-2 py-1.5 rounded-xl border text-center w-[92px] sm:w-[98px] flex-shrink-0 ${
                                               isPast
                                                 ? "bg-button-secondary/30 border-border/40 text-text-secondary/40"
                                                 : isFirst

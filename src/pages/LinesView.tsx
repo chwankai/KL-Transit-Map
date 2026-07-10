@@ -185,8 +185,12 @@ export const LinesView: React.FC = () => {
                       </div>
                       <h2 className={`text-base font-bold leading-tight ${textClass}`}>
                         {tLine(selectedLine.name)}
-                        {language === "zh" && ` (${selectedLine.name})`}
                       </h2>
+                      {language === "zh" && (
+                        <div className={`text-[10px] ${textMutedClass} font-medium mt-0.5 leading-none`}>
+                          {selectedLine.name}
+                        </div>
+                      )}
                       <div className={`flex flex-col gap-0.5 mt-1.5 text-[10px] ${textMutedClass} font-medium`}>
                         <div className="flex flex-wrap gap-x-4 gap-y-0.5">
                           {selectedLine.length && (
