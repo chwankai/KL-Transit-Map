@@ -1,7 +1,19 @@
-import { lazy, Suspense } from "react";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { SettingsProvider } from "./context/SettingsContext";
 import { Layout } from "./components/layout/Layout";
+import { trackPageView } from "./lib/analytics";
+
+// Helper component to track page views automatically on location changes
+const PageViewTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location]);
+
+  return null;
+};
 
 // Lazy-load page components for bundle splitting (excludes heavy Leaflet code from initial load of other pages)
 const MapView = lazy(() => import("./pages/MapView").then(m => ({ default: m.MapView })));
@@ -23,6 +35,7 @@ function App() {
   return (
     <SettingsProvider>
       <Router>
+        <PageViewTracker />
         <Layout>
           <Suspense fallback={<PageLoader />}>
             <Routes>

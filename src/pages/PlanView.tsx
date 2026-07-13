@@ -7,6 +7,7 @@ import { useSettings } from "../context/SettingsContext";
 import { Footer } from "../components/layout/Footer";
 import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp, AlertCircle, X, Heart, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackEvent } from "../lib/analytics";
 
 export const PlanView: React.FC = () => {
   const { language, farePref, t, tStation, tLine } = useSettings();
@@ -177,6 +178,7 @@ export const PlanView: React.FC = () => {
     setDest(tmp);
     setOriginFilter("");
     setDestFilter("");
+    trackEvent("swap_route_endpoints", "plan");
   };
 
   const handleSearchAgain = () => {
@@ -194,14 +196,13 @@ export const PlanView: React.FC = () => {
   const handleSaveRoute = () => {
     if (!searchedOrigin || !searchedDest) return;
     const exists = savedRoutes.some(
-      (r) =>
-        r.origin.toLowerCase() === searchedOrigin.toLowerCase() &&
-        r.dest.toLowerCase() === searchedDest.toLowerCase()
+      (r) => r.origin === searchedOrigin && r.dest === searchedDest
     );
     if (!exists) {
       const updated = [...savedRoutes, { origin: searchedOrigin, dest: searchedDest }];
       setSavedRoutes(updated);
       localStorage.setItem("saved_routes", JSON.stringify(updated));
+      trackEvent("save_route", "plan", `${searchedOrigin} to ${searchedDest}`);
     }
     setIsJustSaved(true);
     setTimeout(() => setIsJustSaved(false), 2000);
@@ -254,6 +255,7 @@ export const PlanView: React.FC = () => {
     setIsLoading(true);
     setErrorMsg(null);
     setExpandedStops({});
+    trackEvent("plan_route_search", "plan", `${origin} to ${dest}`);
 
     let targetTime = "";
     if (timeMode !== "now" && dateInput && timeInput) {
@@ -780,7 +782,10 @@ export const PlanView: React.FC = () => {
                       return (
                         <button
                           key={idx}
-                          onClick={() => setSelectedRouteIndex(idx)}
+                          onClick={() => {
+                            setSelectedRouteIndex(idx);
+                            trackEvent("select_route_option", "plan", `option_${idx + 1}`);
+                          }}
                           className={`flex flex-col text-left p-4 rounded-xl border transition-all ${
                             active
                               ? "border-blue-600/65 bg-blue-600/10 shadow-[0_0_15px_rgba(59,130,246,0.1)]"

@@ -4,6 +4,7 @@ import { Map, Compass, Bus, Settings, Train, X } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
 import { useSettings } from "../../context/SettingsContext";
 import { AnimatePresence } from "framer-motion";
+import { trackEvent } from "../../lib/analytics";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -67,6 +68,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link
                   key={path}
                   to={path}
+                  onClick={() => trackEvent("navigate_tab", "navigation", labelKey)}
                   className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-2 md:px-3.5 py-1 sm:py-2 rounded-lg text-[9px] md:text-sm font-bold tracking-wide transition-all ${
                     isActive
                       ? "bg-blue-600/15 text-blue-500 dark:text-blue-400 border border-blue-500/30 shadow-[0_0_12px_rgba(59,130,246,0.1)]"
@@ -84,7 +86,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Settings button */}
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => {
+              setIsSettingsOpen(true);
+              trackEvent("open_settings", "navigation");
+            }}
             className="rounded-full p-2 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-95 flex items-center justify-center"
             title="Open Settings"
           >

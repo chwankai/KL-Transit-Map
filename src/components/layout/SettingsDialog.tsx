@@ -3,6 +3,7 @@ import { useSettings } from "../../context/SettingsContext";
 import { X, Sun, Moon, Laptop, EyeOff, Globe, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { trackEvent } from "../../lib/analytics";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -21,6 +22,26 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
     setLanguage,
     t,
   } = useSettings();
+
+  const handleLanguageChange = (id: "en" | "ms" | "zh") => {
+    setLanguage(id);
+    trackEvent("change_language", "settings", id);
+  };
+
+  const handleThemeChange = (id: "system" | "light" | "dark") => {
+    setTheme(id);
+    trackEvent("change_theme", "settings", id);
+  };
+
+  const handleFarePrefChange = (id: "all" | "cashless" | "cash" | "concession") => {
+    setFarePref(id);
+    trackEvent("change_fare_preference", "settings", id);
+  };
+
+  const handleHideBusChange = (checked: boolean) => {
+    setHideBusButton(checked);
+    trackEvent("toggle_hide_bus", "settings", checked ? "hidden" : "visible");
+  };
 
   return (
     <motion.div
@@ -69,7 +90,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               ).map(({ id, label }) => (
                 <button
                   key={id}
-                  onClick={() => setLanguage(id)}
+                  onClick={() => handleLanguageChange(id)}
                   className={`py-2 rounded-lg text-xs font-bold transition-all ${
                     language === id
                       ? "bg-blue-600 text-white shadow-md"
@@ -97,7 +118,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               ).map(({ id, labelKey, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setTheme(id)}
+                  onClick={() => handleThemeChange(id)}
                   className={`flex items-center justify-center gap-1.5 py-2 px-1 rounded-lg text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${
                     theme === id
                       ? "bg-blue-600 text-white shadow-md"
@@ -127,7 +148,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               ).map(({ id, labelKey }) => (
                 <button
                   key={id}
-                  onClick={() => setFarePref(id)}
+                  onClick={() => handleFarePrefChange(id)}
                   className={`py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all ${
                     farePref === id
                       ? "bg-blue-600 text-white shadow-md font-bold"
@@ -158,7 +179,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               <input
                 type="checkbox"
                 checked={hideBusButton}
-                onChange={(e) => setHideBusButton(e.target.checked)}
+                onChange={(e) => handleHideBusChange(e.target.checked)}
                 className="rounded bg-input border-border text-blue-600 focus:ring-0 cursor-pointer h-4 w-4"
               />
             </div>
@@ -178,7 +199,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
               </div>
               <Link
                 to="/guide"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  trackEvent("click_how_to_guide", "settings");
+                }}
                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm active:scale-95"
               >
                 {t("open")}

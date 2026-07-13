@@ -8,6 +8,7 @@ import railTracks from "../../public/rail_tracks.json";
 import { useSettings } from "../context/SettingsContext";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { trackEvent } from "../lib/analytics";
 
 export const MapView: React.FC = () => {
   const { language, theme, t, tStation, tLine } = useSettings();
@@ -109,6 +110,7 @@ export const MapView: React.FC = () => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
     setTimeout(() => setIsResetting(false), 300);
+    trackEvent("reset_map_view", "map");
   };
 
   // Mouse drag handlers
@@ -498,9 +500,11 @@ export const MapView: React.FC = () => {
         {/* Toggle Map Type (Standard schematic map view only) */}
         {!showRealScale && (
           <button
-            onClick={() =>
-              setMapType((prev) => (prev === "standard" ? "upcoming" : "standard"))
-            }
+            onClick={() => {
+              const nextType = mapType === "standard" ? "upcoming" : "standard";
+              setMapType(nextType);
+              trackEvent("toggle_map_type", "map", nextType);
+            }}
             className="flex items-center gap-2 rounded-2xl border border-border bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xl hover:bg-blue-700 transition-all active:scale-95 select-none"
           >
             <MapIcon className="h-4 w-4" />
@@ -510,7 +514,11 @@ export const MapView: React.FC = () => {
 
         {/* Real Scale Map Toggle Button */}
         <button
-          onClick={() => setShowRealScale((prev) => !prev)}
+          onClick={() => {
+            const nextRealScale = !showRealScale;
+            setShowRealScale(nextRealScale);
+            trackEvent("toggle_real_scale", "map", nextRealScale ? "real_scale" : "schematic");
+          }}
           className="flex items-center gap-2 rounded-2xl border border-border bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xl hover:bg-emerald-700 transition-all active:scale-95 select-none"
         >
           <MapIcon className="h-4 w-4" />

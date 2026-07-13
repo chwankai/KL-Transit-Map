@@ -6,6 +6,7 @@ import { Footer } from "../components/layout/Footer";
 import { RefreshCw, CheckSquare, Square, EyeOff, LayoutList, Check, Map } from "lucide-react";
 import { useSettings } from "../context/SettingsContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackEvent } from "../lib/analytics";
 
 interface StaticRoute {
   id: string;
@@ -157,8 +158,10 @@ export const BusView: React.FC = () => {
       const next = new Set(prev);
       if (next.has(routeId)) {
         next.delete(routeId);
+        trackEvent("deselect_bus_route", "bus", routeId);
       } else {
         next.add(routeId);
+        trackEvent("select_bus_route", "bus", routeId);
       }
       return next;
     });
@@ -168,10 +171,12 @@ export const BusView: React.FC = () => {
     const all = new Set<string>();
     STATIC_ROUTES[region].forEach((r) => all.add(r.id));
     setSelectedRouteIds(all);
+    trackEvent("select_all_bus_routes", "bus", region);
   };
 
   const deselectAll = () => {
     setSelectedRouteIds((new Set()));
+    trackEvent("deselect_all_bus_routes", "bus", region);
   };
 
   const visibleRoutes = useMemo(() => {
@@ -237,7 +242,10 @@ export const BusView: React.FC = () => {
               {(["johor", "melaka"] as const).map((reg) => (
                 <button
                   key={reg}
-                  onClick={() => setRegion(reg)}
+                  onClick={() => {
+                    setRegion(reg);
+                    trackEvent("change_bus_region", "bus", reg);
+                  }}
                   className={`py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                     region === reg
                       ? "bg-blue-600 text-white shadow-md"
@@ -253,7 +261,10 @@ export const BusView: React.FC = () => {
             <div className="text-[10px] text-text-secondary leading-relaxed bg-button-secondary/50 border border-border rounded-xl p-2.5 flex-shrink-0 flex items-center justify-between">
               <span>{statusText}</span>
               <button
-                onClick={fetchPositions}
+                onClick={() => {
+                  fetchPositions();
+                  trackEvent("refresh_bus_positions", "bus", region);
+                }}
                 disabled={isRefreshing}
                 className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
                 title={t("refreshHint")}
@@ -280,7 +291,11 @@ export const BusView: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={hideInactive}
-                  onChange={(e) => setHideInactive(e.target.checked)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setHideInactive(checked);
+                    trackEvent("toggle_hide_inactive_buses", "bus", checked ? "hidden" : "visible");
+                  }}
                   className="rounded bg-input border-border text-blue-600 focus:ring-0"
                 />
                 {t("hideInactive")}
