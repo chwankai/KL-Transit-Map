@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
+import { trackEvent } from "../lib/analytics";
 import {
   getNextDepartures,
   getFullTimetable,
@@ -257,11 +258,13 @@ export const StationInfoView: React.FC = () => {
 
   const toggleFavourite = () => {
     const favs: string[] = JSON.parse(localStorage.getItem("favourite_stations") || "[]");
+    const nextFavourite = !isFavourite;
     const updated = isFavourite
-      ? favs.filter((f) => f !== decodedName)
-      : [...favs, decodedName].sort();
+      ? favs.filter(name => name !== decodedName)
+      : [...favs, decodedName];
     localStorage.setItem("favourite_stations", JSON.stringify(updated));
-    setIsFavourite(!isFavourite);
+    setIsFavourite(nextFavourite);
+    trackEvent(nextFavourite ? "add_favourite_station" : "remove_favourite_station", "station", decodedName);
   };
 
   // ── 1-second ticker for countdown display ──
@@ -480,7 +483,10 @@ export const StationInfoView: React.FC = () => {
               {t("updated")} {fmtTime12(updatedAt)}
             </span>
             <button
-              onClick={() => loadDepartures(new Date())}
+              onClick={() => {
+                loadDepartures(new Date());
+                trackEvent("reload_station_departures", "station", decodedName);
+              }}
               title="Refresh departures"
               className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all active:scale-90 shadow-md"
             >
@@ -517,7 +523,10 @@ export const StationInfoView: React.FC = () => {
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     title="Plan route to this station"
-                    onClick={() => navigate(`/plan?dest=${encodeURIComponent(decodedName)}`)}
+                    onClick={() => {
+                      navigate(`/plan?dest=${encodeURIComponent(decodedName)}`);
+                      trackEvent("plan_route_to_station", "station", decodedName);
+                    }}
                     className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-blue-500 hover:border-blue-500 transition-all active:scale-90 shadow-sm"
                   >
                     <Navigation className="h-4 w-4" />
@@ -578,7 +587,11 @@ export const StationInfoView: React.FC = () => {
                 {/* Mobile: toggle button */}
                 <div className="block lg:hidden">
                   <button
-                    onClick={() => setDirectoryOpen(p => !p)}
+                    onClick={() => {
+                      const nextOpen = !directoryOpen;
+                      setDirectoryOpen(nextOpen);
+                      trackEvent("toggle_station_directory", "station", nextOpen ? "open" : "close");
+                    }}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all text-xs font-bold uppercase tracking-wider shadow-sm"
                   >
                     <Map className="h-3.5 w-3.5" />
@@ -601,7 +614,10 @@ export const StationInfoView: React.FC = () => {
                       directoryImgExists && directoryUrl && (
                         <div
                           className="cursor-zoom-in hover:brightness-95 transition-all flex justify-center"
-                          onClick={() => setDirectoryModalOpen(true)}
+                          onClick={() => {
+                            setDirectoryModalOpen(true);
+                            trackEvent("open_station_directory_layout", "station", decodedName);
+                          }}
                           title="Click to enlarge"
                         >
                           <img
@@ -733,7 +749,10 @@ export const StationInfoView: React.FC = () => {
                                 {/* View Full Timetable toggle */}
                                 <div className="pt-1">
                                   <button
-                                    onClick={() => toggleTimetable(key, lineId, dir.headsign)}
+                                    onClick={() => {
+                                      toggleTimetable(key, lineId, dir.headsign);
+                                      trackEvent("toggle_timetable_view", "station", `${lineId} to ${dir.headsign}`);
+                                    }}
                                     className="flex items-center gap-1 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-wider"
                                   >
                                     {isExpanded ? (
@@ -750,7 +769,10 @@ export const StationInfoView: React.FC = () => {
                                         {(["weekday", "saturday", "sunday"] as DayTab[]).map(tab => (
                                           <button
                                             key={tab}
-                                            onClick={() => setTimetableTab(prev => ({ ...prev, [key]: tab }))}
+                                            onClick={() => {
+                                              setTimetableTab(prev => ({ ...prev, [key]: tab }));
+                                              trackEvent("change_timetable_day", "station", tab);
+                                            }}
                                             className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
                                               activeTab === tab
                                                 ? "bg-blue-600 text-white"

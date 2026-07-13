@@ -5,6 +5,7 @@ import { lines, stations, lineStations } from "../lib/transit-data";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
 import { translateStation } from "../lib/translations";
+import { trackEvent } from "../lib/analytics";
 
 function getLineNumberText(lineId: string): string {
   const mapping: Record<string, string> = {
@@ -51,6 +52,7 @@ export const LinesView: React.FC = () => {
   const setSelectedLineId = (id: string) => {
     setSearchParams({ line: id });
     setSearchQuery(""); // Clear search when line changes
+    trackEvent("select_line", "lines", id);
   };
 
   const selectedLine = lines[selectedLineId];
@@ -241,7 +243,11 @@ export const LinesView: React.FC = () => {
                   </div>
                   <div className="flex-shrink-0 flex items-center justify-center">
                     <button
-                      onClick={() => setIsReversed((prev) => !prev)}
+                      onClick={() => {
+                        const nextReversed = !isReversed;
+                        setIsReversed(nextReversed);
+                        trackEvent("reverse_stations_list", "lines", nextReversed ? "reversed" : "standard");
+                      }}
                       title="Reverse station list"
                       style={isReversed ? { backgroundColor: "#0f172a", color: selectedLine.color } : { color: selectedLine.color }}
                       className={`p-3 rounded-xl shadow-md flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95 ${
@@ -274,7 +280,10 @@ export const LinesView: React.FC = () => {
                 return (
                   <div
                     key={st.name}
-                    onClick={() => navigate(`/station/${encodeURIComponent(st.name)}`)}
+                    onClick={() => {
+                      navigate(`/station/${encodeURIComponent(st.name)}`);
+                      trackEvent("click_station_detail", "lines", st.name);
+                    }}
                     className="group relative flex items-center justify-between p-4 rounded-2xl border border-border bg-card hover:bg-button-secondary/30 transition-all duration-200 active:scale-[0.99] cursor-pointer shadow-sm overflow-hidden"
                   >
                     <div className="flex items-center gap-3">
@@ -381,7 +390,10 @@ export const LinesView: React.FC = () => {
               return (
                 <div
                   key={`${st.code}-${idx}`}
-                  onClick={() => navigate(`/station/${encodeURIComponent(st.name)}`)}
+                  onClick={() => {
+                    navigate(`/station/${encodeURIComponent(st.name)}`);
+                    trackEvent("click_station_detail", "lines", st.name);
+                  }}
                   className="group relative flex items-center justify-between p-4 rounded-2xl border border-border bg-card hover:bg-button-secondary/30 transition-all duration-200 active:scale-[0.99] cursor-pointer shadow-sm overflow-hidden"
                 >
                   {/* Hover line indicator */}

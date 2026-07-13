@@ -9,6 +9,16 @@ declare global {
 
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
 
+// Define gtag helper globally on window immediately when the module loads
+if (typeof window !== "undefined" && GA_TRACKING_ID) {
+  window.dataLayer = window.dataLayer || [];
+  if (!window.gtag) {
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+  }
+}
+
 /**
  * Dynamically initializes Google Analytics (gtag.js) if a measurement ID is configured.
  * Does nothing if VITE_GA_TRACKING_ID is unset.
@@ -31,17 +41,12 @@ export const initGA = (): void => {
     scriptUrl.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
     document.head.appendChild(scriptUrl);
 
-    const scriptCode = document.createElement("script");
-    scriptCode.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){window.dataLayer.push(arguments);}
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', '${GA_TRACKING_ID}', {
-        send_page_view: false // Managed manually via react-router location changes
+    if (window.gtag) {
+      window.gtag("js", new Date());
+      window.gtag("config", GA_TRACKING_ID, {
+        send_page_view: false // Managed manually via page_view event on router changes
       });
-    `;
-    document.head.appendChild(scriptCode);
+    }
   } catch (error) {
     console.error("Google Analytics failed to initialize script: ", error);
   }
@@ -53,8 +58,10 @@ export const initGA = (): void => {
  */
 export const trackPageView = (pagePath: string): void => {
   if (typeof window !== "undefined" && window.gtag && GA_TRACKING_ID) {
-    window.gtag("config", GA_TRACKING_ID, {
+    window.gtag("event", "page_view", {
       page_path: pagePath,
+      page_location: window.location.href,
+      page_title: document.title
     });
   }
 };
