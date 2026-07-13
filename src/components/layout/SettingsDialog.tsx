@@ -2,7 +2,7 @@ import React from "react";
 import { useSettings } from "../../context/SettingsContext";
 import { X, Sun, Moon, Laptop, EyeOff, Globe, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { trackEvent } from "../../lib/analytics";
 
 interface SettingsDialogProps {
@@ -11,6 +11,7 @@ interface SettingsDialogProps {
 }
 
 export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
+  const navigate = useNavigate();
   const {
     theme,
     setTheme,
@@ -197,16 +198,16 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ onClose }) => {
                   </span>
                 </div>
               </div>
-              <Link
-                to="/guide"
+              <button
                 onClick={() => {
+                  navigate("/guide");
                   onClose();
                   trackEvent("click_how_to_guide", "settings");
                 }}
                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm active:scale-95"
               >
                 {t("open")}
-              </Link>
+              </button>
             </div>
           </div>
         </div>
