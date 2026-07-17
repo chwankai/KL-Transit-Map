@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "adm-zip": "^0.5.18",
     "framer-motion": "^12.42.2",
     "leaflet": "^1.9.4",

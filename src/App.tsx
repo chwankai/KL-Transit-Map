@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { SettingsProvider } from "./context/SettingsContext";
 import { Layout } from "./components/layout/Layout";
 import { trackPageView } from "./lib/analytics";
@@ -49,6 +51,8 @@ function App() {
           </Suspense>
         </Layout>
       </Router>
+      <Analytics />
+      <SpeedInsights />
     </SettingsProvider>
   );
 }
