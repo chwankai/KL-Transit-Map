@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { stations, lines, findRoute, lineStations } from "../lib/transit-data";
+import { stations, lines, findRoute, lineStations, getPlatformNumber } from "../lib/transit-data";
 import type { Route } from "../lib/transit-data";
 import { fetchMyRapidRoute, getCurrentDateTime, subtractSecondsFromDatetime, geocodeStation, fetchSingleRoute } from "../lib/routing";
 import { useSettings } from "../context/SettingsContext";
@@ -946,12 +946,15 @@ export const PlanView: React.FC = () => {
                             const intermediateStops = seg.stations.slice(0, -1);
                             const meta = activeRoute.legMeta?.[idx] || null;
 
-                            let resolvedDirection = meta?.direction || null;
+                             let resolvedDirection = meta?.direction || null;
                             if (!resolvedDirection && !isWalk && seg.stations.length > 0) {
                               const fromSt = idx === 0 ? activeRoute.path[0] : segments[idx - 1].stations[segments[idx - 1].stations.length - 1];
                               const toSt = seg.stations[0];
                               resolvedDirection = getFallbackDirection(seg.line, fromSt, toSt);
                             }
+
+                            const boardStation = idx === 0 ? activeRoute.path[0] : segments[idx - 1].stations[segments[idx - 1].stations.length - 1];
+                            const boardPlatNum = !isWalk ? getPlatformNumber(seg.line, boardStation, resolvedDirection || seg.stations[seg.stations.length - 1]) : null;
 
                             return (
                               <React.Fragment key={idx}>
@@ -970,16 +973,23 @@ export const PlanView: React.FC = () => {
                                   <div className="space-y-2">
                                     <div className="flex flex-wrap items-center justify-between">
                                       <div className="flex flex-col">
-                                        <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
-                                          {isWalk
-                                            ? `${t("walkTo")} ${tStation(seg.stations[seg.stations.length - 1])}`
-                                            : `${t("board")} ${tLine(getLineName(seg.line))}`}
-                                          {resolvedDirection && (
-                                            <span className="text-[10px] text-text-secondary font-normal ml-1.5">
-                                              {t("towardLabel")} {tStation(resolvedDirection)}
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span style={{ color: isWalk ? "var(--text-secondary)" : color }} className="text-xs font-bold">
+                                            {isWalk
+                                              ? `${t("walkTo")} ${tStation(seg.stations[seg.stations.length - 1])}`
+                                              : `${t("board")} ${tLine(getLineName(seg.line))}`}
+                                            {resolvedDirection && (
+                                              <span className="text-[10px] text-text-secondary font-normal ml-1.5">
+                                                {t("towardLabel")} {tStation(resolvedDirection)}
+                                              </span>
+                                            )}
+                                          </span>
+                                          {!isWalk && boardPlatNum && (
+                                            <span className="inline-flex items-center text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-600/10 text-blue-500 border border-blue-500/20 select-none leading-none">
+                                              {t("platform")} {boardPlatNum}
                                             </span>
                                           )}
-                                        </span>
+                                        </div>
                                         {language === "zh" && (
                                           <span className="text-[9px] text-text-secondary font-normal mt-0.5 leading-none">
                                             {isWalk

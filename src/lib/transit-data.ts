@@ -524,3 +524,138 @@ export const lineStations: Record<string, { code: string; name: string; distance
   "BRT": BRT_Line,
   "SA": SA_Line,
 };
+
+/**
+ * Special platform mappings for multi-platform interchanges and specific station layouts
+ */
+const SPECIAL_STATION_PLATFORMS: Record<string, Record<string, Record<string, number>>> = {
+  "TUN RAZAK EXCHANGE (TRX)": {
+    "KG": {
+      "KAJANG": 1,
+      "KWASA DAMANSARA": 2,
+    },
+    "PY": {
+      "PUTRAJAYA": 3,
+      "PUTRAJAYA SENTRAL": 3,
+      "KWASA DAMANSARA": 4,
+    },
+  },
+  "KWASA DAMANSARA": {
+    "KG": {
+      "KAJANG": 1,
+    },
+    "PY": {
+      "PUTRAJAYA": 3,
+      "PUTRAJAYA SENTRAL": 3,
+    },
+  },
+  "PUTRA HEIGHTS": {
+    "KJ": {
+      "GOMBAK": 1,
+    },
+    "SP": {
+      "SENTUL TIMUR": 2,
+    },
+  },
+};
+
+/**
+ * Determine platform number (1, 2, 3, 4) for a station given a line ID and direction headsign/destination.
+ */
+export function getPlatformNumber(
+  lineId: string,
+  stationName: string,
+  directionOrNext: string
+): number | null {
+  if (!lineId || !stationName || !directionOrNext) return null;
+
+  const clean = (str: string) =>
+    str
+      .trim()
+      .toUpperCase()
+      .replace(/\s+STATION\s*$/i, "")
+      .replace(/\s+(LRT|MRT|MONORAIL|KTM)\s*$/i, "")
+      .replace(/[()'"]/g, "")
+      .trim();
+
+  const stationClean = clean(stationName);
+  const targetClean = clean(directionOrNext);
+
+  // 1. Check special station overrides (TRX, Kwasa Damansara, Putra Heights)
+  for (const [sKey, lineMap] of Object.entries(SPECIAL_STATION_PLATFORMS)) {
+    const cleanSKey = clean(sKey);
+    if (stationClean.includes(cleanSKey) || cleanSKey.includes(stationClean)) {
+      const dirMap = lineMap[lineId];
+      if (dirMap) {
+        for (const [dKey, platNum] of Object.entries(dirMap)) {
+          const cleanDKey = clean(dKey);
+          if (targetClean.includes(cleanDKey) || cleanDKey.includes(targetClean)) {
+            return platNum;
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Standard per-line station direction mapping
+  const line = lineStations[lineId];
+  if (!line || line.length === 0) return null;
+
+  // Find index of current station in line
+  const currIdx = line.findIndex(
+    (s) => clean(s.name) === stationClean || stationClean.includes(clean(s.name)) || clean(s.name).includes(stationClean)
+  );
+
+  let isIncreasing = true;
+
+  if (currIdx !== -1) {
+    // Find target index in line
+    let targetIdx = line.findIndex(
+      (s) => clean(s.name) === targetClean || targetClean.includes(clean(s.name))
+    );
+
+    if (targetIdx === -1) {
+      for (let i = 0; i < line.length; i++) {
+        const sClean = clean(line[i].name);
+        if (targetClean.includes(sClean) || sClean.includes(targetClean)) {
+          targetIdx = i;
+          break;
+        }
+      }
+    }
+
+    if (targetIdx !== -1 && targetIdx !== currIdx) {
+      isIncreasing = targetIdx > currIdx;
+    } else {
+      // Check first / last terminal of line
+      const firstTerm = clean(line[0].name);
+      const lastTerm = clean(line[line.length - 1].name);
+
+      if (targetClean.includes(firstTerm)) {
+        isIncreasing = false;
+      } else if (targetClean.includes(lastTerm)) {
+        isIncreasing = true;
+      }
+    }
+  } else {
+    // Current station not in line array, check headsign keywords against terminal
+    const firstTerm = clean(line[0].name);
+    const lastTerm = clean(line[line.length - 1].name);
+
+    if (targetClean.includes(firstTerm)) {
+      isIncreasing = false;
+    } else if (targetClean.includes(lastTerm)) {
+      isIncreasing = true;
+    }
+  }
+
+  // Monorail (MR) direction mapping:
+  // MR1 KL Sentral (idx 0) -> Platform 1 (towards KL Sentral, decreasing idx)
+  // MR11 Titiwangsa (idx 10) -> Platform 2 (towards Titiwangsa, increasing idx)
+  if (lineId === "MR") {
+    return isIncreasing ? 2 : 1;
+  }
+
+  return isIncreasing ? 1 : 2;
+}
+

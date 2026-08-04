@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { stations, lines } from "../lib/transit-data";
+import { stations, lines, getPlatformNumber } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
 import {
   ArrowLeft, Clock, ArrowRight, Train, ChevronDown, ChevronUp,
@@ -684,9 +684,20 @@ export const StationInfoView: React.FC = () => {
                             return (
                               <div key={dir.headsign} className="py-4 first:pt-0 last:pb-0 space-y-4">
                                 <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
-                                  {/* Direction label + status chip */}
+                                  {/* Direction label + platform badge + status chip */}
                                   <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">{t("towards")}</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider leading-none">{t("towards")}</span>
+                                      {(() => {
+                                        const platNum = getPlatformNumber(lineId, decodedName, dir.displayDest || dir.headsign);
+                                        if (!platNum) return null;
+                                        return (
+                                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-blue-600/10 text-blue-500 border border-blue-500/20 leading-none select-none">
+                                            {t("platform")} {platNum}
+                                          </span>
+                                        );
+                                      })()}
+                                    </div>
                                     <div className="flex items-center gap-2 mt-1">
                                       <span className="text-sm font-bold text-text-primary flex items-center gap-1.5">
                                         <ArrowRight className="h-4 w-4 text-text-secondary self-start mt-0.5" />

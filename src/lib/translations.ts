@@ -73,6 +73,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Station Info page
     stationInfo: "Station Information",
+    platform: "Platform",
     nextDepartures: "Next Departures",
     connectedTo: "Connected to",
     updated: "Updated",
@@ -258,6 +259,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Station Info page
     stationInfo: "车站详情信息",
+    platform: "站台",
     nextDepartures: "列车实时到站",
     connectedTo: "站内通道连接至：",
     updated: "更新于",
@@ -443,6 +445,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Station Info page
     stationInfo: "Maklumat Stesen",
+    platform: "Platform",
     nextDepartures: "Pelepasan Seterusnya",
     connectedTo: "Bersambung ke",
     updated: "Dikemas kini",
