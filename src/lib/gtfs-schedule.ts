@@ -22,6 +22,7 @@ interface ServiceSchedule {
   service_id: string;
   frequencies: FreqWindow[];
   offsets: Record<string, number>; // NORMALIZED_STATION_NAME → seconds from first stop
+  first_trains?: Record<string, number>; // NORMALIZED_STATION_NAME → first train arrival seconds from midnight
 }
 
 interface DirectionData {
@@ -99,6 +100,7 @@ function serviceActive(cal: CalendarEntry, dayType: "weekday" | "saturday" | "su
  * Tries exact match first, then partial/fuzzy match.
  */
 function findOffset(offsets: Record<string, number>, normStation: string): number | null {
+  if (!offsets) return null;
   // 1. Exact match
   if (offsets[normStation] !== undefined) return offsets[normStation];
 
@@ -121,6 +123,45 @@ function findOffset(offsets: Record<string, number>, normStation: string): numbe
   if (bestScore >= 2 && bestMatch) return bestMatch[1];
 
   return null;
+}
+
+/**
+ * Generate station arrival timestamps (in seconds from midnight) for a service schedule.
+ * Starts at the exact first train arrival timestamp (from GTFS stop_times)
+ * and accumulates headway frequencies continuously across time windows.
+ */
+function generateStationArrivals(svc: ServiceSchedule, normStation: string): number[] {
+  const offsetSecs = findOffset(svc.offsets, normStation);
+  if (offsetSecs === null) return [];
+
+  let firstTrainArrival: number | null = null;
+  if (svc.first_trains) {
+    firstTrainArrival = findOffset(svc.first_trains, normStation);
+  }
+  if (firstTrainArrival === null) {
+    const baseStart = svc.frequencies[0]?.start_secs ?? 21600;
+    firstTrainArrival = baseStart + offsetSecs;
+  }
+
+  const arrivals: number[] = [];
+  let currentArrival = firstTrainArrival;
+
+  for (const win of svc.frequencies) {
+    const winStartArrival = win.start_secs + offsetSecs;
+    const winEndArrival = win.end_secs + offsetSecs;
+    const headway = win.headway_secs;
+
+    if (currentArrival < winStartArrival) {
+      currentArrival = winStartArrival;
+    }
+
+    while (currentArrival < winEndArrival) {
+      arrivals.push(currentArrival);
+      currentArrival += headway;
+    }
+  }
+
+  return arrivals;
 }
 
 // ── Main exports ──────────────────────────────────────────────────────────────
@@ -155,19 +196,10 @@ export async function getNextDepartures(
     const cal = gtfs.calendar[svc.service_id];
     if (!cal || !serviceActive(cal, dayType)) continue;
 
-    const offsetSecs = findOffset(svc.offsets, normStation);
-    if (offsetSecs === null) continue;
-
-    for (const win of svc.frequencies) {
-      // Generate all base departures from first stop within this window
-      let base = win.start_secs;
-      while (base < win.end_secs) {
-        const arrivalAtStation = base + offsetSecs;
-        // Only keep future arrivals within the next 3 hours
-        if (arrivalAtStation > nowSecs && arrivalAtStation <= nowSecs + 10800) {
-          upcoming.push(arrivalAtStation);
-        }
-        base += win.headway_secs;
+    const arrivals = generateStationArrivals(svc, normStation);
+    for (const arrSecs of arrivals) {
+      if (arrSecs > nowSecs && arrSecs <= nowSecs + 10800) {
+        upcoming.push(arrSecs);
       }
     }
   }
@@ -206,15 +238,10 @@ export async function getFullTimetable(
     const cal = gtfs.calendar[svc.service_id];
     if (!cal || !serviceActive(cal, dayType)) continue;
 
-    const offsetSecs = findOffset(svc.offsets, normStation);
-    if (offsetSecs === null) continue;
-
-    for (const win of svc.frequencies) {
-      let base = win.start_secs;
-      while (base < win.end_secs) {
-        const arr = base + offsetSecs;
-        if (arr >= 0 && arr < 90000) allSecs.push(arr); // allow slightly past midnight
-        base += win.headway_secs;
+    const arrivals = generateStationArrivals(svc, normStation);
+    for (const arrSecs of arrivals) {
+      if (arrSecs >= 0 && arrSecs < 90000) {
+        allSecs.push(arrSecs);
       }
     }
   }

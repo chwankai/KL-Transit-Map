@@ -46,9 +46,18 @@ def fetch_zip(url):
                 return f.read()
         raise e
 
+DOCS_DIR = os.path.join(SCRIPT_DIR, "docs")
+
 def read_csv(zf, fname):
-    with zf.open(fname) as f:
-        text = f.read().decode("utf-8-sig")
+    local_docs_file = os.path.join(DOCS_DIR, fname)
+    if os.path.exists(local_docs_file):
+        with open(local_docs_file, "r", encoding="utf-8-sig") as f:
+            text = f.read()
+    elif zf is not None:
+        with zf.open(fname) as f:
+            text = f.read().decode("utf-8-sig")
+    else:
+        raise FileNotFoundError(f"Cannot find {fname}")
     reader = csv.DictReader(io.StringIO(text))
     return [row for row in reader]
 
@@ -65,8 +74,12 @@ def norm_name(s):
     return s.strip()
 
 def main():
-    zip_data = fetch_zip(GTFS_URL)
-    zf = zipfile.ZipFile(io.BytesIO(zip_data))
+    try:
+        zip_data = fetch_zip(GTFS_URL)
+        zf = zipfile.ZipFile(io.BytesIO(zip_data))
+    except Exception as e:
+        print(f"Warning: Could not fetch zip ({e}). Will check local docs directory.")
+        zf = None
 
     # stops: stop_id → norm name
     print("Parsing stops.txt...")
@@ -114,7 +127,7 @@ def main():
         except: pass
     print(f"  {len(freq_by_trip)} trips with frequencies")
 
-    # stop_times: trip_id → sorted stops with offset from first stop
+    # stop_times: trip_id → sorted stops with offset & first train arrival from first stop
     print("Parsing stop_times.txt...")
     st_rows = read_csv(zf, "stop_times.txt")
     print(f"  {len(st_rows):,} rows")
@@ -129,22 +142,26 @@ def main():
         except: continue
         stops_by_trip.setdefault(tid, []).append({"stop_id": row.get("stop_id",""), "arr": arr_secs, "seq": seq})
 
-    # Build offset map: trip_id → {station_name: offset_secs}
-    offset_by_trip = {}  # trip_id → {norm_station_name: offset_secs}
+    # Build offset & first_train map: trip_id → {station_name: offset_secs / first_train_secs}
+    offset_by_trip = {}     # trip_id → {norm_station_name: offset_secs}
+    first_train_by_trip = {}# trip_id → {norm_station_name: arr_secs}
     for tid, slist in stops_by_trip.items():
         slist.sort(key=lambda x: x["seq"])
         base = slist[0]["arr"]
         offset_by_trip[tid] = {}
+        first_train_by_trip[tid] = {}
         for s in slist:
             sname = stop_name.get(s["stop_id"])
             if sname:
                 offset_by_trip[tid][sname] = s["arr"] - base
+                first_train_by_trip[tid][sname] = s["arr"]
 
     # Build output
     lines_out = {}
     for tid, meta in trip_meta.items():
         freqs = freq_by_trip.get(tid, [])
         offsets = offset_by_trip.get(tid, {})
+        first_trains = first_train_by_trip.get(tid, {})
         if not freqs or not offsets: continue
 
         line_id = meta["line_id"]
@@ -156,7 +173,8 @@ def main():
         lines_out[line_id]["directions"][headsign]["services"].append({
             "service_id": service_id,
             "frequencies": freqs,
-            "offsets": offsets,  # norm_station_name → secs
+            "offsets": offsets,      # norm_station_name → secs from terminal departure
+            "first_trains": first_trains, # norm_station_name → first train arrival secs from midnight
         })
 
     result = {"calendar": calendar, "lines": lines_out}
