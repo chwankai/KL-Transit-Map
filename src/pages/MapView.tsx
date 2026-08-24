@@ -916,11 +916,11 @@ export const MapView: React.FC = () => {
       {/* Location Error Notification Banner */}
       <AnimatePresence>
         {locationError && showRealScale && (
-          <div className="absolute top-4 inset-x-0 z-40 flex justify-center pointer-events-none px-4">
+          <div className="absolute bottom-6 inset-x-0 z-40 flex justify-center pointer-events-none px-4">
             <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              exit={{ opacity: 0, y: 30, scale: 0.95 }}
               className="pointer-events-auto max-w-sm sm:max-w-md w-full flex items-start gap-3 rounded-2xl border border-red-500/30 bg-card/95 p-3.5 shadow-2xl backdrop-blur-md"
             >
               <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />

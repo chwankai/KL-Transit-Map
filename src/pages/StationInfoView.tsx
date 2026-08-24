@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { stations, lines, getPlatformNumber } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
@@ -67,8 +67,35 @@ export const StationInfoView: React.FC = () => {
   const navigate = useNavigate();
   const { language, t, tStation, tLine } = useSettings();
 
-  const decodedName = stationName ? decodeURIComponent(stationName) : "";
-  const station: StationObj | undefined = stations[decodedName];
+  let rawDecoded = "";
+  try {
+    rawDecoded = stationName ? decodeURIComponent(stationName) : "";
+  } catch {
+    rawDecoded = stationName || "";
+  }
+
+  // Resilient station lookup (exact, trimmed, case-insensitive, code, alias)
+  const resolvedStation = useMemo((): { station: StationObj | undefined; name: string } => {
+    if (!rawDecoded) return { station: undefined, name: "" };
+    if (stations[rawDecoded]) return { station: stations[rawDecoded], name: rawDecoded };
+
+    const trimmed = rawDecoded.trim();
+    if (stations[trimmed]) return { station: stations[trimmed], name: trimmed };
+
+    const lower = trimmed.toLowerCase();
+    const foundKey = Object.keys(stations).find((k) => k.toLowerCase() === lower);
+    if (foundKey) return { station: stations[foundKey], name: foundKey };
+
+    const codeKey = Object.keys(stations).find((k) =>
+      stations[k]?.codes?.some((c) => c.toUpperCase() === trimmed.toUpperCase())
+    );
+    if (codeKey) return { station: stations[codeKey], name: codeKey };
+
+    return { station: undefined, name: rawDecoded };
+  }, [rawDecoded]);
+
+  const station = resolvedStation.station;
+  const decodedName = resolvedStation.name || rawDecoded;
 
   // Redirect to formal station name if accessed via legacy/alias name
   useEffect(() => {
@@ -81,9 +108,9 @@ export const StationInfoView: React.FC = () => {
   const getGroupedStations = useCallback((baseName: string): string[] => {
     const group = [baseName];
     const baseStation = stations[baseName];
-    if (baseStation) {
-      baseStation.connections.forEach(conn => {
-        if (conn.line === "WALKWAY") {
+    if (baseStation && Array.isArray(baseStation.connections)) {
+      baseStation.connections.forEach((conn) => {
+        if (conn && conn.line === "WALKWAY" && conn.to) {
           group.push(conn.to);
         }
       });
@@ -94,7 +121,7 @@ export const StationInfoView: React.FC = () => {
   const groupedStationNames = getGroupedStations(decodedName);
   
   // Collect all codes from the grouped stations
-  const groupedCodes = groupedStationNames.flatMap(name => stations[name]?.codes ?? []);
+  const groupedCodes = groupedStationNames.flatMap((name) => stations[name]?.codes ?? []);
 
   // ── Time state ──
   const [now, setNow] = useState(new Date());
@@ -430,8 +457,8 @@ export const StationInfoView: React.FC = () => {
   const isWeekend = (() => { const d = now.getDay(); return d === 0 || d === 6; })();
 
   return (
-    <div className="flex flex-col h-full w-full bg-background text-text-primary overflow-y-auto animate-fade-in">
-      <div className="max-w-6xl mx-auto w-full px-5 py-6 space-y-6 flex-1">
+    <div className="flex-1 w-full bg-background text-text-primary overflow-y-auto animate-fade-in">
+      <div className="max-w-6xl mx-auto w-full px-4 sm:px-5 py-6 space-y-6">
 
         {/* ── Header bar ── */}
         <div className="flex items-center gap-3 flex-wrap">
