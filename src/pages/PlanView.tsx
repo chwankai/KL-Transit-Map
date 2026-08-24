@@ -96,6 +96,24 @@ export const PlanView: React.FC = () => {
       return;
     }
 
+    const fetchPositionSafely = () => {
+      try {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const name = findNearestStationName(pos.coords.latitude, pos.coords.longitude);
+            if (name) {
+              setNearestStation(name);
+              sessionStorage.setItem("nearest_station_name", name);
+            }
+          },
+          () => {
+            // Silently ignore error without freezing
+          },
+          { enableHighAccuracy: false, timeout: 2500, maximumAge: 180000 }
+        );
+      } catch {}
+    };
+
     // Check & listen to permission changes if supported
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions
@@ -107,6 +125,7 @@ export const PlanView: React.FC = () => {
           } else if (status.state === "granted") {
             const cached = sessionStorage.getItem("nearest_station_name");
             if (cached) setNearestStation(cached);
+            fetchPositionSafely();
           }
 
           status.onchange = () => {
@@ -114,40 +133,18 @@ export const PlanView: React.FC = () => {
               setNearestStation(null);
               sessionStorage.removeItem("nearest_station_name");
             } else if (status.state === "granted") {
-              navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                  const name = findNearestStationName(pos.coords.latitude, pos.coords.longitude);
-                  if (name) {
-                    setNearestStation(name);
-                    sessionStorage.setItem("nearest_station_name", name);
-                  }
-                },
-                () => {
-                  setNearestStation(null);
-                  sessionStorage.removeItem("nearest_station_name");
-                },
-                { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 }
-              );
+              fetchPositionSafely();
             }
           };
         })
-        .catch(() => {});
+        .catch(() => {
+          // If permissions query not supported, don't block
+        });
+    } else {
+      // Fallback for browsers without permissions API
+      const cached = sessionStorage.getItem("nearest_station_name");
+      if (cached) setNearestStation(cached);
     }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const name = findNearestStationName(pos.coords.latitude, pos.coords.longitude);
-        if (name) {
-          setNearestStation(name);
-          sessionStorage.setItem("nearest_station_name", name);
-        }
-      },
-      () => {
-        setNearestStation(null);
-        sessionStorage.removeItem("nearest_station_name");
-      },
-      { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 }
-    );
   }, []);
 
   // State to filter suggestions list. Reset to empty on focus so the full list displays.

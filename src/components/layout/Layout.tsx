@@ -47,11 +47,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background text-text-primary">
       {/* Top Header - Unified Mobile & Desktop */}
       <header className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 h-[calc(64px+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] border-b border-border bg-card backdrop-blur-md z-40">
-        <Link
-          to="/"
-          onMouseDown={(e) => e.preventDefault()}
-          className="flex items-center gap-2 sm:gap-3 select-none"
-        >
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 select-none">
           <div className="text-xl sm:text-2xl flex items-center justify-center">🚇</div>
           <div className="flex flex-col md:gap-0.5">
             <h1 className="text-xs sm:text-base font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent leading-tight md:leading-snug">
@@ -72,7 +68,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link
                   key={path}
                   to={path}
-                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => trackEvent("navigate_tab", "navigation", labelKey)}
                   className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-2 md:px-3.5 py-1 sm:py-2 rounded-lg text-[9px] md:text-sm font-bold tracking-wide transition-all ${
                     isActive
@@ -91,7 +86,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Settings button */}
           <button
-            onMouseDown={(e) => e.preventDefault()}
             onClick={() => {
               setIsSettingsOpen(true);
               trackEvent("open_settings", "navigation");
