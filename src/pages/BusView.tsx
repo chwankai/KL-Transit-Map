@@ -1,397 +1,488 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { decodeVehiclePositions } from "../lib/bus-decoder";
 import type { DecodedVehicle } from "../lib/bus-decoder";
-import { SvgBusMap } from "../components/bus/SvgBusMap";
-import { Footer } from "../components/layout/Footer";
-import { RefreshCw, CheckSquare, Square, EyeOff, LayoutList, Check, Map } from "lucide-react";
+import { LeafletBusMap } from "../components/bus/LeafletBusMap";
+import type { RapidBusRoute, BusRouteStop } from "../components/bus/LeafletBusMap";
+import {
+  RefreshCw, Search, ChevronRight, X, ArrowLeft, Bus as BusIcon,
+  Map as MapIcon, List as ListIcon, MapPin, Layers
+} from "lucide-react";
 import { useSettings } from "../context/SettingsContext";
-import { motion, AnimatePresence } from "framer-motion";
 import { trackEvent } from "../lib/analytics";
-
-interface StaticRoute {
-  id: string;
-  name: string;
-  desc: string;
-}
-
-const STATIC_ROUTES: Record<"johor" | "melaka", StaticRoute[]> = {
-  johor: [
-    { id: "J10", name: "J10", desc: "JB Sentral - Kota Tinggi" },
-    { id: "J11", name: "J11", desc: "JB Sentral - AEON Dato' Onn" },
-    { id: "J13", name: "J13", desc: "JB Sentral - Larkin Sentral" },
-    { id: "J15", name: "J15", desc: "JB Sentral - Mid Valley Southkey" },
-    { id: "J16", name: "J16", desc: "Angsana - Toppen Tebrau" },
-    { id: "J20", name: "J20", desc: "JB Sentral - Masai" },
-    { id: "J21", name: "J21", desc: "JB Sentral - Permas Jaya" },
-    { id: "J22", name: "J22", desc: "JB Sentral - Scientex" },
-    { id: "J30", name: "J30", desc: "JB Sentral - Kulai" },
-    { id: "J31", name: "J31", desc: "JB Sentral - Pulai Mutiara" },
-    { id: "J32", name: "J32", desc: "JB Sentral - Selesa Jaya" },
-    { id: "J33", name: "J33", desc: "JB Sentral - Sri Yaacob" },
-    { id: "J34", name: "J34", desc: "JB Sentral - Sutera Mall" },
-    { id: "J40", name: "J40", desc: "Larkin Sentral - Gelang Patah" },
-    { id: "J42", name: "J42", desc: "Gelang Patah - Pendas" },
-    { id: "J44", name: "J44", desc: "Larkin Sentral - Puteri Harbour" },
-    { id: "J50", name: "J50", desc: "Larkin Sentral - Pontian" },
-    { id: "J100", name: "J100", desc: "JB Sentral - KSL City Mall" },
-    { id: "J200", name: "J200", desc: "Terminal Masai - PPR Seri Alam" },
-    { id: "J205", name: "J205", desc: "Terminal Masai - Lotus Kota Masai" },
-    { id: "J300", name: "J300", desc: "Terminal Kulai - Putri Kulai" },
-  ],
-  melaka: [
-    { id: "M10A", name: "M10A", desc: "Melaka Sentral - MITC & UTeM" },
-    { id: "M10B", name: "M10B", desc: "Melaka Sentral - MITC" },
-    { id: "M11", name: "M11", desc: "Melaka Sentral - Bukit Katil" },
-    { id: "M12", name: "M12", desc: "Melaka Sentral - Airport Batu Berendam" },
-    { id: "M13", name: "M13", desc: "Melaka Sentral - Taman Inang Sari" },
-    { id: "M14", name: "M14", desc: "Melaka Sentral - Bertam Ulu" },
-    { id: "M15", name: "M15", desc: "Melaka Sentral - Pulau Gadong" },
-    { id: "M16", name: "M16", desc: "Melaka Sentral - Paya Luboh" },
-    { id: "M17", name: "M17", desc: "Melaka Sentral - Tangga Batu" },
-    { id: "M20", name: "M20", desc: "Melaka Sentral - Tampin" },
-    { id: "M20X", name: "M20X", desc: "Melaka Sentral - Alor Gajah" },
-    { id: "M21", name: "M21", desc: "Melaka Sentral - Tampin via Durian Tunggal" },
-    { id: "M21X", name: "M21X", desc: "Melaka Sentral - Alor Gajah via Durian Tunggal" },
-    { id: "M22", name: "M22", desc: "Melaka Sentral - Bandar Vendor" },
-    { id: "M23", name: "M23", desc: "Melaka Sentral - Masjid Tanah" },
-    { id: "M23X", name: "M23X", desc: "Melaka Sentral - Masjid Tanah" },
-    { id: "M30", name: "M30", desc: "Melaka Sentral - Batang Melaka via Selandar" },
-    { id: "M31", name: "M31", desc: "Melaka Sentral - Batang Melaka via Tebong" },
-    { id: "M32", name: "M32", desc: "Melaka Sentral - Jasin" },
-    { id: "M33", name: "M33", desc: "Jasin - Taman Seri Asahan" },
-    { id: "M100", name: "M100", desc: "Bandaraya Melaka Feeder" },
-    { id: "M101", name: "M101", desc: "Pasar Melaka Feeder" },
-  ],
-};
-
-const REGION_CONFIGS = {
-  johor: {
-    url: "https://api.data.gov.my/gtfs-realtime/vehicle-position/mybas-johor/",
-  },
-  melaka: {
-    url: "https://api.data.gov.my/gtfs-realtime/vehicle-position/mybas-melaka/",
-  },
-};
 
 export const BusView: React.FC = () => {
   const { t } = useSettings();
-  const [region, setRegion] = useState<"johor" | "melaka">("johor");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [statusKey, setStatusKey] = useState<"initializing" | "refreshing" | "success" | "failed">("initializing");
-  const [activeBusesCountVal, setActiveBusesCountVal] = useState({ count: 0, routes: 0 });
+
+  const [routes, setRoutes] = useState<RapidBusRoute[]>([]);
   const [buses, setBuses] = useState<DecodedVehicle[]>([]);
-  const [hideInactive, setHideInactive] = useState(true);
-  const [selectedRouteIds, setSelectedRouteIds] = useState<Set<string>>(new Set());
+  const [isRefreshingBuses, setIsRefreshingBuses] = useState(false);
 
-  // Generate dynamic, harmonized color palette for route ids
-  const selectedRouteColors = useMemo<Record<string, string>>(() => {
-    const colors: Record<string, string> = {};
-    const allRoutes = STATIC_ROUTES[region];
-    allRoutes.forEach((r, idx) => {
-      const h = (idx * (360 / allRoutes.length)) % 360;
-      colors[r.id] = `hsl(${h}, 85%, 50%)`;
-    });
-    return colors;
-  }, [region]);
+  // Filters & Selected State
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "trunk" | "feeder">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRoute, setSelectedRoute] = useState<RapidBusRoute | null>(null);
+  const [focusedStop, setFocusedStop] = useState<BusRouteStop | null>(null);
+  const [showAllRoutes, setShowAllRoutes] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"list" | "map">("list");
 
-  const cleanName = (routeId: string) => {
-    return routeId.replace(/CWLMYJB|MYJB|JB|CWLMYMK|MYMK|MK/g, "").trim();
-  };
-
-  // Compile active bus count per route
-  const activeBusCounts = useMemo<Record<string, number>>(() => {
-    const counts: Record<string, number> = {};
-    buses.forEach((b) => {
-      const id = cleanName(b.routeId);
-      counts[id] = (counts[id] || 0) + 1;
-    });
-    return counts;
-  }, [buses]);
-
-  // Fetch myBAS Live position positions
-  const fetchPositions = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    setStatusKey("refreshing");
-
-    try {
-      const res = await fetch(REGION_CONFIGS[region].url);
-      if (!res.ok) throw new Error(`HTTP status ${res.status}`);
-      const buffer = await res.arrayBuffer();
-
-      const list = decodeVehiclePositions(new Uint8Array(buffer));
-      setBuses(list);
-
-      // Initialize selected routes if empty
-      setSelectedRouteIds((prev) => {
-        if (prev.size === 0) {
-          const fresh = new Set<string>();
-          STATIC_ROUTES[region].forEach((r) => fresh.add(r.id));
-          return fresh;
+  // 1. Fetch static RapidKL bus catalog
+  useEffect(() => {
+    fetch("/rapid_bus_data.json")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.routes) {
+          setRoutes(data.routes);
         }
-        return prev;
+      })
+      .catch((err) => {
+        console.warn("Failed to load RapidKL bus catalog:", err);
+      });
+  }, []);
+
+  // 2. Fetch live realtime bus positions from data.gov.my
+  const fetchLiveBuses = useCallback(async () => {
+    setIsRefreshingBuses(true);
+    try {
+      const endpoints = [
+        "https://api.data.gov.my/gtfs-realtime/vehicle-position/prasarana?category=rapid-bus-kl",
+        "https://api.data.gov.my/gtfs-realtime/vehicle-position/prasarana?category=rapid-bus-mrtfeeder",
+      ];
+
+      const responses = await Promise.allSettled(
+        endpoints.map(async (url) => {
+          const res = await fetch(url, { headers: { Accept: "application/x-protobuf" } });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const buffer = await res.arrayBuffer();
+          return decodeVehiclePositions(new Uint8Array(buffer));
+        })
+      );
+
+      const allVehicles: DecodedVehicle[] = [];
+      responses.forEach((result) => {
+        if (result.status === "fulfilled") {
+          allVehicles.push(...result.value);
+        }
       });
 
-      setActiveBusesCountVal({ count: list.length, routes: STATIC_ROUTES[region].length });
-      setStatusKey("success");
-    } catch (err: any) {
-      console.error(err);
-      setStatusKey("failed");
+      setBuses(allVehicles);
+    } catch (e) {
+      console.warn("Realtime bus fetch failed:", e);
     } finally {
-      setIsRefreshing(false);
+      setIsRefreshingBuses(false);
     }
-  };
+  }, []);
 
+  // Auto-refresh every 15 seconds
   useEffect(() => {
-    // Reset selections on region switch
-    setSelectedRouteIds(new Set());
-    setBuses([]);
-    fetchPositions();
-
-    const interval = setInterval(fetchPositions, 15000);
+    fetchLiveBuses();
+    const interval = setInterval(fetchLiveBuses, 15000);
     return () => clearInterval(interval);
-  }, [region]);
+  }, [fetchLiveBuses]);
 
-  const toggleRoute = (routeId: string) => {
-    setSelectedRouteIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(routeId)) {
-        next.delete(routeId);
-        trackEvent("deselect_bus_route", "bus", routeId);
-      } else {
-        next.add(routeId);
-        trackEvent("select_bus_route", "bus", routeId);
-      }
-      return next;
+  // 3. Map route ID -> color lookup
+  const routeColorMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    routes.forEach((r) => {
+      map[r.id] = r.color;
+      map[r.name] = r.color;
     });
+    return map;
+  }, [routes]);
+
+  // 4. Calculate live bus count per route
+  const activeBusesByRoute = useMemo(() => {
+    const counts: Record<string, DecodedVehicle[]> = {};
+    buses.forEach((b) => {
+      const cleanRouteId = b.routeId
+        .replace(/^U([0-9]+)0$/, "$1")
+        .replace(/^T([0-9]+)0$/, "T$1")
+        .replace(/^U/, "");
+
+      // Match by exact id or clean short name
+      const matched = routes.find(
+        (r) => r.id === b.routeId || r.name.toUpperCase() === cleanRouteId.toUpperCase()
+      );
+
+      const key = matched ? matched.id : b.routeId;
+      if (!counts[key]) counts[key] = [];
+      counts[key].push(b);
+    });
+    return counts;
+  }, [buses, routes]);
+
+  // Total active routes count
+  const activeRouteCount = Object.keys(activeBusesByRoute).length;
+
+  // 5. Filter routes list
+  const filteredRoutes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return routes.filter((r) => {
+      // Category filter
+      if (categoryFilter !== "all" && r.category !== categoryFilter) {
+        return false;
+      }
+      // Search query
+      if (!q) return true;
+      return (
+        r.name.toLowerCase().includes(q) ||
+        r.desc.toLowerCase().includes(q) ||
+        r.origin.toLowerCase().includes(q) ||
+        r.dest.toLowerCase().includes(q) ||
+        r.stops.some((s) => s.name.toLowerCase().includes(q))
+      );
+    });
+  }, [routes, categoryFilter, searchQuery]);
+
+  // Selected route's live vehicles
+  const selectedRouteBuses = selectedRoute
+    ? activeBusesByRoute[selectedRoute.id] || []
+    : [];
+
+  const handleSelectCategory = (cat: "all" | "trunk" | "feeder") => {
+    setCategoryFilter(cat);
+    setSelectedRoute(null);
+    setFocusedStop(null);
+    trackEvent("filter_bus_category", "bus", cat);
   };
 
-  const selectAll = () => {
-    const all = new Set<string>();
-    STATIC_ROUTES[region].forEach((r) => all.add(r.id));
-    setSelectedRouteIds(all);
-    trackEvent("select_all_bus_routes", "bus", region);
-  };
-
-  const deselectAll = () => {
-    setSelectedRouteIds((new Set()));
-    trackEvent("deselect_all_bus_routes", "bus", region);
-  };
-
-  const visibleRoutes = useMemo(() => {
-    let list = STATIC_ROUTES[region];
-    if (hideInactive) {
-      list = list.filter((r) => (activeBusCounts[r.id] || 0) > 0);
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    if (selectedRoute) {
+      setSelectedRoute(null);
+      setFocusedStop(null);
     }
-    return list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-  }, [region, hideInactive, activeBusCounts]);
-
-  const statusText = (() => {
-    if (statusKey === "initializing") return "Initializing tracker...";
-    if (statusKey === "refreshing") return t("refreshingFeed");
-    if (statusKey === "failed") return t("refreshFailed");
-    return t("activeBusesCount")
-      .replace("{count}", String(activeBusesCountVal.count))
-      .replace("{routes}", String(activeBusesCountVal.routes));
-  })();
+  };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-background text-text-primary relative">
-      {/* Search Bus / Show Tracker Floating Button - Mobile only */}
-      {!isSidebarOpen && (
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="md:hidden absolute top-4 left-4 z-30 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-2.5 text-xs font-bold shadow-2xl flex items-center gap-1.5 active:scale-95 transition-all"
-        >
-          <LayoutList className="h-4 w-4" />
-          {t("showTracker")}
-        </button>
-      )}
-
-      {/* Sidebar Selector Form */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div
-            initial={{ x: -280, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -280, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 260, damping: 30 }}
-            className="absolute md:relative inset-y-0 left-0 w-[300px] md:w-[320px] z-20 flex-shrink-0 p-4 border-r border-border bg-sidebar/95 backdrop-blur-md overflow-hidden flex flex-col gap-4 shadow-2xl md:shadow-none"
-          >
-            {/* Header Title */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold tracking-tight bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
-                  {t("busTracker")}
-                </h2>
-                <span className="bg-red-500/20 text-red-500 border border-red-500/30 text-[8px] font-extrabold px-1.5 py-0.5 rounded select-none animate-pulse-soft">
-                  LIVE
-                </span>
+    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-background text-text-primary relative animate-fade-in">
+      {/* ── Left Sidebar (Desktop) / Sliding Panel (Mobile) ── */}
+      <div
+        className={`w-full md:w-[380px] lg:w-[420px] flex-shrink-0 border-r border-border bg-sidebar/95 backdrop-blur-md md:backdrop-blur-none z-30 transition-all duration-300 flex flex-col justify-between overflow-hidden ${
+          mobileTab === "list" ? "flex h-full" : "hidden md:flex"
+        }`}
+      >
+        {/* Top Header Card */}
+        <div className="p-4 border-b border-border/80 space-y-3 flex-shrink-0 bg-card/60">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600/15 text-blue-500 shadow-inner">
+                <BusIcon className="h-4 w-4" />
               </div>
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="md:hidden text-[10px] font-bold text-text-secondary hover:text-text-primary"
-              >
-                {t("hide")}
-              </button>
+              <div>
+                <h1 className="text-sm font-bold tracking-tight text-text-primary">
+                  {t("rapidKlBuses")}
+                </h1>
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-500">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>
+                    {buses.length} {t("live")} • {activeRouteCount} routes
+                  </span>
+                </div>
+              </div>
             </div>
 
-            {/* Region Selector tabs */}
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-button-secondary p-0.5 border border-border flex-shrink-0">
-              {(["johor", "melaka"] as const).map((reg) => (
-                <button
-                  key={reg}
-                  onClick={() => {
-                    setRegion(reg);
-                    trackEvent("change_bus_region", "bus", reg);
-                  }}
-                  className={`py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
-                    region === reg
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "text-text-secondary hover:text-text-primary"
-                  }`}
-                >
-                  {reg === "johor" ? (t("johor") || "Johor") : (t("melaka") || "Melaka")}
-                </button>
-              ))}
-            </div>
-
-            {/* Live Counts Status label */}
-            <div className="text-[10px] text-text-secondary leading-relaxed bg-button-secondary/50 border border-border rounded-xl p-2.5 flex-shrink-0 flex items-center justify-between">
-              <span>{statusText}</span>
+            {/* Header Action Buttons */}
+            <div className="flex items-center gap-1.5">
+              {/* Toggle All Lines Button */}
               <button
                 onClick={() => {
-                  fetchPositions();
-                  trackEvent("refresh_bus_positions", "bus", region);
+                  setShowAllRoutes((prev) => !prev);
+                  trackEvent("toggle_all_bus_lines", "bus", String(!showAllRoutes));
                 }}
-                disabled={isRefreshing}
-                className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
-                title={t("refreshHint")}
+                className={`p-2 rounded-xl border transition-all active:scale-90 shadow-sm ${
+                  showAllRoutes
+                    ? "bg-blue-600 border-blue-500 text-white shadow-blue-500/20"
+                    : "border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500"
+                }`}
+                title={showAllRoutes ? t("hideAllLines") : t("showAllLines")}
               >
-                <RefreshCw className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} />
+                <Layers className="h-4 w-4" />
+              </button>
+
+              {/* Refresh Button */}
+              <button
+                onClick={() => {
+                  fetchLiveBuses();
+                  trackEvent("manual_refresh_buses", "bus");
+                }}
+                disabled={isRefreshingBuses}
+                className="p-2 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary hover:border-blue-500 transition-all active:scale-90 shadow-sm"
+                title="Refresh Live Buses"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshingBuses ? "animate-spin text-blue-500" : ""}`} />
               </button>
             </div>
+          </div>
 
-            {/* Control buttons */}
-            <div className="space-y-2 flex-shrink-0">
-              <div className="flex justify-between items-center text-[10px] font-semibold text-text-secondary">
-                <button onClick={selectAll} className="hover:text-text-primary flex items-center gap-1">
-                  <CheckSquare className="h-3.5 w-3.5" />
-                  {t("selectAll")}
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-secondary" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder={t("searchBusPlaceholder")}
+              className="w-full pl-9 pr-8 py-2 rounded-xl border border-border bg-input text-xs text-text-primary focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder:text-text-secondary/60 shadow-inner"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => handleSearchChange("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-text-secondary hover:text-text-primary"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex gap-1.5">
+            {(
+              [
+                { key: "all", labelKey: "allRoutes" },
+                { key: "trunk", labelKey: "trunkRoutes" },
+                { key: "feeder", labelKey: "feederRoutes" },
+              ] as const
+            ).map(({ key, labelKey }) => {
+              const active = categoryFilter === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => handleSelectCategory(key)}
+                  className={`flex-1 py-1.5 text-[10.5px] font-bold rounded-lg transition-all text-center whitespace-nowrap leading-none ${
+                    active
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "bg-card border border-border text-text-secondary hover:text-text-primary hover:bg-button-secondary"
+                  }`}
+                >
+                  {t(labelKey)}
                 </button>
-                <button onClick={deselectAll} className="hover:text-text-primary flex items-center gap-1">
-                  <Square className="h-3.5 w-3.5" />
-                  {t("deselectAll")}
-                </button>
-              </div>
+              );
+            })}
+          </div>
+        </div>
 
-              {/* Hide Inactive */}
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-text-secondary select-none">
-                <input
-                  type="checkbox"
-                  checked={hideInactive}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setHideInactive(checked);
-                    trackEvent("toggle_hide_inactive_buses", "bus", checked ? "hidden" : "visible");
-                  }}
-                  className="rounded bg-input border-border text-blue-600 focus:ring-0"
-                />
-                {t("hideInactive")}
-              </label>
-            </div>
+        {/* Middle Content: Route Detail View OR Route List */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {selectedRoute ? (
+            /* ── Selected Route Detail Drawer ── */
+            <div className="p-4 flex-1 flex flex-col min-h-0 space-y-3.5 animate-fade-in overflow-hidden">
+              {/* Back to List Button */}
+              <button
+                onClick={() => {
+                  setSelectedRoute(null);
+                  setFocusedStop(null);
+                }}
+                className="flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-600 transition-colors flex-shrink-0"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>{t("allRoutes")}</span>
+              </button>
 
-            {/* Routes list wrapper */}
-            <div className="flex-1 overflow-y-auto pr-1 space-y-1.5">
-              {visibleRoutes.map((route) => {
-                const count = activeBusCounts[route.id] || 0;
-                const isSelected = selectedRouteIds.has(route.id);
-                const color = selectedRouteColors[route.id];
+              {/* Route Summary Card */}
+              <div className="glass-panel rounded-2xl p-3.5 border border-border bg-card shadow-md space-y-2.5 flex-shrink-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      style={{ backgroundColor: selectedRoute.color }}
+                      className="px-2.5 py-1 rounded-lg text-sm font-black text-white shadow-sm"
+                    >
+                      {selectedRoute.name}
+                    </span>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                        {selectedRoute.category === "feeder" ? t("feederRoutes") : t("trunkRoutes")}
+                      </div>
+                      <div className="text-xs font-bold text-text-primary leading-tight mt-0.5">
+                        {selectedRoute.desc}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                return (
-                  <button
-                    key={route.id}
-                    onClick={() => toggleRoute(route.id)}
-                    className={`w-full flex items-start justify-between px-3 py-2 rounded-xl text-left border transition-all ${
-                      isSelected
-                        ? "border-border bg-button-secondary/30"
-                        : "border-transparent bg-transparent hover:bg-button-secondary/35"
+                <div className="flex items-center justify-between pt-2 border-t border-border/60 text-xs">
+                  <span className="text-text-secondary">
+                    {selectedRoute.stopCount} {t("stopsCount").replace("{count}", "")}
+                  </span>
+                  <span
+                    className={`font-bold px-2 py-0.5 rounded-full text-[10px] ${
+                      selectedRouteBuses.length > 0
+                        ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                        : "bg-button-secondary text-text-secondary"
                     }`}
                   >
-                    <div className="flex items-start gap-2.5 min-w-0 flex-1 pr-1.5">
-                      <span
-                        className={`h-4 w-4 mt-0.5 rounded-lg flex-shrink-0 border flex items-center justify-center transition-all ${
-                          isSelected
-                            ? "bg-blue-600 border-blue-600 text-white"
-                            : "border-border bg-input"
-                        }`}
-                      >
-                        {isSelected && <Check className="h-3 w-3" />}
-                      </span>
-                      <span
-                        style={{ backgroundColor: color }}
-                        className="text-[8px] font-extrabold text-white px-1.5 py-0.5 mt-0.5 rounded shadow-md uppercase tracking-wide flex-shrink-0"
-                      >
-                        {route.name}
-                      </span>
-                      <span className="text-[11px] text-text-secondary font-semibold break-words whitespace-normal leading-tight">
-                        {route.desc}
-                      </span>
-                    </div>
-                    {count > 0 && (
-                      <span className="text-[9px] font-bold bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/25 px-1.5 py-0.5 rounded-full select-none flex-shrink-0 whitespace-nowrap text-center min-w-[48px]">
-                        {count} {t("live")}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+                    {selectedRouteBuses.length} {t("live")}
+                  </span>
+                </div>
+              </div>
 
-              {visibleRoutes.length === 0 && (
-                <div className="h-[120px] flex flex-col items-center justify-center text-center text-text-secondary">
-                  <EyeOff className="h-8 w-8 mb-2 animate-pulse" />
-                  <p className="text-xs">{t("noRoutesMatched")}</p>
+              {/* Live Buses Active on Route */}
+              {selectedRouteBuses.length > 0 && (
+                <div className="space-y-1.5 flex-shrink-0">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{t("activeBusesOnRoute").replace("{count}", String(selectedRouteBuses.length))}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedRouteBuses.map((b) => (
+                      <div
+                        key={b.vehicleId}
+                        className="rounded-xl border border-border bg-card p-2 text-xs space-y-0.5 shadow-sm"
+                      >
+                        <div className="font-bold text-text-primary flex items-center justify-between">
+                          <span>{b.licensePlate}</span>
+                          <span className="text-[9px] text-emerald-500 font-extrabold">LIVE</span>
+                        </div>
+                        <div className="text-[10px] text-text-secondary">
+                          {b.speed} km/h
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
+
+              {/* Stops List (Expanded to the bottom of the screen with straight dividers) */}
+              <div className="flex-1 flex flex-col min-h-0 space-y-2 overflow-hidden">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-text-secondary flex items-center justify-between flex-shrink-0">
+                  <span>{t("busStops")} ({selectedRoute.stops.length})</span>
+                  <span className="text-[9px] font-normal text-text-secondary/70">Tap stop to locate</span>
+                </div>
+
+                <div className="flex-1 overflow-y-auto divide-y divide-border/60 -mx-4 border-t border-b border-border/60">
+                  {selectedRoute.stops.map((stop, idx) => {
+                    const isFocused = focusedStop?.id === stop.id;
+                    return (
+                      <button
+                        key={`${stop.id}_${idx}`}
+                        onClick={() => {
+                          setFocusedStop(stop);
+                          setMobileTab("map");
+                        }}
+                        className={`w-full flex items-center justify-between gap-3 py-2.5 px-4 text-xs transition-colors text-left group ${
+                          isFocused
+                            ? "bg-blue-600/10 text-blue-500 font-bold dark:bg-blue-950/40 dark:text-blue-400"
+                            : "hover:bg-button-secondary/60 text-text-primary"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <span
+                            className={`w-5 text-center text-[10.5px] font-mono font-extrabold shrink-0 ${
+                              isFocused
+                                ? "text-blue-500 dark:text-blue-400"
+                                : "text-text-secondary"
+                            }`}
+                          >
+                            {idx + 1}
+                          </span>
+                          <span className="truncate leading-tight font-medium">
+                            {stop.name}
+                          </span>
+                        </div>
+                        <MapPin className={`h-3.5 w-3.5 shrink-0 transition-opacity ${isFocused ? "text-blue-500 dark:text-blue-400 opacity-100" : "opacity-0 group-hover:opacity-60 text-text-secondary"}`} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
+          ) : (
+            /* ── Route List ── */
+            <div className="flex-1 overflow-y-auto divide-y divide-border/60">
+              {filteredRoutes.length === 0 ? (
+                <div className="p-8 text-center text-text-secondary text-xs">
+                  {t("noRoutesMatched")}
+                </div>
+              ) : (
+                filteredRoutes.map((r) => {
+                  const liveCount = activeBusesByRoute[r.id]?.length || 0;
+                  return (
+                    <button
+                      key={r.id}
+                      onClick={() => {
+                        setSelectedRoute(r);
+                        setFocusedStop(null);
+                        setMobileTab("map");
+                        trackEvent("select_bus_route", "bus", r.name);
+                      }}
+                      className="w-full p-3.5 flex items-center justify-between gap-3 text-left hover:bg-button-secondary/50 transition-colors border-b border-border/50 last:border-b-0 group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span
+                          style={{ backgroundColor: r.color }}
+                          className="px-2 py-0.5 rounded-md text-xs font-extrabold text-white shrink-0 shadow-sm leading-none"
+                        >
+                          {r.name}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-bold text-text-primary truncate leading-tight">
+                            {r.desc}
+                          </div>
+                          <div className="text-[10px] text-text-secondary font-medium mt-0.5">
+                            {r.stopCount} {t("stopsCount").replace("{count}", "")}
+                          </div>
+                        </div>
+                      </div>
 
-            {/* Sidebar toggle back to map & Footer */}
-            <div className="mt-auto border-t border-border pt-3 flex-shrink-0 space-y-3">
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="w-full py-2.5 rounded-xl border border-border bg-button-secondary text-text-secondary font-semibold text-xs hover:text-text-primary active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
-                <Map className="h-4 w-4" />
-                {t("hideSidebar")}
-              </button>
-              
-              <Footer />
+                      <div className="flex items-center gap-2 shrink-0">
+                        {liveCount > 0 && (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 whitespace-nowrap">
+                            {liveCount} {t("live")}
+                          </span>
+                        )}
+                        <ChevronRight className="h-4 w-4 text-text-secondary group-hover:text-text-primary transition-colors" />
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </div>
+      </div>
 
-      {/* Main Map Content - Fills available view */}
-      <div className="flex-1 h-full p-4 relative overflow-hidden bg-slate-900">
-        {/* Floating Sidebar Toggle Button (if closed) - Desktop only */}
-        {!isSidebarOpen && (
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="hidden md:flex absolute top-4 left-4 z-30 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-2.5 text-xs font-bold shadow-2xl items-center gap-1.5 active:scale-95 transition-all"
-          >
-            <LayoutList className="h-4 w-4" />
-            {t("showTrackerSidebar")}
-          </button>
-        )}
-
-        {/* Live SVG Vector Map Overlay */}
-        <SvgBusMap
-          region={region}
+      {/* ── Right / Main Map View (Leaflet) ── */}
+      <div className={`flex-1 relative w-full h-full overflow-hidden ${mobileTab === "map" ? "block h-full" : "hidden md:block"}`}>
+        <LeafletBusMap
           buses={buses}
-          selectedRouteColors={selectedRouteColors}
-          selectedRouteIds={selectedRouteIds}
+          allRoutes={routes}
+          showAllRoutes={showAllRoutes}
+          onToggleShowAllRoutes={() => {
+            setShowAllRoutes((prev) => !prev);
+            trackEvent("toggle_all_bus_lines", "bus", String(!showAllRoutes));
+          }}
+          selectedRoute={selectedRoute}
+          focusedStop={focusedStop}
+          onSelectRoute={(route) => {
+            setSelectedRoute(route);
+            setFocusedStop(null);
+            trackEvent("select_bus_route_from_map", "bus", route.name);
+          }}
+          onClearSelectedRoute={() => {
+            setSelectedRoute(null);
+            setFocusedStop(null);
+          }}
+          routeColorMap={routeColorMap}
         />
+      </div>
+
+      {/* Mobile Floating Tab Switcher (List <-> Map) */}
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+        <button
+          onClick={() => setMobileTab((prev) => (prev === "map" ? "list" : "map"))}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-600 text-white font-bold text-xs shadow-2xl hover:bg-blue-700 active:scale-95 transition-all"
+        >
+          {mobileTab === "map" ? (
+            <>
+              <ListIcon className="h-4 w-4" />
+              <span>{selectedRoute ? selectedRoute.name : t("allRoutes")}</span>
+            </>
+          ) : (
+            <>
+              <MapIcon className="h-4 w-4" />
+              <span>{t("map")}</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
