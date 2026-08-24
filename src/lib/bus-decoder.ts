@@ -91,6 +91,7 @@ export interface DecodedVehicle {
   licensePlate: string;
   lat: number;
   lng: number;
+  bearing?: number;
   speed: string;
   timestamp: number;
 }
@@ -109,6 +110,7 @@ export function decodeVehiclePositions(buffer: Uint8Array): DecodedVehicle[] {
         const licensePlate = ent.vehicle.vehicle ? ent.vehicle.vehicle.license_plate : "N/A";
         const lat = ent.vehicle.position.latitude;
         const lng = ent.vehicle.position.longitude;
+        const bearing = ent.vehicle.position.bearing ? Number(ent.vehicle.position.bearing) : undefined;
         const speed = ent.vehicle.position.speed
           ? (ent.vehicle.position.speed * 3.6).toFixed(1)
           : "0.0";
@@ -122,6 +124,7 @@ export function decodeVehiclePositions(buffer: Uint8Array): DecodedVehicle[] {
           licensePlate,
           lat,
           lng,
+          bearing,
           speed,
           timestamp,
         });

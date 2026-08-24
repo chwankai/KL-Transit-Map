@@ -24,6 +24,7 @@ const PlanView = lazy(() => import("./pages/PlanView").then(m => ({ default: m.P
 const BusView = lazy(() => import("./pages/BusView").then(m => ({ default: m.BusView })));
 const StationInfoView = lazy(() => import("./pages/StationInfoView").then(m => ({ default: m.StationInfoView })));
 const GuideView = lazy(() => import("./pages/GuideView").then(m => ({ default: m.GuideView })));
+const DevTranslationsView = lazy(() => import("./pages/DevTranslationsView").then(m => ({ default: m.DevTranslationsView })));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center w-full h-[calc(100vh-64px)] bg-background">
@@ -47,6 +48,9 @@ function App() {
               <Route path="/bus" element={<BusView />} />
               <Route path="/station/:stationName" element={<StationInfoView />} />
               <Route path="/guide" element={<GuideView />} />
+              {/* Hidden developer-only routes (not visible in public navigation) */}
+              <Route path="/dev/translations" element={<DevTranslationsView />} />
+              <Route path="/dev/i18n" element={<DevTranslationsView />} />
             </Routes>
           </Suspense>
         </Layout>
