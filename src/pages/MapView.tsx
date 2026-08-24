@@ -1,7 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
-import { RotateCcw, Map as MapIcon } from "lucide-react";
-import { motion } from "framer-motion";
+import {
+  RotateCcw,
+  Map as MapIcon,
+  Crosshair,
+  Navigation,
+  Loader2,
+  AlertCircle,
+  X,
+  MapPin,
+  ChevronRight,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { stations, lines } from "../lib/transit-data";
 import stationCoords from "../../public/station_coords.json";
 import railTracks from "../../public/rail_tracks.json";
@@ -10,6 +20,24 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { trackEvent } from "../lib/analytics";
 
+interface UserLocationData {
+  lat: number;
+  lng: number;
+  accuracy: number;
+  heading: number | null;
+}
+
+interface NearestStationData {
+  name: string;
+  distance: number;
+  codes: string[];
+  lines: string[];
+}
+
+const DEFAULT_REAL_SCALE_CENTER: [number, number] = [3.086790, 101.628849];
+
+const DEFAULT_REAL_SCALE_ZOOM = 12;
+
 export const MapView: React.FC = () => {
   const { language, theme, t, tStation, tLine } = useSettings();
   const [mapType, setMapType] = useState<"standard" | "upcoming">("standard");
@@ -17,14 +45,37 @@ export const MapView: React.FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
-  // By default, open web will show standard schematic map
-  const [showRealScale, setShowRealScale] = useState(false);
+  // Default is always standard schematic map
+  const [showRealScale, setShowRealScale] = useState<boolean>(false);
+  const [pendingLocate, setPendingLocate] = useState(false);
+
+  // Real-time user location state
+  const [userLocation, setUserLocation] = useState<UserLocationData | null>(null);
+  const [trackingStatus, setTrackingStatus] = useState<"idle" | "locating" | "following" | "located" | "error">("idle");
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [nearestStation, setNearestStation] = useState<NearestStationData | null>(null);
+  const [showNearestCard, setShowNearestCard] = useState(true);
 
   const dragStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const lastTouchDistance = useRef<number | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+
+  const watchIdRef = useRef<number | null>(null);
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const accuracyCircleRef = useRef<L.Circle | null>(null);
+  const trackingStatusRef = useRef<"idle" | "locating" | "following" | "located" | "error">("idle");
+  const userLocationRef = useRef<UserLocationData | null>(null);
+
+  // Keep refs in sync for event listeners
+  useEffect(() => {
+    trackingStatusRef.current = trackingStatus;
+  }, [trackingStatus]);
+
+  useEffect(() => {
+    userLocationRef.current = userLocation;
+  }, [userLocation]);
 
   const mapUrl =
     mapType === "standard"
@@ -79,10 +130,248 @@ export const MapView: React.FC = () => {
     return null;
   };
 
-  // Sync scale mode preference
-  useEffect(() => {
-    localStorage.setItem("show_real_scale", String(showRealScale));
-  }, [showRealScale]);
+  // Haversine distance formula between two lat/lng points in meters
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371e3; // metres
+    const phi1 = (lat1 * Math.PI) / 180;
+    const phi2 = (lat2 * Math.PI) / 180;
+    const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+    const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+      Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  };
+
+  // Find nearest station to given coordinates
+  const findNearestStation = useCallback((lat: number, lng: number): NearestStationData | null => {
+    let nearest: NearestStationData | null = null;
+    let minDistance = Infinity;
+
+    Object.entries(stations).forEach(([name, node]) => {
+      const coord = getStationCoord(name) || getStationCoord(node.codes[0]);
+      if (coord) {
+        const dist = calculateDistance(lat, lng, coord.lat, coord.lng);
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearest = {
+            name,
+            distance: Math.round(dist),
+            codes: node.codes,
+            lines: node.lines.filter((l) => l !== "WALKWAY"),
+          };
+        }
+      }
+    });
+
+    return nearest;
+  }, []);
+
+  // Format distance for UI
+  const formatDistance = (meters: number): string => {
+    if (meters < 1000) {
+      return t("metersAway").replace("{distance}", String(meters));
+    }
+    return t("kmAway").replace("{distance}", (meters / 1000).toFixed(1));
+  };
+
+  // Create Leaflet divIcon for real-time user marker
+  const createUserLocationIcon = (heading: number | null) => {
+    const hasHeading = heading !== null && heading !== undefined && !isNaN(heading);
+    const headingHtml = hasHeading
+      ? `<div class="user-location-heading-cone" style="transform: rotate(${heading}deg);"></div>`
+      : "";
+
+    return L.divIcon({
+      className: "custom-user-location-marker",
+      html: `
+        <div class="user-location-marker-container">
+          <div class="user-location-pulse-ring"></div>
+          ${headingHtml}
+          <div class="user-location-core-dot"></div>
+        </div>
+      `,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+  };
+
+  // Create popup HTML for user location marker
+  const createUserPopupHtml = useCallback(
+    (nearest: NearestStationData | null) => {
+      const distFormatted = nearest ? formatDistance(nearest.distance) : "";
+
+      return `
+        <div style="text-align: center !important;" class="p-2.5 space-y-2 font-sans leading-snug">
+          <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-blue-600">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#2563eb; box-shadow: 0 0 6px rgba(37,99,235,0.6);"></span>
+            ${t("myLocation")}
+          </div>
+          ${
+            nearest
+              ? `
+            <div class="pt-2 border-t border-slate-200 mt-1">
+              <div class="text-[9.5px] font-semibold text-slate-500 uppercase tracking-wider">${t("nearestStation")}</div>
+              <div class="text-xs font-bold text-slate-900 mt-0.5">${tStation(nearest.name)}</div>
+              ${language === "zh" ? `<div style="font-size: 9px; color: #64748b; font-weight: 500; margin-top: 1px;">${nearest.name}</div>` : ""}
+              <div class="text-[10px] text-blue-600 font-semibold mt-0.5">${distFormatted}</div>
+              <div class="pt-2 mt-1 flex justify-center">
+                <a href="#/station/${encodeURIComponent(nearest.name)}" style="color: white !important;" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all no-underline inline-block hover:scale-95 active:scale-95 shadow-md">${t("viewArrivals")}</a>
+              </div>
+            </div>
+          `
+              : ""
+          }
+        </div>
+      `;
+    },
+    [t, tStation, language]
+  );
+
+  // Stop tracking helper
+  const stopLocationTracking = useCallback(() => {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    if (userMarkerRef.current && mapRef.current) {
+      mapRef.current.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+    if (accuracyCircleRef.current && mapRef.current) {
+      mapRef.current.removeLayer(accuracyCircleRef.current);
+      accuracyCircleRef.current = null;
+    }
+    setTrackingStatus("idle");
+    setUserLocation(null);
+    setNearestStation(null);
+  }, []);
+
+  // Request & Start watching real-time location
+  const startLocationTracking = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError(t("locationUnavailable"));
+      setTrackingStatus("error");
+      return;
+    }
+
+    setLocationError(null);
+    setTrackingStatus("locating");
+    trackEvent("locate_me_start", "map");
+
+    // Clear previous watcher if any
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+
+    const handleSuccess = (pos: GeolocationPosition) => {
+      const { latitude, longitude, accuracy, heading } = pos.coords;
+      const newLoc: UserLocationData = {
+        lat: latitude,
+        lng: longitude,
+        accuracy,
+        heading: heading !== null && !isNaN(heading) ? heading : null,
+      };
+
+      setUserLocation(newLoc);
+      const nearest = findNearestStation(latitude, longitude);
+      setNearestStation(nearest);
+      setShowNearestCard(true);
+
+      const map = mapRef.current;
+      if (map) {
+        // Update or create User Marker
+        if (!userMarkerRef.current) {
+          const marker = L.marker([latitude, longitude], {
+            icon: createUserLocationIcon(newLoc.heading),
+            zIndexOffset: 1000,
+          }).addTo(map);
+
+          marker.bindPopup(createUserPopupHtml(nearest), {
+            closeButton: false,
+            minWidth: 160,
+          });
+
+          userMarkerRef.current = marker;
+        } else {
+          userMarkerRef.current.setLatLng([latitude, longitude]);
+          userMarkerRef.current.setIcon(createUserLocationIcon(newLoc.heading));
+          userMarkerRef.current.setPopupContent(createUserPopupHtml(nearest));
+        }
+
+        // Update or create Accuracy Circle
+        if (!accuracyCircleRef.current) {
+          const circle = L.circle([latitude, longitude], {
+            radius: Math.max(accuracy, 10),
+            color: "#3b82f6",
+            fillColor: "#3b82f6",
+            fillOpacity: 0.12,
+            weight: 1.5,
+            opacity: 0.45,
+          }).addTo(map);
+          accuracyCircleRef.current = circle;
+        } else {
+          accuracyCircleRef.current.setLatLng([latitude, longitude]);
+          accuracyCircleRef.current.setRadius(Math.max(accuracy, 10));
+        }
+
+        // If in 'locating' or 'following' mode, smoothly center/fly map to user position
+        if (trackingStatusRef.current === "locating" || trackingStatusRef.current === "following") {
+          const targetZoom = Math.max(map.getZoom(), 15);
+          map.flyTo([latitude, longitude], targetZoom, { duration: 1.2 });
+          setTrackingStatus("following");
+        }
+      }
+    };
+
+    const handleError = (err: GeolocationPositionError) => {
+      let errorKey = "locationError";
+      if (err.code === err.PERMISSION_DENIED) {
+        errorKey = "locationPermissionDenied";
+      } else if (err.code === err.POSITION_UNAVAILABLE) {
+        errorKey = "locationUnavailable";
+      } else if (err.code === err.TIMEOUT) {
+        errorKey = "locationTimeout";
+      }
+      setLocationError(errorKey);
+      setTrackingStatus("error");
+      trackEvent("locate_me_error", "map", String(err.code));
+    };
+
+    const watchId = navigator.geolocation.watchPosition(handleSuccess, handleError, {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 12000,
+    });
+
+    watchIdRef.current = watchId;
+  }, [t, findNearestStation, createUserPopupHtml]);
+
+  // Handle click on Locate button
+  const handleLocateButtonClick = () => {
+    if (trackingStatus === "following") {
+      // Toggle tracking off when already centered & following
+      stopLocationTracking();
+      trackEvent("locate_me_stop", "map");
+    } else if (trackingStatus === "located") {
+      // Recenter on user location
+      if (userLocation && mapRef.current) {
+        const targetZoom = Math.max(mapRef.current.getZoom(), 15);
+        mapRef.current.flyTo([userLocation.lat, userLocation.lng], targetZoom, { duration: 1.0 });
+        setTrackingStatus("following");
+        trackEvent("locate_me_recenter", "map");
+      } else {
+        startLocationTracking();
+      }
+    } else {
+      // Idle, locating, or error state -> trigger start/retry
+      startLocationTracking();
+    }
+  };
 
   // Clamp map panning offsets to ensure a portion of the map remains visible
   const clampPosition = (x: number, y: number, currentScale: number) => {
@@ -236,6 +525,7 @@ export const MapView: React.FC = () => {
   // Leaflet map initialization and overlay logic
   useEffect(() => {
     if (!showRealScale) {
+      stopLocationTracking();
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -243,11 +533,21 @@ export const MapView: React.FC = () => {
       return;
     }
 
-    // Initialize map centering around Klang Valley
+    // Initialize map centering at 3°05'57.1"N 101°38'47.7"E (mobile: 50% zoomed out / zoom 11)
+    const isMobile = window.innerWidth < 768;
+    const initialZoom = isMobile ? 11 : DEFAULT_REAL_SCALE_ZOOM;
+
     const map = L.map("leaflet-map", {
       zoomControl: false,
-    }).setView([3.1390, 101.6868], 12);
+    }).setView(DEFAULT_REAL_SCALE_CENTER, initialZoom);
     mapRef.current = map;
+
+    // Detach following mode when user manually drags the Leaflet map
+    map.on("dragstart", () => {
+      if (trackingStatusRef.current === "following") {
+        setTrackingStatus("located");
+      }
+    });
 
     // Use high contrast thematic tiles matching theme settings
     const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -473,12 +773,26 @@ export const MapView: React.FC = () => {
     });
 
     return () => {
+      stopLocationTracking();
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
-  }, [showRealScale, theme, language]);
+  }, [showRealScale, theme, language, t, tLine, tStation, stopLocationTracking]);
+
+  // Handle pending locate triggered from schematic view
+  useEffect(() => {
+    if (showRealScale && pendingLocate) {
+      const timer = setTimeout(() => {
+        if (mapRef.current) {
+          setPendingLocate(false);
+          startLocationTracking();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showRealScale, pendingLocate, startLocationTracking]);
 
   return (
     <div className="relative w-full h-full bg-background overflow-hidden select-none">
@@ -491,6 +805,79 @@ export const MapView: React.FC = () => {
             title={t("resetView")}
           >
             <RotateCcw className="h-5 w-5" />
+          </button>
+
+          <button
+            onClick={() => {
+              setShowRealScale(true);
+              setPendingLocate(true);
+              trackEvent("toggle_real_scale_from_locate", "map");
+            }}
+            className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-blue-500 transition-all active:scale-90"
+            title={t("locateMe")}
+          >
+            <Crosshair className="h-5 w-5" />
+          </button>
+        </div>
+      )}
+
+      {/* Floating Controls for Real Scale Map on top-left */}
+      {showRealScale && (
+        <div className="absolute top-4 left-4 z-30 flex flex-col gap-2 rounded-2xl border border-border bg-card p-1.5 shadow-2xl backdrop-blur-md animate-fade-in">
+          {/* Refresh / Reset View Button */}
+          <button
+            onClick={() => {
+              if (mapRef.current) {
+                const isMobile = window.innerWidth < 768;
+                const resetZoom = isMobile ? 11 : DEFAULT_REAL_SCALE_ZOOM;
+                mapRef.current.setView(DEFAULT_REAL_SCALE_CENTER, resetZoom);
+                if (trackingStatus === "following") {
+                  setTrackingStatus("located");
+                }
+              }
+            }}
+            className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
+            title={t("resetView")}
+          >
+            <RotateCcw className="h-5 w-5" />
+          </button>
+
+          {/* Real-time Location / GPS Button */}
+          <button
+            onClick={handleLocateButtonClick}
+            disabled={trackingStatus === "locating"}
+            className={`relative flex items-center justify-center rounded-xl p-2.5 transition-all active:scale-90 ${
+              trackingStatus === "following"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                : trackingStatus === "located"
+                ? "bg-blue-500/15 text-blue-500 border border-blue-500/30"
+                : "text-text-secondary hover:bg-button-secondary hover:text-text-primary"
+            }`}
+            title={
+              trackingStatus === "following"
+                ? t("stopTracking")
+                : trackingStatus === "located"
+                ? t("recenterLocation")
+                : t("locateMe")
+            }
+          >
+            {trackingStatus === "locating" ? (
+              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+            ) : trackingStatus === "following" ? (
+              <Navigation className="h-5 w-5 fill-current" />
+            ) : trackingStatus === "located" ? (
+              <Crosshair className="h-5 w-5" />
+            ) : (
+              <Crosshair className="h-5 w-5" />
+            )}
+
+            {/* Active follow pulse ping */}
+            {trackingStatus === "following" && (
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+              </span>
+            )}
           </button>
         </div>
       )}
@@ -525,6 +912,119 @@ export const MapView: React.FC = () => {
           {showRealScale ? t("schematicMap") : t("realScaleMap")}
         </button>
       </div>
+
+      {/* Location Error Notification Banner */}
+      <AnimatePresence>
+        {locationError && showRealScale && (
+          <div className="absolute bottom-6 inset-x-0 z-40 flex justify-center pointer-events-none px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 30, scale: 0.95 }}
+              className="pointer-events-auto max-w-sm sm:max-w-md w-full flex items-start gap-3 rounded-2xl border border-red-500/30 bg-card/95 p-3.5 shadow-2xl backdrop-blur-md"
+            >
+              <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+              <div className="flex-1 text-xs text-text-primary leading-snug">
+                <div className="font-bold text-red-500 mb-0.5">{t("locationError")}</div>
+                <div className="text-text-secondary">
+                  {locationError === "locationPermissionDenied"
+                    ? t("locationPermissionDenied")
+                    : locationError === "locationUnavailable"
+                    ? t("locationUnavailable")
+                    : locationError === "locationTimeout"
+                    ? t("locationTimeout")
+                    : t("locationError")}
+                </div>
+              </div>
+              <button
+                onClick={() => setLocationError(null)}
+                className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Nearest Station Info Floating Card (Real Scale Map) */}
+      <AnimatePresence>
+        {showRealScale && userLocation && nearestStation && showNearestCard && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            className="absolute bottom-6 left-4 right-4 sm:left-auto sm:right-6 max-w-sm w-auto mx-auto sm:mx-0 z-30 flex items-center justify-between gap-4 rounded-2xl border border-border bg-card/95 p-3.5 pr-9 shadow-2xl backdrop-blur-md"
+          >
+            {/* Top-Right Cross/Dismiss Button */}
+            <button
+              onClick={() => setShowNearestCard(false)}
+              className="absolute top-2.5 right-2.5 rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors"
+              title={t("hide")}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+
+            {/* Left Side: Single vertically aligned icon + 4 lines of text */}
+            <div className="flex items-center gap-3 min-w-0 pr-1">
+              {/* Single Vertically Aligned Icon */}
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-500 shadow-inner">
+                <MapPin className="h-6 w-6" />
+              </div>
+
+              {/* 4 lines of content */}
+              <div className="flex flex-col gap-1 min-w-0">
+                {/* Line 1: NEAREST STATION */}
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-text-secondary leading-none">
+                  {t("nearestStation")}
+                </span>
+
+                {/* Line 2: {station code} */}
+                <div className="flex gap-1 flex-wrap items-center">
+                  {nearestStation.codes.map((code) => {
+                    const lineId = getLineOfCode(code);
+                    return (
+                      <span
+                        key={code}
+                        style={{ backgroundColor: getLineColor(lineId) }}
+                        className="rounded px-1.5 py-0.5 text-[8.5px] font-extrabold text-white shadow-sm leading-none"
+                      >
+                        {code}
+                      </span>
+                    );
+                  })}
+                </div>
+
+                {/* Line 3: {station name} */}
+                <div className="truncate font-bold text-xs text-text-primary leading-tight">
+                  {tStation(nearestStation.name)}
+                  {language === "zh" && (
+                    <span className="text-[9.5px] text-text-secondary font-medium ml-1">
+                      {nearestStation.name}
+                    </span>
+                  )}
+                </div>
+
+                {/* Line 4: {distance} */}
+                <span className="text-[10.5px] font-semibold text-blue-500 leading-none">
+                  {formatDistance(nearestStation.distance)}
+                </span>
+              </div>
+            </div>
+
+            {/* Right Side: Vertically Aligned View Arrivals Button */}
+            <div className="flex items-center shrink-0 self-center">
+              <a
+                href={`#/station/${encodeURIComponent(nearestStation.name)}`}
+                className="flex items-center gap-1 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:bg-blue-700 transition-all active:scale-95 no-underline whitespace-nowrap"
+              >
+                <span>{t("viewArrivals")}</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Map Content Switcher */}
       {showRealScale ? (
