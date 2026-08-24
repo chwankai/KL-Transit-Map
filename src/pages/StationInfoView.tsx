@@ -4,7 +4,7 @@ import { stations, lines, getPlatformNumber } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
 import {
   ArrowLeft, Clock, ArrowRight, Train, ChevronDown, ChevronUp,
-  Navigation, Heart, RefreshCw, Map, X, ZoomIn, ZoomOut
+  Navigation, Heart, RefreshCw, Map, X, ZoomIn, ZoomOut, WifiOff
 } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
@@ -248,7 +248,9 @@ export const StationInfoView: React.FC = () => {
     }
   };
 
-  useEffect(() => {
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  const loadDirectoryImage = useCallback(() => {
     if (!directoryUrl) {
       setDirectoryImgExists(false);
       setIsDirLoading(false);
@@ -257,11 +259,10 @@ export const StationInfoView: React.FC = () => {
     setIsDirLoading(true);
     const img = new Image();
     img.onload = () => {
-      // Simulate slow loading delay of 1.2 seconds
       setTimeout(() => {
         setDirectoryImgExists(true);
         setIsDirLoading(false);
-      }, 1200);
+      }, 500);
     };
     img.onerror = () => {
       setDirectoryImgExists(false);
@@ -269,6 +270,26 @@ export const StationInfoView: React.FC = () => {
     };
     img.src = directoryUrl;
   }, [directoryUrl]);
+
+  useEffect(() => {
+    loadDirectoryImage();
+  }, [loadDirectoryImage]);
+
+  useEffect(() => {
+    const onOnline = () => {
+      setIsOffline(false);
+      loadDirectoryImage();
+    };
+    const onOffline = () => {
+      setIsOffline(true);
+    };
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [loadDirectoryImage]);
 
   useEffect(() => {
     if (!directoryModalOpen) {
@@ -629,31 +650,59 @@ export const StationInfoView: React.FC = () => {
                 {/* Desktop: always visible; Mobile: only when open */}
                 <div className={`${directoryOpen ? "block" : "hidden lg:block"} mt-3 lg:mt-0`}>
                   <div className="glass-panel rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
-                    <div className="px-4 py-3 border-b border-border/60 flex items-center gap-2">
-                      <Map className="h-3.5 w-3.5 text-text-secondary" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{t("stationDirectory")}</span>
+                    <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Map className="h-3.5 w-3.5 text-text-secondary" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">{t("stationDirectory")}</span>
+                      </div>
+                      {isOffline && (
+                        <span className="flex items-center gap-1 text-[9px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                          <WifiOff className="h-2.5 w-2.5" />
+                          <span>Offline</span>
+                        </span>
+                      )}
                     </div>
                     {isDirLoading ? (
-                      <div className="p-4">
-                        <div className="w-full aspect-square bg-button-secondary rounded-xl animate-pulse"></div>
+                      <div className="p-5 flex flex-col items-center justify-center min-h-[140px] gap-2 bg-button-secondary/15">
+                        <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />
+                        <span className="text-[10px] font-semibold text-text-secondary">{t("loading")}</span>
+                      </div>
+                    ) : directoryImgExists && directoryUrl ? (
+                      <div
+                        className="cursor-zoom-in hover:brightness-95 transition-all flex justify-center p-2"
+                        onClick={() => {
+                          setDirectoryModalOpen(true);
+                          trackEvent("open_station_directory_layout", "station", decodedName);
+                        }}
+                        title="Click to enlarge"
+                      >
+                        <img
+                          src={directoryUrl}
+                          alt={`${decodedName} station directory`}
+                          className="w-full h-auto object-contain rounded-xl"
+                        />
                       </div>
                     ) : (
-                      directoryImgExists && directoryUrl && (
-                        <div
-                          className="cursor-zoom-in hover:brightness-95 transition-all flex justify-center"
-                          onClick={() => {
-                            setDirectoryModalOpen(true);
-                            trackEvent("open_station_directory_layout", "station", decodedName);
-                          }}
-                          title="Click to enlarge"
-                        >
-                          <img
-                            src={directoryUrl}
-                            alt={`${decodedName} station directory`}
-                            className="w-full h-auto object-contain"
-                          />
+                      <div className="p-5 flex flex-col items-center justify-center text-center gap-2.5 bg-button-secondary/15">
+                        <div className="p-2.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                          <WifiOff className="h-4 w-4" />
                         </div>
-                      )
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-text-primary">
+                            {isOffline ? t("directoryUnavailable") : t("directoryUnavailable")}
+                          </div>
+                          <p className="text-[10.5px] text-text-secondary leading-snug max-w-[210px]">
+                            {t("directoryOffline")}
+                          </p>
+                        </div>
+                        <button
+                          onClick={loadDirectoryImage}
+                          className="mt-1 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-text-secondary hover:text-text-primary text-[10px] font-bold tracking-wider uppercase transition-all shadow-sm active:scale-95"
+                        >
+                          <RefreshCw className="h-3 w-3" />
+                          <span>{t("refresh") || "Retry"}</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
