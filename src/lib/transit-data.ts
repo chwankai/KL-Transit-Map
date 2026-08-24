@@ -19,6 +19,7 @@ export interface StationObj {
   lines: string[];
   connections: Connection[];
   facility?: string;
+  isAccessible?: boolean;
 }
 
 export interface Edge {
@@ -388,6 +389,7 @@ function buildGraph(): Record<string, StationObj> {
   ]);
 
   Object.keys(stations).forEach(name => {
+    stations[name].isAccessible = true;
     if (parkAndRideStations.has(name)) {
       stations[name].facility = "P";
     } else {

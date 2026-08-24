@@ -201,6 +201,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "showTrackerSidebar": "Show Tracker Sidebar",
     "live": "Live",
     "hideInactive": "Hide Inactive",
+    "wheelchairAccessible": "OKU Accessibility",
+    "connectingToKtm": "Connecting to KTM",
+    "connectingToErl": "Connecting to ERL",
   },
   zh: {
     "map": "地图",
@@ -402,6 +405,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "hideAllLines": "隐藏全部巴士路线",
     "hideSidebar": "隐藏侧边栏",
     "showTrackerSidebar": "显示监测侧边栏",
+    "wheelchairAccessible": "无障碍设施",
+    "connectingToKtm": "Connecting to KTM",
+    "connectingToErl": "Connecting to ERL",
   },
   ms: {
     "map": "Peta",
@@ -603,6 +609,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "hideSidebar": "Sembunyikan Bar Sisi",
     "showTrackerSidebar": "Tunjukkan Bar Sisi Penjejak",
     "hideInactive": "Sembunyikan Laluan Tidak Aktif",
+    "wheelchairAccessible": "Mesra OKU & Kerusi Roda",
+    "connectingToKtm": "Connecting to KTM",
+    "connectingToErl": "Connecting to ERL",
   }
 };
 

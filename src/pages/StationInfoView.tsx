@@ -4,7 +4,8 @@ import { stations, lines, getPlatformNumber } from "../lib/transit-data";
 import type { StationObj } from "../lib/transit-data";
 import {
   ArrowLeft, Clock, ArrowRight, Train, ChevronDown, ChevronUp,
-  Navigation, Heart, RefreshCw, Map, X, ZoomIn, ZoomOut, WifiOff
+  Navigation, Heart, RefreshCw, Map, X, ZoomIn, ZoomOut, WifiOff,
+  Accessibility
 } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
@@ -60,6 +61,27 @@ interface TimetableData {
   saturday: string[];
   sunday: string[];
 }
+
+const KTM_CONNECTING_STATIONS = new Set([
+  "Sungai Buloh",
+  "Sri Damansara Timur",
+  "Kampung Batu",
+  "Kajang",
+  "Abdullah Hukum",
+  "Salak Selatan",
+  "Bandar Tasik Selatan",
+  "Sunway-Setia Jaya",
+  "Sunway–Setia Jaya",
+  "Setia Jaya",
+  "KL Sentral",
+  "Pasar Seni",
+]);
+
+const ERL_CONNECTING_STATIONS = new Set([
+  "Bandar Tasik Selatan",
+  "Putrajaya Sentral",
+  "KL Sentral",
+]);
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export const StationInfoView: React.FC = () => {
@@ -117,6 +139,20 @@ export const StationInfoView: React.FC = () => {
     }
     return [...new Set(group)];
   }, []);
+
+  const connectsToKtm = useMemo(() => {
+    return (
+      KTM_CONNECTING_STATIONS.has(decodedName) ||
+      (station?.name ? KTM_CONNECTING_STATIONS.has(station.name) : false)
+    );
+  }, [decodedName, station]);
+
+  const connectsToErl = useMemo(() => {
+    return (
+      ERL_CONNECTING_STATIONS.has(decodedName) ||
+      (station?.name ? ERL_CONNECTING_STATIONS.has(station.name) : false)
+    );
+  }, [decodedName, station]);
 
   const groupedStationNames = getGroupedStations(decodedName);
   
@@ -618,13 +654,43 @@ export const StationInfoView: React.FC = () => {
                 </div>
               )}
 
-              {/* Park n' Ride Facility */}
-              {station?.facility?.includes("P") && (
-                <div className="pt-3 border-t border-border/80 space-y-2">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-600/10 text-blue-500 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/20 select-none w-fit">
-                    <span className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-blue-600 text-white text-[9px] font-black">P</span>
-                    <span>Park n' Ride</span>
-                  </div>
+              {/* Station Facilities & Intermodal Connections (Accessibility, Park n' Ride, KTM, ERL) */}
+              {(station?.isAccessible ||
+                station?.facility?.includes("P") ||
+                connectsToKtm ||
+                connectsToErl) && (
+                <div className="pt-3 border-t border-border/80 flex items-center gap-2 flex-wrap">
+                  {/* Wheelchair Accessibility Facility */}
+                  {station?.isAccessible && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold uppercase tracking-wider border border-emerald-500/20 select-none w-fit">
+                      <Accessibility className="h-3.5 w-3.5" />
+                      <span>{t("wheelchairAccessible")}</span>
+                    </div>
+                  )}
+
+                  {/* Park n' Ride Facility */}
+                  {station?.facility?.includes("P") && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-600/10 text-blue-500 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/20 select-none w-fit">
+                      <span className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-blue-600 text-white text-[9px] font-black">P</span>
+                      <span>Park n' Ride</span>
+                    </div>
+                  )}
+
+                  {/* KTM Connection */}
+                  {connectsToKtm && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold uppercase tracking-wider border border-amber-500/20 select-none w-fit">
+                      <Train className="h-3.5 w-3.5 text-amber-500" />
+                      <span>{t("connectingToKtm")}</span>
+                    </div>
+                  )}
+
+                  {/* ERL Connection */}
+                  {connectsToErl && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[10px] font-extrabold uppercase tracking-wider border border-teal-500/20 select-none w-fit">
+                      <Train className="h-3.5 w-3.5 text-teal-500" />
+                      <span>{t("connectingToErl")}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
