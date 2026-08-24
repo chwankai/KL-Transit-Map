@@ -10,8 +10,6 @@ import {
   X,
   MapPin,
   ChevronRight,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { stations, lines } from "../lib/transit-data";
@@ -538,10 +536,13 @@ export const MapView: React.FC = () => {
       return;
     }
 
-    // Initialize map centering at 3°05'57.1"N 101°38'47.7"E
+    // Initialize map centering at 3°05'57.1"N 101°38'47.7"E (mobile: 50% zoomed out / zoom 11)
+    const isMobile = window.innerWidth < 768;
+    const initialZoom = isMobile ? 11 : DEFAULT_REAL_SCALE_ZOOM;
+
     const map = L.map("leaflet-map", {
       zoomControl: false,
-    }).setView(DEFAULT_REAL_SCALE_CENTER, DEFAULT_REAL_SCALE_ZOOM);
+    }).setView(DEFAULT_REAL_SCALE_CENTER, initialZoom);
     mapRef.current = map;
 
     // Detach following mode when user manually drags the Leaflet map
@@ -826,7 +827,25 @@ export const MapView: React.FC = () => {
       {/* Floating Controls for Real Scale Map on top-left */}
       {showRealScale && (
         <div className="absolute top-4 left-4 z-30 flex flex-col gap-2 rounded-2xl border border-border bg-card p-1.5 shadow-2xl backdrop-blur-md animate-fade-in">
-          {/* Real-time Location Button */}
+          {/* Refresh / Reset View Button */}
+          <button
+            onClick={() => {
+              if (mapRef.current) {
+                const isMobile = window.innerWidth < 768;
+                const resetZoom = isMobile ? 11 : DEFAULT_REAL_SCALE_ZOOM;
+                mapRef.current.setView(DEFAULT_REAL_SCALE_CENTER, resetZoom);
+                if (trackingStatus === "following") {
+                  setTrackingStatus("located");
+                }
+              }
+            }}
+            className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
+            title={t("resetView")}
+          >
+            <RotateCcw className="h-5 w-5" />
+          </button>
+
+          {/* Real-time Location / GPS Button */}
           <button
             onClick={handleLocateButtonClick}
             disabled={trackingStatus === "locating"}
@@ -862,44 +881,6 @@ export const MapView: React.FC = () => {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
               </span>
             )}
-          </button>
-
-          {/* Map Zoom Controls */}
-          <div className="h-px bg-border my-0.5 mx-1" />
-          
-          <button
-            onClick={() => {
-              if (mapRef.current) mapRef.current.zoomIn();
-            }}
-            className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
-            title="Zoom In"
-          >
-            <ZoomIn className="h-5 w-5" />
-          </button>
-
-          <button
-            onClick={() => {
-              if (mapRef.current) mapRef.current.zoomOut();
-            }}
-            className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
-            title="Zoom Out"
-          >
-            <ZoomOut className="h-5 w-5" />
-          </button>
-
-          <button
-            onClick={() => {
-              if (mapRef.current) {
-                mapRef.current.setView(DEFAULT_REAL_SCALE_CENTER, DEFAULT_REAL_SCALE_ZOOM);
-                if (trackingStatus === "following") {
-                  setTrackingStatus("located");
-                }
-              }
-            }}
-            className="rounded-xl p-2.5 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-all active:scale-90"
-            title={t("resetView")}
-          >
-            <RotateCcw className="h-5 w-5" />
           </button>
         </div>
       )}
