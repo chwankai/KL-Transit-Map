@@ -201,7 +201,7 @@ export const MapView: React.FC = () => {
 
   // Create popup HTML for user location marker
   const createUserPopupHtml = useCallback(
-    (accuracy: number, nearest: NearestStationData | null) => {
+    (nearest: NearestStationData | null) => {
       const distFormatted = nearest ? formatDistance(nearest.distance) : "";
 
       return `
@@ -209,9 +209,6 @@ export const MapView: React.FC = () => {
           <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-blue-600">
             <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#2563eb; box-shadow: 0 0 6px rgba(37,99,235,0.6);"></span>
             ${t("myLocation")}
-          </div>
-          <div class="text-[10px] text-slate-500 font-medium">
-            ${t("accuracy")}: ±${Math.round(accuracy)}m
           </div>
           ${
             nearest
@@ -294,7 +291,7 @@ export const MapView: React.FC = () => {
             zIndexOffset: 1000,
           }).addTo(map);
 
-          marker.bindPopup(createUserPopupHtml(accuracy, nearest), {
+          marker.bindPopup(createUserPopupHtml(nearest), {
             closeButton: false,
             minWidth: 160,
           });
@@ -303,7 +300,7 @@ export const MapView: React.FC = () => {
         } else {
           userMarkerRef.current.setLatLng([latitude, longitude]);
           userMarkerRef.current.setIcon(createUserLocationIcon(newLoc.heading));
-          userMarkerRef.current.setPopupContent(createUserPopupHtml(accuracy, nearest));
+          userMarkerRef.current.setPopupContent(createUserPopupHtml(nearest));
         }
 
         // Update or create Accuracy Circle
@@ -332,15 +329,15 @@ export const MapView: React.FC = () => {
     };
 
     const handleError = (err: GeolocationPositionError) => {
-      let msg = t("locationError");
+      let errorKey = "locationError";
       if (err.code === err.PERMISSION_DENIED) {
-        msg = t("locationPermissionDenied");
+        errorKey = "locationPermissionDenied";
       } else if (err.code === err.POSITION_UNAVAILABLE) {
-        msg = t("locationUnavailable");
+        errorKey = "locationUnavailable";
       } else if (err.code === err.TIMEOUT) {
-        msg = t("locationTimeout");
+        errorKey = "locationTimeout";
       }
-      setLocationError(msg);
+      setLocationError(errorKey);
       setTrackingStatus("error");
       trackEvent("locate_me_error", "map", String(err.code));
     };
@@ -919,24 +916,34 @@ export const MapView: React.FC = () => {
       {/* Location Error Notification Banner */}
       <AnimatePresence>
         {locationError && showRealScale && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-40 max-w-sm sm:max-w-md w-[90%] flex items-start gap-3 rounded-2xl border border-red-500/30 bg-card/95 p-3.5 shadow-2xl backdrop-blur-md"
-          >
-            <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-            <div className="flex-1 text-xs text-text-primary leading-snug">
-              <div className="font-bold text-red-500 mb-0.5">{t("locationError")}</div>
-              <div className="text-text-secondary">{locationError}</div>
-            </div>
-            <button
-              onClick={() => setLocationError(null)}
-              className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary"
+          <div className="absolute top-4 inset-x-0 z-40 flex justify-center pointer-events-none px-4">
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="pointer-events-auto max-w-sm sm:max-w-md w-full flex items-start gap-3 rounded-2xl border border-red-500/30 bg-card/95 p-3.5 shadow-2xl backdrop-blur-md"
             >
-              <X className="h-4 w-4" />
-            </button>
-          </motion.div>
+              <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+              <div className="flex-1 text-xs text-text-primary leading-snug">
+                <div className="font-bold text-red-500 mb-0.5">{t("locationError")}</div>
+                <div className="text-text-secondary">
+                  {locationError === "locationPermissionDenied"
+                    ? t("locationPermissionDenied")
+                    : locationError === "locationUnavailable"
+                    ? t("locationUnavailable")
+                    : locationError === "locationTimeout"
+                    ? t("locationTimeout")
+                    : t("locationError")}
+                </div>
+              </div>
+              <button
+                onClick={() => setLocationError(null)}
+                className="rounded-lg p-1 text-text-secondary hover:bg-button-secondary hover:text-text-primary transition-colors shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

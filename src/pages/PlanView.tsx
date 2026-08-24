@@ -1,13 +1,73 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { stations, lines, findRoute, lineStations, getPlatformNumber } from "../lib/transit-data";
 import type { Route } from "../lib/transit-data";
 import { fetchMyRapidRoute, getCurrentDateTime, subtractSecondsFromDatetime, geocodeStation, fetchSingleRoute } from "../lib/routing";
 import { useSettings } from "../context/SettingsContext";
 import { Footer } from "../components/layout/Footer";
-import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp, AlertCircle, X, Heart, Trash2 } from "lucide-react";
+import { ArrowUpDown, Search, Compass, RefreshCw, Clock, ChevronDown, ChevronUp, AlertCircle, X, Heart, Trash2, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trackEvent } from "../lib/analytics";
+import stationCoords from "../../public/station_coords.json";
+
+const getStationCoord = (key: string): { lat: number; lng: number } | null => {
+  if (!key) return null;
+  const cleanKey = key.trim().toUpperCase();
+  if ((stationCoords as any)[cleanKey]) return (stationCoords as any)[cleanKey];
+  if ((stationCoords as any)[key]) return (stationCoords as any)[key];
+
+  const getNormalized = (str: string): string => str.replace(/[^A-Z0-9]/g, "").toUpperCase();
+  const getZeroStripped = (str: string): string => str.replace(/^([A-Z]+)0+([0-9]+)$/, "$1$2");
+
+  let normalizedKey = getNormalized(cleanKey);
+  if (normalizedKey.endsWith("TRX") && normalizedKey !== "TRX") {
+    normalizedKey = normalizedKey.slice(0, -3);
+  }
+  const strippedKey = getZeroStripped(normalizedKey);
+
+  const foundKey = Object.keys(stationCoords).find((k) => {
+    let normK = getNormalized(k);
+    if (normK.endsWith("TRX") && normK !== "TRX") {
+      normK = normK.slice(0, -3);
+    }
+    const stripK = getZeroStripped(normK);
+    return normK === normalizedKey || stripK === strippedKey || normK === strippedKey || stripK === normalizedKey;
+  });
+  if (foundKey) return (stationCoords as any)[foundKey];
+
+  return null;
+};
+
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371e3;
+  const phi1 = (lat1 * Math.PI) / 180;
+  const phi2 = (lat2 * Math.PI) / 180;
+  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+const findNearestStationName = (lat: number, lng: number): string | null => {
+  let nearestName: string | null = null;
+  let minDistance = Infinity;
+
+  Object.entries(stations).forEach(([name, node]) => {
+    const coord = getStationCoord(name) || getStationCoord(node.codes[0]);
+    if (coord) {
+      const dist = calculateDistance(lat, lng, coord.lat, coord.lng);
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearestName = name;
+      }
+    }
+  });
+
+  return nearestName;
+};
 
 export const PlanView: React.FC = () => {
   const { language, farePref, t, tStation, tLine } = useSettings();
@@ -23,6 +83,72 @@ export const PlanView: React.FC = () => {
   const [destInputFocused, setDestInputFocused] = useState(false);
   const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
   const [destSuggestions, setDestSuggestions] = useState<string[]>([]);
+
+  // Nearest station from live geolocation
+  const [nearestStation, setNearestStation] = useState<string | null>(() => {
+    return sessionStorage.getItem("nearest_station_name") || null;
+  });
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setNearestStation(null);
+      sessionStorage.removeItem("nearest_station_name");
+      return;
+    }
+
+    // Check & listen to permission changes if supported
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: "geolocation" as PermissionName })
+        .then((status) => {
+          if (status.state === "denied") {
+            setNearestStation(null);
+            sessionStorage.removeItem("nearest_station_name");
+          } else if (status.state === "granted") {
+            const cached = sessionStorage.getItem("nearest_station_name");
+            if (cached) setNearestStation(cached);
+          }
+
+          status.onchange = () => {
+            if (status.state === "denied") {
+              setNearestStation(null);
+              sessionStorage.removeItem("nearest_station_name");
+            } else if (status.state === "granted") {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  const name = findNearestStationName(pos.coords.latitude, pos.coords.longitude);
+                  if (name) {
+                    setNearestStation(name);
+                    sessionStorage.setItem("nearest_station_name", name);
+                  }
+                },
+                () => {
+                  setNearestStation(null);
+                  sessionStorage.removeItem("nearest_station_name");
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+              );
+            }
+          };
+        })
+        .catch(() => {});
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const name = findNearestStationName(pos.coords.latitude, pos.coords.longitude);
+        if (name) {
+          setNearestStation(name);
+          sessionStorage.setItem("nearest_station_name", name);
+        }
+      },
+      () => {
+        setNearestStation(null);
+        sessionStorage.removeItem("nearest_station_name");
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  }, []);
 
   // State to filter suggestions list. Reset to empty on focus so the full list displays.
   const [originFilter, setOriginFilter] = useState("");
@@ -101,14 +227,25 @@ export const PlanView: React.FC = () => {
     }
   })();
 
-  const sortedStationNames = (() => {
+  const favSet = useMemo(() => new Set(favouriteStations), [favouriteStations]);
+
+  const sortedStationNames = useMemo(() => {
     const all = Object.keys(stations).sort();
-    if (favouriteStations.length === 0) return all;
-    const favSet = new Set(favouriteStations);
     const favSorted = [...favouriteStations].sort();
-    const rest = all.filter(s => !favSet.has(s));
-    return [...favSorted, ...rest];
-  })();
+
+    // Pinned list:
+    // If nearestStation is available and NOT in favSet -> put nearestStation on top.
+    // Favourite stations are pinned on top (with red heart).
+    const pinned: string[] = [];
+    if (nearestStation && !favSet.has(nearestStation) && stations[nearestStation]) {
+      pinned.push(nearestStation);
+    }
+    pinned.push(...favSorted);
+
+    const pinnedSet = new Set(pinned);
+    const rest = all.filter((s) => !pinnedSet.has(s));
+    return [...pinned, ...rest];
+  }, [favouriteStations, favSet, nearestStation]);
 
   // Pre-fill destination from URL query param (?dest=StationName)
   useEffect(() => {
@@ -144,7 +281,7 @@ export const PlanView: React.FC = () => {
       );
       setOriginSuggestions(match);
     }
-  }, [originFilter]);
+  }, [originFilter, sortedStationNames, tStation]);
 
   useEffect(() => {
     if (!destFilter) {
@@ -156,7 +293,7 @@ export const PlanView: React.FC = () => {
       );
       setDestSuggestions(match);
     }
-  }, [destFilter]);
+  }, [destFilter, sortedStationNames, tStation]);
 
   // Click outside to close dropdowns
   useEffect(() => {
@@ -347,7 +484,7 @@ export const PlanView: React.FC = () => {
     const node = stations[stationName];
     if (!node || !node.codes) return null;
     return (
-      <div className="flex gap-1 flex-wrap">
+      <div className="flex gap-1 flex-wrap shrink-0 items-center justify-end">
         {node.codes.map((code) => {
           const match = code.match(/^[a-zA-Z]+/);
           let lineId = match ? match[0] : "";
@@ -359,7 +496,7 @@ export const PlanView: React.FC = () => {
             <span
               key={code}
               style={{ backgroundColor: color }}
-              className="text-[9px] font-extrabold text-white px-1.5 py-0.5 rounded shadow-sm animate-fade-in"
+              className="text-[9px] font-extrabold text-white px-1.5 py-0.5 rounded shadow-sm shrink-0 whitespace-nowrap leading-none"
             >
               {code}
             </span>
@@ -487,26 +624,40 @@ export const PlanView: React.FC = () => {
                 </div>
                 {originInputFocused && originSuggestions.length > 0 && (
                   <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
-                    {originSuggestions.map((name) => (
-                      <button
-                        key={name}
-                        type="button"
-                        onClick={() => {
-                          setOrigin(name);
-                          setOriginFilter("");
-                          setOriginInputFocused(false);
-                        }}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
-                      >
-                        <span className="flex flex-col text-left">
-                          <span>{tStation(name)}</span>
-                          {language === "zh" && (
-                            <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{name}</span>
-                          )}
-                        </span>
-                        {getStationBadges(name)}
-                      </button>
-                    ))}
+                    {originSuggestions.map((name) => {
+                      const isFav = favSet.has(name);
+                      const isNearest = name === nearestStation;
+
+                      return (
+                        <button
+                          key={name}
+                          type="button"
+                          onClick={() => {
+                            setOrigin(name);
+                            setOriginFilter("");
+                            setOriginInputFocused(false);
+                          }}
+                          className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-2.5 text-left min-w-0 flex-1">
+                            {isFav ? (
+                              <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500 shrink-0" />
+                            ) : isNearest ? (
+                              <MapPin className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                            ) : null}
+                            <span className="flex flex-col text-left min-w-0 flex-1">
+                              <span className="text-xs font-medium leading-snug text-text-primary break-words">{tStation(name)}</span>
+                              {language === "zh" && (
+                                <span className="text-[10px] font-normal text-text-secondary leading-snug mt-0.5 break-words">{name}</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="shrink-0 flex items-center justify-end">
+                            {getStationBadges(name)}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -559,26 +710,40 @@ export const PlanView: React.FC = () => {
                 </div>
                 {destInputFocused && destSuggestions.length > 0 && (
                   <div className="absolute left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-xl border border-border bg-card dark:bg-slate-900 shadow-2xl opacity-100">
-                    {destSuggestions.map((name) => (
-                      <button
-                        key={name}
-                        type="button"
-                        onClick={() => {
-                          setDest(name);
-                          setDestFilter("");
-                          setDestInputFocused(false);
-                        }}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
-                      >
-                        <span className="flex flex-col text-left">
-                          <span>{tStation(name)}</span>
-                          {language === "zh" && (
-                            <span className="text-[9px] font-normal text-text-secondary leading-none mt-0.5">{name}</span>
-                          )}
-                        </span>
-                        {getStationBadges(name)}
-                      </button>
-                    ))}
+                    {destSuggestions.map((name) => {
+                      const isFav = favSet.has(name);
+                      const isNearest = name === nearestStation;
+
+                      return (
+                        <button
+                          key={name}
+                          type="button"
+                          onClick={() => {
+                            setDest(name);
+                            setDestFilter("");
+                            setDestInputFocused(false);
+                          }}
+                          className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 text-left text-xs text-text-primary hover:bg-button-secondary transition-colors border-b border-slate-200 dark:border-slate-800 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-2.5 text-left min-w-0 flex-1">
+                            {isFav ? (
+                              <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500 shrink-0" />
+                            ) : isNearest ? (
+                              <MapPin className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                            ) : null}
+                            <span className="flex flex-col text-left min-w-0 flex-1">
+                              <span className="text-xs font-medium leading-snug text-text-primary break-words">{tStation(name)}</span>
+                              {language === "zh" && (
+                                <span className="text-[10px] font-normal text-text-secondary leading-snug mt-0.5 break-words">{name}</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="shrink-0 flex items-center justify-end">
+                            {getStationBadges(name)}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
