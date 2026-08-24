@@ -126,7 +126,7 @@ export const PlanView: React.FC = () => {
                   setNearestStation(null);
                   sessionStorage.removeItem("nearest_station_name");
                 },
-                { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+                { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 }
               );
             }
           };
@@ -146,7 +146,7 @@ export const PlanView: React.FC = () => {
         setNearestStation(null);
         sessionStorage.removeItem("nearest_station_name");
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 3000, maximumAge: 120000 }
     );
   }, []);
 
