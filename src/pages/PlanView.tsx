@@ -81,8 +81,6 @@ export const PlanView: React.FC = () => {
 
   const [originInputFocused, setOriginInputFocused] = useState(false);
   const [destInputFocused, setDestInputFocused] = useState(false);
-  const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
-  const [destSuggestions, setDestSuggestions] = useState<string[]>([]);
 
   // Nearest station from live geolocation
   const [nearestStation, setNearestStation] = useState<string | null>(() => {
@@ -215,14 +213,17 @@ export const PlanView: React.FC = () => {
   };
 
   // Favourite stations sorted alphabetically, surfaced at top of suggestions
-  const favouriteStations: string[] = (() => {
+  const rawFavs = localStorage.getItem("favourite_stations") || "[]";
+  const favouriteStations = useMemo<string[]>(() => {
     try {
-      const parsed = JSON.parse(localStorage.getItem("favourite_stations") || "[]") as string[];
-      return parsed.map(s => s === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (s === "Pasar Jawa" ? "Jambatan Kota" : s));
+      const parsed = JSON.parse(rawFavs) as string[];
+      return parsed.map((s) =>
+        s === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : s === "Pasar Jawa" ? "Jambatan Kota" : s
+      );
     } catch {
       return [];
     }
-  })();
+  }, [rawFavs]);
 
   const favSet = useMemo(() => new Set(favouriteStations), [favouriteStations]);
 
@@ -243,6 +244,27 @@ export const PlanView: React.FC = () => {
     const rest = all.filter((s) => !pinnedSet.has(s));
     return [...pinned, ...rest];
   }, [favouriteStations, favSet, nearestStation]);
+
+  // Derive suggestions with useMemo to guarantee 0 re-render loops
+  const originSuggestions = useMemo(() => {
+    if (!originFilter) return sortedStationNames;
+    const lower = originFilter.toLowerCase();
+    return sortedStationNames.filter(
+      (name) =>
+        name.toLowerCase().includes(lower) ||
+        tStation(name).toLowerCase().includes(lower)
+    );
+  }, [originFilter, sortedStationNames, tStation]);
+
+  const destSuggestions = useMemo(() => {
+    if (!destFilter) return sortedStationNames;
+    const lower = destFilter.toLowerCase();
+    return sortedStationNames.filter(
+      (name) =>
+        name.toLowerCase().includes(lower) ||
+        tStation(name).toLowerCase().includes(lower)
+    );
+  }, [destFilter, sortedStationNames, tStation]);
 
   // Pre-fill destination from URL query param (?dest=StationName)
   useEffect(() => {
@@ -266,31 +288,6 @@ export const PlanView: React.FC = () => {
     const min = String(now.getMinutes()).padStart(2, "0");
     setTimeInput(`${hh}:${min}`);
   }, []);
-
-  // Update origin/dest autocompletes based on filter values (empty shows full list)
-  useEffect(() => {
-    if (!originFilter) {
-      setOriginSuggestions(sortedStationNames);
-    } else {
-      const match = sortedStationNames.filter((name) =>
-        name.toLowerCase().includes(originFilter.toLowerCase()) ||
-        tStation(name).toLowerCase().includes(originFilter.toLowerCase())
-      );
-      setOriginSuggestions(match);
-    }
-  }, [originFilter, sortedStationNames, tStation]);
-
-  useEffect(() => {
-    if (!destFilter) {
-      setDestSuggestions(sortedStationNames);
-    } else {
-      const match = sortedStationNames.filter((name) =>
-        name.toLowerCase().includes(destFilter.toLowerCase()) ||
-        tStation(name).toLowerCase().includes(destFilter.toLowerCase())
-      );
-      setDestSuggestions(match);
-    }
-  }, [destFilter, sortedStationNames, tStation]);
 
   // Click outside to close dropdowns
   useEffect(() => {
