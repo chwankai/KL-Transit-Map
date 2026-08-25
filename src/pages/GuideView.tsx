@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Share, Heart, Bookmark, Info } from "lucide-react";
+import { ArrowLeft, BookOpen, Share, Heart, Bookmark, Info, ShieldCheck } from "lucide-react";
 import { Footer } from "../components/layout/Footer";
 import { useSettings } from "../context/SettingsContext";
 
@@ -160,7 +160,27 @@ export const GuideView: React.FC = () => {
             </p>
           </div>
 
-          {/* Guide 5: Disclaimer */}
+          {/* Guide 5: Location & Privacy Notice */}
+          <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2 border-b border-border/60 pb-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              {t("guidePrivacyTitle") || "Location & Privacy Notice"}
+            </h2>
+            <p className="text-xs text-text-secondary leading-relaxed">
+              {t("guidePrivacyDesc1")}
+            </p>
+            <p className="text-xs text-text-secondary leading-relaxed">
+              {t("guidePrivacyDesc2")}
+            </p>
+            <div className="flex items-start gap-2 bg-blue-500/10 border border-blue-500/25 p-3 rounded-xl">
+              <Info className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+              <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 leading-normal">
+                {t("guidePrivacyNote")}
+              </span>
+            </div>
+          </div>
+
+          {/* Guide 6: Disclaimer */}
           <div className="glass-panel rounded-2xl p-5 border border-border bg-card shadow-xl space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2 border-b border-border/60 pb-2">
               <Bookmark className="h-4 w-4 text-emerald-500" />
