@@ -6,6 +6,8 @@ import { useSettings } from "../../context/SettingsContext";
 import { AnimatePresence } from "framer-motion";
 import { trackEvent } from "../../lib/analytics";
 
+import { isSimulatedOffline } from "../../lib/offlineSimulator";
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -14,25 +16,37 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const { hideBusButton, t } = useSettings();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isOffline, setIsOffline] = useState(() => !navigator.onLine || isSimulatedOffline());
   const [showOfflineBanner, setShowOfflineBanner] = useState(true);
 
   useEffect(() => {
     const handleOnline = () => {
-      setIsOffline(false);
-      setShowOfflineBanner(false);
+      if (!isSimulatedOffline()) {
+        setIsOffline(false);
+        setShowOfflineBanner(false);
+      }
     };
     const handleOffline = () => {
       setIsOffline(true);
       setShowOfflineBanner(true);
     };
+    const handleSimulatedChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ enabled: boolean }>;
+      const isSim = customEvent.detail ? customEvent.detail.enabled : isSimulatedOffline();
+      setIsOffline(!navigator.onLine || isSim);
+      if (!navigator.onLine || isSim) {
+        setShowOfflineBanner(true);
+      }
+    };
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+    window.addEventListener("simulated_offline_change", handleSimulatedChange);
 
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("simulated_offline_change", handleSimulatedChange);
     };
   }, []);
 
