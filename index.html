@@ -19,12 +19,28 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      // Only register Service Worker in production to prevent stale Vite dev chunk conflicts
+      const isLocalhost = Boolean(
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '[::1]' ||
+        window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+      );
+
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker registered successfully:', reg.scope))
-            .catch(err => console.log('Service Worker registration failed:', err));
-        });
+        if (!isLocalhost) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+              .then(reg => console.log('Service Worker registered:', reg.scope))
+              .catch(err => console.log('Service Worker registration failed:', err));
+          });
+        } else {
+          // Unregister any stale dev workers on localhost
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (const reg of registrations) {
+              reg.unregister();
+            }
+          });
+        }
       }
     </script>
   </body>
