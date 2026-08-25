@@ -562,7 +562,7 @@ export const NetworkDataManagerView: React.FC = () => {
         </div>
 
         {/* Tab Selection Bar */}
-        <div className="flex items-center gap-2 mt-6 border-b border-border pb-3 overflow-x-auto">
+        <div className="flex items-center gap-1.5 sm:gap-2 mt-6 border-b border-border pb-3 overflow-x-auto no-scrollbar select-none -mx-1 px-1">
           <button
             onClick={() => setActiveTab("stations")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${

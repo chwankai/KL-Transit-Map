@@ -1035,7 +1035,7 @@ export const StorageInspectorView: React.FC = () => {
         </div>
 
         {/* Section Navigation Tabs */}
-        <div className="flex items-center gap-1.5 border-b border-border mt-6 pb-2.5 overflow-x-auto">
+        <div className="flex items-center gap-1.5 border-b border-border mt-6 pb-2.5 overflow-x-auto no-scrollbar select-none -mx-1 px-1">
           <button
             onClick={() => setActiveSection("overview")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${

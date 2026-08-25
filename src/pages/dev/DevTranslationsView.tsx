@@ -409,7 +409,7 @@ export const translateLine = (lineName: string, lang: Language): string => {
 
         {/* Section Navigation Tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border mt-6 pb-2.5">
-          <div className="flex items-center gap-1.5 overflow-x-auto">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar select-none -mx-1 px-1">
             <button
               onClick={() => setActiveTab("ui_keys")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${

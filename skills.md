@@ -1,3 +1,3 @@
 - avoid using complicated word if there is simpler term to replace
-- the layout should always be minimalistic and user-friendly, always remember to adapt into btoh light and dark mode
+- the layout should always be minimalistic and user-friendly, always remember to adapt into btoh light and dark mode, and mobile view friendly
 - remember for the translations across the production page, english only is accepted in dev environment
