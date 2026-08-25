@@ -9,6 +9,7 @@ Built using **React, TypeScript, Vite, Tailwind CSS, and Leaflet**.
 ## 🚀 Key Features
 
 * **Interactive Real-Scale Map**: Realistic GPS-aligned vector rail tracks, walkway transfer links, and interactive station markers with custom line badges. Click track lines to view line-specific summaries.
+* **Real-Time GPS Location & Tracking**: Live GPS positioning on the interactive map with device heading orientation, pulse indicator, nearest station proximity detection, and continuous follow mode.
 * **Schematic Map Viewer**: Quick access to the standard Klang Valley Rail Map and the upcoming Circle Line Map.
 * **GTFS Static Schedule Engine**: Calculates live departure timetables mathematically using Template Trips (`stop_times.txt`) and Frequency Windows (`frequencies.txt`) from Malaysia's open static GTFS feeds.
 * **Live Dynamic Countdowns**: Real-time ticket ticker counting down arrival minutes and seconds for the nearest trains (updates every 10 seconds), with flashing status indicators.
