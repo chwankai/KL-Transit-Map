@@ -167,11 +167,16 @@ export const PlanView: React.FC = () => {
     const saved = localStorage.getItem("saved_routes");
     if (!saved) return [];
     try {
-      const parsed = JSON.parse(saved) as { origin: string; dest: string }[];
-      return parsed.map(route => ({
-        origin: route.origin === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (route.origin === "Pasar Jawa" ? "Jambatan Kota" : route.origin),
-        dest: route.dest === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (route.dest === "Pasar Jawa" ? "Jambatan Kota" : route.dest)
-      }));
+      const parsed = JSON.parse(saved) as any[];
+      return parsed
+        .map((route) => {
+          const rawDest = route.dest || route.destination || "";
+          return {
+            origin: route.origin === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (route.origin === "Pasar Jawa" ? "Jambatan Kota" : route.origin),
+            dest: rawDest === "Tun Razak Exchange" ? "Tun Razak Exchange (TRX)" : (rawDest === "Pasar Jawa" ? "Jambatan Kota" : rawDest)
+          };
+        })
+        .filter((r) => r.origin && r.dest);
     } catch {
       return [];
     }

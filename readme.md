@@ -1,8 +1,8 @@
 # Klang Valley Transit Map & Route Planner
 
-An interactive transit map, GTFS static schedule explorer, and multi-line route planner for the Klang Valley rail transit network in Kuala Lumpur, Malaysia.
+An interactive transit map, GTFS static schedule explorer, multi-line route planner, and bus network explorer for the Klang Valley transit system in Kuala Lumpur, Malaysia.
 
-Built using **React, TypeScript, Vite, Tailwind CSS, and Leaflet**.
+Built using **React, TypeScript, Vite, Tailwind CSS, Leaflet, and data.gov.my Open APIs**.
 
 ---
 
@@ -10,11 +10,12 @@ Built using **React, TypeScript, Vite, Tailwind CSS, and Leaflet**.
 
 * **Interactive Real-Scale Map**: Realistic GPS-aligned vector rail tracks, walkway transfer links, and interactive station markers with custom line badges. Click track lines to view line-specific summaries.
 * **Real-Time GPS Location & Tracking**: Live GPS positioning on the interactive map with device heading orientation, pulse indicator, nearest station proximity detection, and continuous follow mode.
-* **Schematic Map Viewer**: Quick access to the standard Klang Valley Rail Map and the upcoming Circle Line Map.
-* **GTFS Static Schedule Engine**: Calculates live departure timetables mathematically using Template Trips (`stop_times.txt`) and Frequency Windows (`frequencies.txt`) from Malaysia's open static GTFS feeds.
-* **Live Dynamic Countdowns**: Real-time ticket ticker counting down arrival minutes and seconds for the nearest trains (updates every 10 seconds), with flashing status indicators.
-* **Smart Route Planner**: Finds the fastest path across the network with exact transfer instructions, cashless fare calculations, and total travel distance estimation.
-* **Lines Explorer**: Explores stations by transit lines (sorted MRT > LRT > Monorail > BRT), featuring interchange codes, walking walkway connections, and a global search tool.
+* **Smart Route Planner & Saved Routes**: Finds the fastest path across the network with exact transfer instructions, cashless fare calculations, total travel distance estimation, and station/route bookmarks.
+* **Rapid Bus & Rail Explorer**: Explore stations by transit lines (sorted MRT > LRT > Monorail > BRT > KTM) and browse 100+ Rapid Bus routes with stops, schedules, and interchange badges.
+* **GTFS Static Schedule Engine & Countdowns**: Real-time ticker counting down arrival minutes and seconds for the nearest trains (updates every 10 seconds), with dynamic frequency calculation.
+* **RapidKL Ridership & Analytics**: Live transit insights and ridership trends powered by Malaysia's official `data.gov.my` Data Catalogue API.
+* **Multilingual Localization**: Complete localized interface supporting English, Bahasa Melayu, and Chinese (Simplified).
+* **Offline Readiness & PWA Caching**: Full client-side caching of map data, station floor plans, and schedules for reliable offline transit planning.
 * **Dark / Light Theme Support**: Custom system-preference styling with modern dark and light theme toggles.
 
 ---
@@ -23,8 +24,9 @@ Built using **React, TypeScript, Vite, Tailwind CSS, and Leaflet**.
 
 * **Framework**: React 18, Vite, TypeScript
 * **Styling**: Tailwind CSS, Lucide React Icons
-* **Mapping**: Leaflet (via OSM)
-* **Routing**: Dijkstra's algorithm for multi-modal pathfinding
+* **Mapping**: Leaflet (via OSM tile providers)
+* **Routing**: Dijkstra's algorithm for multi-modal pathfinding and fare calculations
+* **Data Sources**: Official GTFS static feeds & data.gov.my Open Data Catalogue API
 
 ---
 
@@ -39,18 +41,24 @@ Built using **React, TypeScript, Vite, Tailwind CSS, and Leaflet**.
 │   ├── station_schedules.json  # Pre-compiled static timetable data
 │   └── maps/                   # Schematic rail maps (JPG, PDF)
 └── src/
-    ├── context/                # Theme and settings state providers
+    ├── context/                # Theme, language, and settings state providers
     ├── components/
     │   └── layout/             # Layout components (Header, Footer, Settings)
     ├── lib/
     │   ├── gtfs-schedule.ts    # Main countdown schedule algorithm
+    │   ├── locationSimulator.ts# Mock GPS geolocation simulator
+    │   ├── offlineSimulator.ts # Network simulation and storage manager
     │   ├── routing.ts          # Pathfinding & fare calculation engine
+    │   ├── translations.ts     # Multilingual i18n dictionaries
     │   └── transit-data.ts     # Station coordinates & structural definitions
     └── pages/
         ├── MapView.tsx         # OSM Leaflet / Schematic map page
         ├── PlanView.tsx        # Pathfinding and journey query page
         ├── LinesView.tsx       # Transit line explorer with global search
-        └── StationInfoView.tsx # Live schedules & timetables info page
+        ├── BusView.tsx         # Rapid Bus network explorer
+        ├── StationInfoView.tsx # Live schedules & station floor plan page
+        ├── GuideView.tsx       # Transit guide and fare policy reference
+        └── dev/                # Developer portal, GPS simulator & analytics
 ```
 
 ---
@@ -88,7 +96,7 @@ The static timetables and shapes are parsed directly from Malaysia's Open Data G
    ```bash
    python fetch_gtfs_data.py
    ```
-2. Compile and compile coordinates and shapes:
+2. Compile schedules and coordinates:
    ```bash
    python fetch_schedules.py
    ```

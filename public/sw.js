@@ -7,7 +7,9 @@ const ASSETS_TO_CACHE = [
   "/station_coords.json",
   "/station_schedules.json",
   "/rail_tracks.json",
-  "/gtfs_data.json"
+  "/gtfs_data.json",
+  "/rapid_bus_data.json",
+  "/manifest.json"
 ];
 
 self.addEventListener("install", (e) => {
